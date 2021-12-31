@@ -313,79 +313,6 @@ $(() => {
     });
 
     /*
-        Click event for the quick visualization buttons
-     */
-    $('.quick-buttons *[class*="-tile"]').on('click', function() {
-        if (
-            !$(`#timetable .${this.classList[0].split('-')[0]}`).hasClass(
-                'clash',
-            ) &&
-            $(`#timetable .${this.classList[0].split('-')[0]}`).children('div')
-                .length == 0
-        ) {
-            if ($(this).hasClass('highlight')) {
-                $(`#timetable .${this.classList[0].split('-')[0]}`).removeClass(
-                    'highlight',
-                );
-                // remove slots from highlighted
-                var index = highlighted[activeTable.id].indexOf(
-                    this.classList[0].split('-')[0],
-                );
-                highlighted[activeTable.id].splice(index, 1);
-            } else {
-                $(`#timetable .${this.classList[0].split('-')[0]}`).addClass(
-                    'highlight',
-                );
-                // add slots to highlighted
-                highlighted[activeTable.id].push(
-                    this.classList[0].split('-')[0],
-                );
-            }
-            $(this).toggleClass('highlight');
-        }
-    });
-
-    /*
-        Click event for the periods when quick visualization is enabled
-     */
-    $('#timetable .period:not([disabled])').on('click', function() {
-        if (
-            $('#quick-toggle').attr('data-state') == 'enabled' &&
-            !$(this).hasClass('clash') &&
-            $(this).children('div').length === 0
-        ) {
-            $(this).toggleClass('highlight');
-            if (!$(this).hasClass('highlight')) {
-                $(`.quick-buttons .${this.classList[1]}-tile`).removeClass(
-                    'highlight',
-                );
-                // remove slots from highlighted
-                var index = highlighted[activeTable.id].indexOf(
-                    this.classList[2],
-                );
-                highlighted[activeTable.id].splice(index, 1);
-                return;
-            } else {
-                // add slots to highlighted
-                if (this.classList.length === 3) {
-                    // some course may only have lab slot
-                    highlighted[activeTable.id].push(this.classList[1]);
-                } else {
-                    highlighted[activeTable.id].push(this.classList[2]);
-                }
-            }
-            if (
-                $(`#timetable .${this.classList[1]}`).not('.highlight')
-                    .length === 0
-            ) {
-                $(`.quick-buttons .${this.classList[1]}-tile`).addClass(
-                    'highlight',
-                );
-            }
-        }
-    });
-
-    /*
         Getting saved data from localforage
      */
     localforage
@@ -698,6 +625,85 @@ function checkSlotClash() {
         }
     });
 }
+
+/*
+    Function to initialize quick visualization
+ */
+function initializeQuickVisualization() {
+    /*
+        Click event for the quick visualization buttons
+     */
+    $('.quick-buttons *[class*="-tile"]').on('click', function() {
+        if (
+            !$(`#timetable .${this.classList[0].split('-')[0]}`).hasClass(
+                'clash',
+            ) &&
+            $(`#timetable .${this.classList[0].split('-')[0]}`).children('div')
+                .length == 0
+        ) {
+            if ($(this).hasClass('highlight')) {
+                $(`#timetable .${this.classList[0].split('-')[0]}`).removeClass(
+                    'highlight',
+                );
+                // remove slots from highlighted
+                var index = highlighted[activeTable.id].indexOf(
+                    this.classList[0].split('-')[0],
+                );
+                highlighted[activeTable.id].splice(index, 1);
+            } else {
+                $(`#timetable .${this.classList[0].split('-')[0]}`).addClass(
+                    'highlight',
+                );
+                // add slots to highlighted
+                highlighted[activeTable.id].push(
+                    this.classList[0].split('-')[0],
+                );
+            }
+            $(this).toggleClass('highlight');
+        }
+    });
+
+    /*
+        Click event for the periods when quick visualization is enabled
+     */
+    $('#timetable .period:not([disabled])').on('click', function() {
+        if (
+            $('#quick-toggle').attr('data-state') == 'enabled' &&
+            !$(this).hasClass('clash') &&
+            $(this).children('div').length === 0
+        ) {
+            $(this).toggleClass('highlight');
+            if (!$(this).hasClass('highlight')) {
+                $(`.quick-buttons .${this.classList[1]}-tile`).removeClass(
+                    'highlight',
+                );
+                // remove slots from highlighted
+                var index = highlighted[activeTable.id].indexOf(
+                    this.classList[2],
+                );
+                highlighted[activeTable.id].splice(index, 1);
+                return;
+            } else {
+                // add slots to highlighted
+                if (this.classList.length === 3) {
+                    // some course may only have lab slot
+                    highlighted[activeTable.id].push(this.classList[1]);
+                } else {
+                    highlighted[activeTable.id].push(this.classList[2]);
+                }
+            }
+            if (
+                $(`#timetable .${this.classList[1]}`).not('.highlight')
+                    .length === 0
+            ) {
+                $(`.quick-buttons .${this.classList[1]}-tile`).addClass(
+                    'highlight',
+                );
+            }
+        }
+    });
+}
+
 /*
     Function to initialize the timetable
  */
@@ -707,6 +713,7 @@ window.initializeTimetable = () => {
         .slice(2)
         .hide();
     $('#timetable tr td:not(:first-child)').remove();
+    $('.quick-buttons table').html('<tr></tr><tr></tr><tr></tr>');
 
     if (window.campus == 'Chennai') {
         timetable = require('../schemas/chennai.json');
@@ -718,6 +725,7 @@ window.initializeTimetable = () => {
         lab = timetable.lab;
     var theoryIndex = 0,
         labIndex = 0;
+    var $quickButtons = $('.quick-buttons').eq(0); // Morning slot quick buttons
 
     while (theoryIndex < theory.length || labIndex < lab.length) {
         const theorySlots = theory[theoryIndex];
@@ -727,8 +735,10 @@ window.initializeTimetable = () => {
             $('#timetable tr:first').append(
                 '<td class="lunch" style="width: 8px;" rowspan="9">L<br />U<br />N<br />C<br />H</td>',
             );
+            $quickButtons = $('.quick-buttons').eq(1); // Afternoon slot quick buttons
             ++theoryIndex;
             ++labIndex;
+
             continue;
         }
 
@@ -754,18 +764,33 @@ window.initializeTimetable = () => {
             const day = days[i];
 
             if (theorySlots && theorySlots.days && day in theorySlots.days) {
-                $period.text(theorySlots.days[day]);
-                $period.addClass(theorySlots.days[day]);
+                const slot = theorySlots.days[day];
+                $period.text(slot);
+                $period.addClass(slot);
                 $(`#${day}`).show();
+
+                // Add quick buttons for theory slots
+                if (!$(`.${slot}-tile`).get(0)) {
+                    $quickButtons
+                        .find('tr')
+                        .eq(slot.length - 2)
+                        .append(
+                            `<button class="${slot}-tile btn quick-button">${slot}</button>`,
+                        );
+                }
             }
 
             if (labSlots && labSlots.days && day in labSlots.days) {
+                const slot = labSlots.days[day];
                 $period.text(
-                    ($period.text() != '' ? $period.text() + ' / ' : '') +
-                        labSlots.days[day],
+                    ($period.text() != '' ? $period.text() + ' / ' : '') + slot,
                 );
-                $period.addClass(labSlots.days[day]);
+                $period.addClass(slot);
                 $(`#${day}`).show();
+            }
+
+            if ($period.text() == '') {
+                $period.attr('disabled', true);
             }
 
             $(`#${day}`).append($period);
@@ -779,6 +804,8 @@ window.initializeTimetable = () => {
             ++labIndex;
         }
     }
+
+    initializeQuickVisualization();
 };
 
 /*

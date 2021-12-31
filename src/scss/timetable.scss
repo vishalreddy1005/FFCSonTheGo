@@ -44,10 +44,19 @@
 
     table {
         margin: auto;
+
+        :first-child {
+            margin-top: 0.3rem;
+        }
+
+        :last-child {
+            margin-bottom: 0.3rem;
+        }
     }
 
-    td {
+    tr {
         display: flex;
+        margin: 0 0.3rem;
     }
 
     .quick-button {
