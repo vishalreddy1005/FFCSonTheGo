@@ -773,7 +773,7 @@ window.initializeTimetable = () => {
                 if (!$(`.${slot}-tile`).get(0)) {
                     $quickButtons
                         .find('tr')
-                        .eq(slot.length - 2)
+                        .eq(slot.replace(/[^A-Z]/gi, '').length - 1)
                         .append(
                             `<button class="${slot}-tile btn quick-button">${slot}</button>`,
                         );
