@@ -552,315 +552,33 @@
         <div class="container-xxl text-center noselect">
             <div id="timetable" class="table-responsive">
                 <table class="table table-bordered mt-2 mb-0">
-                    <tr>
+                    <tr id="theory">
                         <td class="day">THEORY <br />HOURS</td>
-                        <td class="theory-hour">
-                            08:00 AM <br />to <br />08:50 AM
-                        </td>
-                        <td class="theory-hour">
-                            09:00 AM <br />to <br />09:50 AM
-                        </td>
-                        <td class="theory-hour">
-                            10:00 AM <br />to <br />10:50 AM
-                        </td>
-                        <td class="theory-hour">
-                            11:00 AM <br />to <br />11:50 AM
-                        </td>
-                        <td class="theory-hour">
-                            12:00 PM <br />to <br />12:50 PM
-                        </td>
-                        <td class="theory-hour"></td>
-                        <td width="8px" rowspan="7" class="lunch">
-                            <strong>L <br />U <br />N <br />C <br />H</strong>
-                        </td>
-                        <td class="theory-hour">
-                            02:00 PM <br />to <br />02:50 PM
-                        </td>
-                        <td class="theory-hour">
-                            03:00 PM <br />to <br />03:50 PM
-                        </td>
-                        <td class="theory-hour">
-                            04:00 PM <br />to <br />04:50 PM
-                        </td>
-                        <td class="theory-hour">
-                            05:00 PM <br />to <br />05:50 PM
-                        </td>
-                        <td class="theory-hour">
-                            06:00 PM <br />to <br />06:50 PM
-                        </td>
-                        <td class="theory-hour">
-                            07:00 PM <br />to <br />07:50 PM
-                        </td>
-                        <!--<td class="theory-hour">07:00 PM<br>to<br>07:50 PM</td>
-                        <td class="theory-hour">08:00 PM<br>to<br>08:50 PM</td>-->
                     </tr>
-                    <tr>
+                    <tr id="lab">
                         <td class="day">LAB <br />HOURS</td>
-                        <td class="lab-hour">
-                            08:00 AM <br />to <br />08:45 AM
-                        </td>
-                        <td class="lab-hour">
-                            08:46 AM <br />to <br />09:30 AM
-                        </td>
-                        <td class="lab-hour">
-                            10:00 AM <br />to <br />10:45 AM
-                        </td>
-                        <td class="lab-hour">
-                            10:46 AM <br />to <br />11:30 AM
-                        </td>
-                        <td class="lab-hour">
-                            11:31 AM <br />to <br />12:15 AM
-                        </td>
-                        <td class="lab-hour">
-                            12:16 AM <br />to <br />01:00 PM
-                        </td>
-                        <td class="lab-hour">
-                            02:00 PM <br />to <br />02:45 PM
-                        </td>
-                        <td class="lab-hour">
-                            02:46 PM <br />to <br />03:30 PM
-                        </td>
-                        <td class="lab-hour">
-                            04:00 PM <br />to <br />04:45 PM
-                        </td>
-                        <td class="lab-hour">
-                            04:46 PM <br />to <br />05:30 PM
-                        </td>
-                        <td class="lab-hour">
-                            05:31 PM <br />to <br />06:15 PM
-                        </td>
-                        <td class="lab-hour">
-                            06:16 PM <br />to <br />07:00 PM
-                        </td>
-                        <!--<td class="lab-hour">07:30 PM<br>to<br>08:20 PM</td>
-                        <td class="lab-hour">08:20 PM<br>to<br>09:10 PM</td>-->
                     </tr>
-                    <tr>
-                        <!-- IMPORTANT: It's important to maintain the order of class. i.e. A1,F1,D1,.. are 2nd -->
+                    <tr id="mon" style="display: none;">
                         <td class="day">MON</td>
-                        <td class="period A1 L1 no-post-lab">
-                            A1 / L1
-                        </td>
-                        <td class="period F1 L2 no-pre-theory">
-                            F1 / L2
-                        </td>
-                        <td class="period D1 L3 no-post-lab">
-                            D1 / L3
-                        </td>
-                        <td class="period TB1 L4 no-post-lab no-pre-theory">
-                            TB1 / L4
-                        </td>
-                        <td class="period TG1 L5 no-post-lab no-pre-theory">
-                            TG1 / L5
-                        </td>
-                        <td class="period L6 no-pre-theory">L6</td>
-                        <td class="period A2 L31 no-post-lab">
-                            A2 / L31
-                        </td>
-                        <td class="period F2 L32 no-pre-theory">
-                            F2 / L32
-                        </td>
-                        <td class="period D2 L33 no-post-lab">
-                            D2 / L33
-                        </td>
-                        <td class="period TB2 L34 no-post-lab no-pre-theory">
-                            TB2 / L34
-                        </td>
-                        <td class="period TG2 L35 no-post-lab no-pre-theory">
-                            TG2 / L35
-                        </td>
-                        <td class="period V3 L36 no-pre-theory">
-                            V3 / L36
-                        </td>
-                        <!--<td class="period H1 L61">H1 / L61</td>
-                        <td class="period K1 L62">K1 / L62</td>-->
                     </tr>
-                    <tr>
+                    <tr id="tue" style="display: none;">
                         <td class="day">TUE</td>
-                        <td class="period B1 L7 no-post-lab">
-                            B1 / L7
-                        </td>
-                        <td class="period G1 L8 no-pre-theory">
-                            G1 / L8
-                        </td>
-                        <td class="period E1 L9 no-post-lab">
-                            E1 / L9
-                        </td>
-                        <td class="period TC1 L10 no-post-lab no-pre-theory">
-                            TC1 / L10
-                        </td>
-                        <td class="period TAA1 L11 no-post-lab no-pre-theory">
-                            TAA1 / L11
-                        </td>
-                        <td class="period L12 no-pre-theory">L12</td>
-                        <td class="period B2 L37 no-post-lab">
-                            B2 / L37
-                        </td>
-                        <td class="period G2 L38 no-pre-theory">
-                            G2 / L38
-                        </td>
-                        <td class="period E2 L39 no-post-lab">
-                            E2 / L39
-                        </td>
-                        <td class="period TC2 L40 no-post-lab no-pre-theory">
-                            TC2 / L40
-                        </td>
-                        <td class="period TAA2 L41 no-post-lab no-pre-theory">
-                            TAA2 / L41
-                        </td>
-                        <td class="period V4 L42 no-pre-theory">
-                            V4 / L42
-                        </td>
-                        <!--<td class="period H2 L63">H2 / L63</td>
-                        <td class="period K2 L64">K2 / L64</td>-->
                     </tr>
-                    <tr>
+                    <tr id="wed" style="display: none;">
                         <td class="day">WED</td>
-                        <td class="period C1 L13 no-post-lab">
-                            C1 / L13
-                        </td>
-                        <td class="period A1 L14 no-pre-theory">
-                            A1 / L14
-                        </td>
-                        <td class="period F1 L15 no-post-lab">
-                            F1 / L15
-                        </td>
-                        <td class="period V1 L16 no-post-lab no-pre-theory">
-                            V1 / L16
-                        </td>
-                        <td class="period V2 no-post-lab no-pre-theory">
-                            V2
-                        </td>
-                        <td class="period"></td>
-                        <td class="period C2 L43 no-post-lab">
-                            C2 / L43
-                        </td>
-                        <td class="period A2 L44 no-pre-theory">
-                            A2 / L44
-                        </td>
-                        <td class="period F2 L45 no-post-lab">
-                            F2 / L45
-                        </td>
-                        <td class="period TD2 L46 no-post-lab no-pre-theory">
-                            TD2 / L46
-                        </td>
-                        <td class="period TBB2 L47 no-post-lab no-pre-theory">
-                            TBB2 / L47
-                        </td>
-                        <td class="period V5 L48 no-pre-theory">
-                            V5 / L48
-                        </td>
-                        <!--<td class="period H3 L65">H3 / L65</td>
-                        <td class="period K3 L66">K3 / L66</td>-->
                     </tr>
-                    <tr>
+                    <tr id="thu" style="display: none;">
                         <td class="day">THU</td>
-                        <td class="period D1 L19 no-post-lab">
-                            D1 / L19
-                        </td>
-                        <td class="period B1 L20 no-pre-theory">
-                            B1 / L20
-                        </td>
-                        <td class="period G1 L21 no-post-lab">
-                            G1 / L21
-                        </td>
-                        <td class="period TE1 L22 no-post-lab no-pre-theory">
-                            TE1 / L22
-                        </td>
-                        <td class="period TCC1 L23 no-post-lab no-pre-theory">
-                            TCC1 / L23
-                        </td>
-                        <td class="period L24 no-pre-theory">L24</td>
-                        <td class="period D2 L49 no-post-lab">
-                            D2 / L49
-                        </td>
-                        <td class="period B2 L50 no-pre-theory">
-                            B2 / L50
-                        </td>
-                        <td class="period G2 L51 no-post-lab">
-                            G2 / L51
-                        </td>
-                        <td class="period TE2 L52 no-post-lab no-pre-theory">
-                            TE2 / L52
-                        </td>
-                        <td class="period TCC2 L53 no-post-lab no-pre-theory">
-                            TCC2 / L53
-                        </td>
-                        <td class="period V6 L54 no-pre-theory">
-                            V6 / L54
-                        </td>
-                        <!--<td class="period H4 L67">H4 / L67</td>
-                        <td class="period K4 L68">K4 / L68</td>-->
                     </tr>
-                    <tr>
+                    <tr id="fri" style="display: none;">
                         <td class="day">FRI</td>
-                        <td class="period E1 L25 no-post-lab">
-                            E1 / L25
-                        </td>
-                        <td class="period C1 L26 no-pre-theory">
-                            C1 / L26
-                        </td>
-                        <td class="period TA1 L27 no-post-lab">
-                            TA1 / L27
-                        </td>
-                        <td class="period TF1 L28 no-post-lab no-pre-theory">
-                            TF1 / L28
-                        </td>
-                        <td class="period TD1 L29 no-post-lab no-pre-theory">
-                            TD1 / L29
-                        </td>
-                        <td class="period L30 no-pre-theory">L30</td>
-                        <td class="period E2 L55 no-post-lab">
-                            E2 / L55
-                        </td>
-                        <td class="period C2 L56 no-pre-theory">
-                            C2 / L56
-                        </td>
-                        <td class="period TA2 L57 no-post-lab">
-                            TA2 / L57
-                        </td>
-                        <td class="period TF2 L58 no-post-lab no-pre-theory">
-                            TF2 / L58
-                        </td>
-                        <td class="period TDD2 L59 no-post-lab no-pre-theory">
-                            TDD2 / L59
-                        </td>
-                        <td class="period V7 L60 no-pre-theory">
-                            V7 / L60
-                        </td>
-                        <!--<td class="period H5 L69">H5 / L69</td>
-                        <td class="period K5 L70">K5 / L70</td>-->
                     </tr>
-                    <!-- <tr>
+                    <tr id="sat" style="display: none;">
                         <td class="day">SAT</td>
-                        <td class="period V8 L71">V8 / L71</td>
-                        <td class="period X1 L72">X1 / L72</td>
-                        <td class="period X1 L73">X1 / L73</td>
-                        <td class="period Y1 L74">Y1 / L74</td>
-                        <td class="period Y1 L75">Y1 / L75</td>
-                        <td class="period L76">L76</td>
-                        <td class="period X2 L77">X2 / L77</td>
-                        <td class="period Z L78">Z / L78</td>
-                        <td class="period Y2 L79">Y2 / L79</td>
-                        <td class="period W2 L80">W2 / L80</td>
-                        <td class="period W2 L81">W2 / L81</td>
-                        <td class="period V9 L82">V9 / L82</td>
                     </tr>
-                    <tr>
+                    <tr id="sun" style="display: none;">
                         <td class="day">SUN</td>
-                        <td class="period V10 L83">V10 / L83</td>
-                        <td class="period Y1 L84">Y1 / L84</td>
-                        <td class="period Y1 L85">Y1 / L85</td>
-                        <td class="period X1 L86">X1 / L86</td>
-                        <td class="period X1 L87">X1 / L87</td>
-                        <td class="period L88">L88</td>
-                        <td class="period Y2 L89">Y2 / L89</td>
-                        <td class="period Z L90">Z / L90</td>
-                        <td class="period X2 L91">X2 / L91</td>
-                        <td class="period W2 L92">W2 / L92</td>
-                        <td class="period W2 L93">W2 / L93</td>
-                        <td class="period V11 L94">V11 / L94</td>
-                    </tr> -->
+                    </tr>
                 </table>
             </div>
         </div>

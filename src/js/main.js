@@ -54,6 +54,7 @@ function switchCampus() {
     }
 
     getCourses();
+    initializeTimetable();
 }
 
 /*

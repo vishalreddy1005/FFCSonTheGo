@@ -698,6 +698,88 @@ function checkSlotClash() {
         }
     });
 }
+/*
+    Function to initialize the timetable
+ */
+window.initializeTimetable = () => {
+    var timetable;
+    $('#timetable tr')
+        .slice(2)
+        .hide();
+    $('#timetable tr td:not(:first-child)').remove();
+
+    if (window.campus == 'Chennai') {
+        timetable = require('../schemas/chennai.json');
+    } else {
+        timetable = require('../schemas/vellore.json');
+    }
+
+    var theory = timetable.theory,
+        lab = timetable.lab;
+    var theoryIndex = 0,
+        labIndex = 0;
+
+    while (theoryIndex < theory.length || labIndex < lab.length) {
+        const theorySlots = theory[theoryIndex];
+        const labSlots = lab[labIndex];
+
+        if (theorySlots && labSlots && !theorySlots.days && !labSlots.days) {
+            $('#timetable tr:first').append(
+                '<td class="lunch" style="width: 8px;" rowspan="9">L<br />U<br />N<br />C<br />H</td>',
+            );
+            ++theoryIndex;
+            ++labIndex;
+            continue;
+        }
+
+        const $theoryHour = $('<td class="theory-hour"></td>');
+        const $labHour = $('<td class="lab-hour"></td>');
+
+        if (theorySlots && theorySlots.start && theorySlots.end) {
+            $theoryHour.html(
+                `${theorySlots.start}<br />to<br />${theorySlots.end}`,
+            );
+        }
+
+        if (labSlots && labSlots.start && labSlots.end) {
+            $labHour.html(`${labSlots.start}<br />to<br />${labSlots.end}`);
+        }
+
+        $('#theory').append($theoryHour);
+        $('#lab').append($labHour);
+
+        const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        for (var i = 0; i < days.length; ++i) {
+            const $period = $('<td class="period"></td>');
+            const day = days[i];
+
+            if (theorySlots && theorySlots.days && day in theorySlots.days) {
+                $period.text(theorySlots.days[day]);
+                $period.addClass(theorySlots.days[day]);
+                $(`#${day}`).show();
+            }
+
+            if (labSlots && labSlots.days && day in labSlots.days) {
+                $period.text(
+                    ($period.text() != '' ? $period.text() + ' / ' : '') +
+                        labSlots.days[day],
+                );
+                $period.addClass(labSlots.days[day]);
+                $(`#${day}`).show();
+            }
+
+            $(`#${day}`).append($period);
+        }
+
+        if (theorySlots && !theorySlots.lunch) {
+            ++theoryIndex;
+        }
+
+        if (labSlots && !labSlots.lunch) {
+            ++labIndex;
+        }
+    }
+};
 
 /*
     Function to add a course to the timetable
