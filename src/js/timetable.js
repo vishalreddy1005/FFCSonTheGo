@@ -294,6 +294,7 @@ $(() => {
             $('i', this).prop('class', 'fas fa-eye');
             $('span', this).html('&nbsp;&nbsp;Enable Quick Visualization');
             $(this).attr('data-state', 'disabled');
+            $('.highlight:not(:has(div))').removeClass('highlight');
         } else {
             $('i', this).prop('class', 'fas fa-eye-slash');
             $('span', this).html('&nbsp;&nbsp;Disable Quick Visualization');
@@ -393,15 +394,6 @@ function updateLocalForage() {
 function getTableIndex(id) {
     return timetableStorage.findIndex(function(el) {
         return el.id === id;
-    });
-}
-
-/*
-    Function to get the course index
- */
-function getCourseIndex(id) {
-    return activeTable.data.findIndex(function(el) {
-        return el.courseId === id;
     });
 }
 
@@ -807,6 +799,9 @@ window.addCourseToTimetable = (courseData) => {
     Function to remove a course from the timetable
  */
 window.removeCourseFromTimetable = (course) => {
+    $(`#timetable tr td div[data-course="${course}"]`)
+        .parent()
+        .removeClass('highlight');
     $(`#timetable tr td div[data-course="${course}"]`).remove();
     checkSlotClash();
     updateLocalForage();
