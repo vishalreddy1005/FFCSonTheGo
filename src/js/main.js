@@ -12,6 +12,8 @@ import '../scss/course-panel.scss';
 import '../scss/timetable.scss';
 import '../scss/course-list.scss';
 
+import localforage from '../../node_modules/localforage/dist/localforage';
+
 import './attacher';
 import './course-panel';
 import './timetable';
@@ -22,40 +24,63 @@ const lastUpdate = require('../../package.json')['lastUpdate'];
 
 $(function() {
     /*
-        Event to listen to hash changes
-     */
-    $(window).on('hashchange', () => {
-        switchCampus();
-    });
-
-    /*
         Remove focus from quick buttons once clicked
      */
     $('.quick-buttons .btn').on('click', function() {
         $(this).trigger('blur');
     });
 
-    switchCampus();
+    localforage.getItem('campus').then((campus) => {
+        window.location.hash = campus || '#Vellore';
+        switchCampus();
+
+        /*
+            Event to listen for hash changes
+         */
+        $(window).on('hashchange', () => {
+            if (window.location.hash === `#${window.campus}`) {
+                return;
+            }
+
+            new bootstrap.Modal($('#switch-campus-modal').get(0)).show();
+        });
+    });
+
     Utils.removeTouchHoverCSSRule();
 });
 
 /*
     Function to switch campuses
  */
-function switchCampus() {
-    if (window.location.hash === '#Chennai') {
+window.switchCampus = () => {
+    if (window.location.hash.toLowerCase() === '#chennai') {
         $('#campus').text('Chennai Campus');
         $('#last-update').text(lastUpdate.chennai);
+        window.location.hash = '#Chennai';
         window.campus = 'Chennai';
-    } else {
+    } else if (window.location.hash.toLowerCase() === '#vellore') {
         $('#campus').text('Vellore Campus');
         $('#last-update').text(lastUpdate.vellore);
+        window.location.hash = '#Vellore';
         window.campus = 'Vellore';
+    } else {
+        window.location.hash = `#${window.campus}`;
     }
 
-    getCourses();
-    initializeTimetable();
-}
+    localforage.getItem('campus').then((campus) => {
+        localforage.setItem('campus', window.campus).catch(console.error);
+
+        if (campus && campus != window.campus) {
+            localforage
+                .removeItem('timetableStorage')
+                .then(window.location.reload());
+            return;
+        }
+
+        getCourses();
+        initializeTimetable();
+    });
+};
 
 /*
     Redirect to the GitHub page when Ctrl + U is clicked
