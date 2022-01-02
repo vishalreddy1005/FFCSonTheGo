@@ -5,6 +5,7 @@
 
 import localforage from '../../node_modules/localforage/dist/localforage';
 import html2canvas from '../../node_modules/html2canvas/dist/html2canvas';
+import '../../node_modules/datejs';
 
 var timetableStorage = [
     {
@@ -523,106 +524,64 @@ function addTableToPicker(tableId, tableName) {
 }
 
 /*
-    Function to check is slots are clashing
+    Function to check if slots are clashing
  */
 function checkSlotClash() {
-    // Remove table-danger class (shows clashing) form tr in course list table.
-    $('#course-list tbody tr').removeClass('table-danger');
-    $('#timetable tr .hidden').removeClass('hidden');
+    $('#timetable tr td').removeClass('clash');
+    $('#course-list tr').removeClass('table-danger');
 
-    // Check clash from timetable in each slot area
-    $('#timetable tr .highlight').each(function() {
-        var $highlightedCell = $(this);
-        var $highlightedCellDivs = $(this).children('div[data-course]');
+    const $theoryHours = $('#theory td:not(.lunch)');
+    const $labHours = $('#lab td:not(.lunch)');
 
-        var noPostLabFlag =
-            $(this).hasClass('no-post-lab') &&
-            $(this).children('div[data-is-lab="false"]').length > 0 &&
-            $(this)
-                .next()
-                .children('div[data-is-lab="true"]').length > 0;
-        var noPreTheoryFlag =
-            $(this).hasClass('no-pre-theory') &&
-            $(this).children('div[data-is-lab="true"]').length > 0 &&
-            $(this)
-                .prev()
-                .children('div[data-is-lab="false"]').length > 0;
+    $('#timetable tr').each(function() {
+        $('.highlight', this).each(function() {
+            const index = $(this).index();
+            var currentEnd, nextStart;
 
-        if (
-            $highlightedCellDivs.length > 1 ||
-            noPostLabFlag ||
-            noPreTheoryFlag
-        ) {
-            var isClashing = true;
-
-            // Check if there are two dissimilar courses or if there is a J
-            // component course and a sibling in this cell.
-            if ($highlightedCellDivs.length === 2) {
-                var $firstCellDiv = $highlightedCellDivs.eq(0),
-                    $secondCellDiv = $highlightedCellDivs.eq(1);
-
-                var isFirstCourseJComp = $firstCellDiv.data('is-project'),
-                    isSecondCourseJComp = $secondCellDiv.data('is-project');
-
-                if (isFirstCourseJComp && isSecondCourseJComp) {
-                } // Two J components in the same slot is a clash.
-                else if (isFirstCourseJComp || isSecondCourseJComp) {
-                    // Otherwise, check for similarity.
-                    var firstCourseId = +$firstCellDiv
-                        .data('course')
-                        .split(/(\d+)/)[1];
-                    var secondCourseId = +$secondCellDiv
-                        .data('course')
-                        .split(/(\d+)/)[1];
-
-                    var firstCourseIdx = getCourseIndex(firstCourseId);
-                    var secondCourseIdx = getCourseIndex(secondCourseId);
-
-                    var firstCourse = activeTable.data[firstCourseIdx];
-                    var secondCourse = activeTable.data[secondCourseIdx];
-
-                    // Check to see if two courses are similar.
-                    if (
-                        firstCourse[1] === secondCourse[1] && // Course Code
-                        firstCourse[2] === secondCourse[2] // Course Title
-                    ) {
-                        $highlightedCell.removeClass('clash');
-                        var $projectDiv = isFirstCourseJComp
-                            ? $firstCellDiv
-                            : $secondCellDiv;
-                        $projectDiv.addClass('hidden');
-                        isClashing = false;
-                    }
-                }
+            if ($('div', this).data('is-lab')) {
+                currentEnd = Date.parse($labHours.eq(index).data('end'));
+            } else if ($('div', this).data('is-theory')) {
+                currentEnd = Date.parse($theoryHours.eq(index).data('end'));
             }
 
-            if (isClashing) {
-                // clash
-                // remove, add clash in timetable
+            if ($('div', $(this).next()).data('is-lab')) {
+                nextStart = Date.parse($labHours.eq(index + 1).data('start'));
+            } else if ($('div', this).data('is-theory')) {
+                nextStart = Date.parse(
+                    $theoryHours.eq(index + 1).data('start'),
+                );
+            }
+
+            if ($('div', this).length > 1) {
                 $(this).addClass('clash');
-                // show clash in course list table
-                $(this)
-                    .children('div[data-course]')
-                    .each(function() {
-                        var dataCourse = $(this).attr('data-course');
-                        // Add table-danger class to tr of clashing course list table.
-                        $(
-                            `#course-list tbody tr[data-course="${dataCourse}"]`,
-                        ).addClass('table-danger');
-                    });
+
+                $('div', this).each(function() {
+                    const dataCourse = $(this).data('course');
+                    $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                        'table-danger',
+                    );
+                });
             }
-        } else if ($highlightedCellDivs.length === 1) {
-            // no clash
-            $(this)
-                .removeClass('clash')
-                .addClass('highlight');
-        } else {
-            // no course present
-            $(this).removeClass('clash highlight');
-            $('.quick-buttons .' + this.classList[1] + '-tile').removeClass(
-                'highlight',
-            );
-        }
+
+            if (nextStart && nextStart < currentEnd) {
+                $(this).addClass('clash');
+                $(this)
+                    .next()
+                    .addClass('clash');
+
+                const dataCourse = $('div', this).data('course');
+                $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                    'table-danger',
+                );
+
+                $('div', $(this).next()).each(function() {
+                    const dataCourse = $(this).data('course');
+                    $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                        'table-danger',
+                    );
+                });
+            }
+        });
     });
 }
 
@@ -749,10 +708,14 @@ window.initializeTimetable = () => {
             $theoryHour.html(
                 `${theorySlots.start}<br />to<br />${theorySlots.end}`,
             );
+            $theoryHour.data('start', theorySlots.start);
+            $theoryHour.data('end', theorySlots.end);
         }
 
         if (labSlots && labSlots.start && labSlots.end) {
             $labHour.html(`${labSlots.start}<br />to<br />${labSlots.end}`);
+            $labHour.data('start', labSlots.start);
+            $labHour.data('end', labSlots.end);
         }
 
         $('#theory').append($theoryHour);
@@ -816,12 +779,16 @@ window.addCourseToTimetable = (courseData) => {
         var $divElement = $(
             `<div 
                 data-course="course${courseData.courseId}"
-                data-is-lab="${courseData.slots[0][0] == 'L'}"
-                data-is-project="${courseData.isProject}"
                 >${courseData.courseCode +
                     (courseData.venue != '' ? '-' + courseData.venue : '')}</div
             >`,
         );
+
+        if (courseData.slots[0][0] == 'L') {
+            $divElement.data('is-lab', true);
+        } else {
+            $divElement.data('is-theory', true);
+        }
 
         $(`#timetable tr .${slot}`)
             .addClass('highlight')
