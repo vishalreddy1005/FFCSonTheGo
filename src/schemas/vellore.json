@@ -45,7 +45,7 @@
             }
         },
         {
-            "start": "12:00 AM",
+            "start": "12:00 PM",
             "end": "12:50 PM",
             "days": {
                 "mon": "TG1",
