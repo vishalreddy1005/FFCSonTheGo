@@ -155,7 +155,7 @@
         Hiding the text in the option buttons if the screen
         width is not big enough
     */
-    button span {
+    #option-buttons button span {
         display: none;
     }
 }
