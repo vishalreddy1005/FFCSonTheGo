@@ -847,7 +847,12 @@ window.addCourseToTimetable = (courseData) => {
 window.removeCourseFromTimetable = (course) => {
     $(`#timetable tr td div[data-course="${course}"]`)
         .parent()
-        .removeClass('highlight');
+        .each(function() {
+            if ($(this).children().length == 1) {
+                $(this).removeClass('highlight');
+            }
+        });
+
     $(`#timetable tr td div[data-course="${course}"]`).remove();
     checkSlotClash();
     updateLocalForage();
