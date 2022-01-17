@@ -5,7 +5,7 @@
 
 import localforage from '../../node_modules/localforage/dist/localforage';
 import html2canvas from '../../node_modules/html2canvas/dist/html2canvas';
-import '../../node_modules/datejs';
+import { parse, isValid } from '../../node_modules/date-fns';
 
 var timetableStorage = [
     {
@@ -313,30 +313,6 @@ $(() => {
         updateLocalForage();
         highlighted[activeTable.id] = [];
     });
-
-    /*
-        Getting saved data from localforage
-     */
-    localforage
-        .getItem('timetableStorage')
-        .then(function(storedValue) {
-            timetableStorage = storedValue || timetableStorage;
-            activeTable = timetableStorage[0];
-
-            fillPage(activeTable.data);
-            updatePickerLabel(activeTable.name);
-
-            // Renaming the 'Default Table' option
-            $('#tt-picker-dropdown .tt-picker-label a')
-                .first()
-                .attr('data-table-id', activeTable.id)
-                .text(activeTable.name);
-
-            timetableStorage.slice(1).forEach(function(table) {
-                addTableToPicker(table.id, table.name);
-            });
-        })
-        .catch(console.error);
 });
 
 /*
@@ -531,17 +507,63 @@ function checkSlotClash() {
             var currentEnd, nextStart;
 
             if ($('div', this).data('is-lab')) {
-                currentEnd = Date.parse($labHours.eq(index).data('end'));
+                currentEnd = parse(
+                    $labHours.eq(index).data('end'),
+                    'h:mm aa',
+                    new Date(),
+                );
+
+                if (!isValid(currentEnd)) {
+                    currentEnd = parse(
+                        $labHours.eq(index).data('end'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
             } else if ($('div', this).data('is-theory')) {
-                currentEnd = Date.parse($theoryHours.eq(index).data('end'));
+                currentEnd = parse(
+                    $theoryHours.eq(index).data('end'),
+                    'h:mm aa',
+                    new Date(),
+                );
+
+                if (!isValid(currentEnd)) {
+                    currentEnd = parse(
+                        $theoryHours.eq(index).data('end'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
             }
 
             if ($('div', $(this).next()).data('is-lab')) {
-                nextStart = Date.parse($labHours.eq(index + 1).data('start'));
-            } else if ($('div', this).data('is-theory')) {
-                nextStart = Date.parse(
-                    $theoryHours.eq(index + 1).data('start'),
+                nextStart = parse(
+                    $labHours.eq(index + 1).data('start'),
+                    'h:mm aa',
+                    new Date(),
                 );
+
+                if (!isValid(nextStart)) {
+                    nextStart = parse(
+                        $labHours.eq(index + 1).data('start'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
+            } else if ($('div', this).data('is-theory')) {
+                nextStart = parse(
+                    $theoryHours.eq(index + 1).data('start'),
+                    'h:mm aa',
+                    new Date(),
+                );
+
+                if (!isValid(nextStart)) {
+                    nextStart = parse(
+                        $theoryHours.eq(index + 1).data('start'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
             }
 
             if ($('div', this).length > 1) {
@@ -761,6 +783,30 @@ window.initializeTimetable = () => {
     }
 
     initializeQuickVisualization();
+
+    /*
+        Getting saved data from localforage
+     */
+    localforage
+        .getItem('timetableStorage')
+        .then(function(storedValue) {
+            timetableStorage = storedValue || timetableStorage;
+            activeTable = timetableStorage[0];
+
+            fillPage(activeTable.data);
+            updatePickerLabel(activeTable.name);
+
+            // Renaming the 'Default Table' option
+            $('#tt-picker-dropdown .tt-picker-label a')
+                .first()
+                .attr('data-table-id', activeTable.id)
+                .text(activeTable.name);
+
+            timetableStorage.slice(1).forEach(function(table) {
+                addTableToPicker(table.id, table.name);
+            });
+        })
+        .catch(console.error);
 };
 
 /*
