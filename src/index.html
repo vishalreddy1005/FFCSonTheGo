@@ -60,8 +60,14 @@
                 window.navigator.serviceWorker.addEventListener(
                     'controllerchange',
                     function() {
-                        if (jQuery && bootstrap && $('#update-modal')) {
-                            $('#update-modal').modal();
+                        if (
+                            jQuery &&
+                            bootstrap &&
+                            $('#update-modal').length != 0
+                        ) {
+                            new bootstrap.Modal(
+                                $('#update-modal').get(0),
+                            ).show();
                         } else {
                             var result = window.confirm(
                                 'A new version of FFCS On The Go is available! Would you like to reload the page?',
