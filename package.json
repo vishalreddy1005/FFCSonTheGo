@@ -15,7 +15,7 @@
         "start:noconvert": "parcel src/index.html",
         "build:sw": "workbox generateSW ./src/workbox-config.js",
         "build": "yarn convert && parcel build src/index.html && yarn build:sw",
-        "convert": "node util/convert_to_json.js && node util/json_to_data_dir.js"
+        "convert": "node util/convert_xlsx_to_json.js && node util/convert_json_to_data.js"
     },
     "husky": {
         "hooks": {

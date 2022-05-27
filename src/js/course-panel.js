@@ -217,7 +217,7 @@ $(() => {
 });
 
 const courses_data = {
-    unique_courses: [],
+    courses: [],
     all_data: [],
 };
 
@@ -227,10 +227,10 @@ const courses_data = {
 window.getCourses = () => {
     if (window.campus == 'Chennai') {
         courses_data.all_data = require('../data/all_data_chennai.json');
-        courses_data.unique_courses = require('../data/unique_courses_chennai.json');
+        courses_data.courses = require('../data/courses_chennai.json');
     } else {
-        courses_data.all_data = require('../data/all_data.json');
-        courses_data.unique_courses = require('../data/unique_courses.json');
+        courses_data.all_data = require('../data/all_data_vellore.json');
+        courses_data.courses = require('../data/courses_vellore.json');
     }
 
     initializeAutocomplete();
@@ -241,7 +241,7 @@ window.getCourses = () => {
  */
 function initializeAutocomplete() {
     const courseOptions = {
-        data: courses_data.unique_courses,
+        data: courses_data.courses,
         getValue: function(el) {
             return el.CODE + ' - ' + el.TITLE;
         },
