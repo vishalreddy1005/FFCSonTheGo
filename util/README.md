@@ -2,14 +2,14 @@
 
 ## Usage
 
-`convert_to_json.js` is used to convert excel to JSON.
-`json_to_data_dir.js` has the transformation code to adhere to the required JSON format.
+`convert_xlsx_to_json.js` is used to convert excel to JSON.
+`convert_json_to_data.js` has the transformation code to adhere to the required JSON format.
 
 _`data/all_data.json` and `data/all_data.json` will be modified as per the new excel_
 
 ### Note
 
--   Make sure excel file name is `report.xlsx`
+-   Make sure excel file name is `report_<campus>.xlsx`
 
 -   The sheet name in the file MUST be `Sheet 1`
 

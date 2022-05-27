@@ -5,42 +5,18 @@
 
 import localforage from '../../node_modules/localforage/dist/localforage';
 import html2canvas from '../../node_modules/html2canvas/dist/html2canvas';
+import { parse, isValid } from '../../node_modules/date-fns';
 
 var timetableStorage = [
     {
         id: 0,
         name: 'Default Table',
         data: [],
+        quick: [],
     },
 ];
 
 window.activeTable = timetableStorage[0];
-
-let highlighted = {
-    0: [],
-    highlight: function(id) {
-        if (highlighted[id]) {
-            highlighted[id].forEach(function(slot) {
-                $(`#timetable .${slot}`).addClass('highlight');
-                if ($(`.quick-buttons.${slot}-tile`)) {
-                    $(`.quick-buttons.${slot}-tile`).addClass('highlight');
-                }
-            });
-
-            $('.quick-buttons button:not([disabled])').each(function() {
-                if (
-                    $(`#timetable .${this.classList[0].split('-')[0]}`).not(
-                        '.highlight',
-                    ).length == 0
-                ) {
-                    $(this).addClass('highlight');
-                }
-            });
-        } else {
-            highlighted[id] = [];
-        }
-    },
-};
 
 $(() => {
     /*
@@ -54,12 +30,12 @@ $(() => {
             id: newTableId,
             name: newTableName,
             data: [],
+            quick: [],
         });
 
         addTableToPicker(newTableId, newTableName);
         switchTable(newTableId);
         updateLocalForage();
-        highlighted[newTableId] = [];
     });
 
     /*
@@ -137,7 +113,7 @@ $(() => {
         var tableId = $(this).data('table-id');
         deleteTable(tableId);
 
-        if (timetableStorage.length === 1) {
+        if (timetableStorage.length == 1) {
             $('#tt-picker-dropdown .tt-picker-delete')
                 .first()
                 .remove();
@@ -289,14 +265,25 @@ $(() => {
         Click event for the quick visualization button
      */
     $('#quick-toggle').on('click', function() {
-        if ($(this).attr('data-state') === 'enabled') {
+        if ($(this).attr('data-state') == 'enabled') {
             $('i', this).prop('class', 'fas fa-eye');
             $('span', this).html('&nbsp;&nbsp;Enable Quick Visualization');
             $(this).attr('data-state', 'disabled');
+
+            $('#timetable .highlight:not(:has(div))').removeClass('highlight');
         } else {
             $('i', this).prop('class', 'fas fa-eye-slash');
             $('span', this).html('&nbsp;&nbsp;Disable Quick Visualization');
             $(this).attr('data-state', 'enabled');
+
+            activeTable.quick.forEach((el) =>
+                $('#timetable')
+                    .find('tr')
+                    .eq(el[0])
+                    .find('td')
+                    .eq(el[1])
+                    .addClass('highlight'),
+            );
         }
 
         $('.quick-buttons').slideToggle();
@@ -309,105 +296,7 @@ $(() => {
         resetPage();
         activeTable.data = [];
         updateLocalForage();
-        highlighted[activeTable.id] = [];
     });
-
-    /*
-        Click event for the quick visualization buttons
-     */
-    $('.quick-buttons *[class*="-tile"]').on('click', function() {
-        if (
-            !$(`#timetable .${this.classList[0].split('-')[0]}`).hasClass(
-                'clash',
-            ) &&
-            $(`#timetable .${this.classList[0].split('-')[0]}`).children('div')
-                .length == 0
-        ) {
-            if ($(this).hasClass('highlight')) {
-                $(`#timetable .${this.classList[0].split('-')[0]}`).removeClass(
-                    'highlight',
-                );
-                // remove slots from highlighted
-                var index = highlighted[activeTable.id].indexOf(
-                    this.classList[0].split('-')[0],
-                );
-                highlighted[activeTable.id].splice(index, 1);
-            } else {
-                $(`#timetable .${this.classList[0].split('-')[0]}`).addClass(
-                    'highlight',
-                );
-                // add slots to highlighted
-                highlighted[activeTable.id].push(
-                    this.classList[0].split('-')[0],
-                );
-            }
-            $(this).toggleClass('highlight');
-        }
-    });
-
-    /*
-        Click event for the periods when quick visualization is enabled
-     */
-    $('#timetable .period:not([disabled])').on('click', function() {
-        if (
-            $('#quick-toggle').attr('data-state') == 'enabled' &&
-            !$(this).hasClass('clash') &&
-            $(this).children('div').length === 0
-        ) {
-            $(this).toggleClass('highlight');
-            if (!$(this).hasClass('highlight')) {
-                $(`.quick-buttons .${this.classList[1]}-tile`).removeClass(
-                    'highlight',
-                );
-                // remove slots from highlighted
-                var index = highlighted[activeTable.id].indexOf(
-                    this.classList[2],
-                );
-                highlighted[activeTable.id].splice(index, 1);
-                return;
-            } else {
-                // add slots to highlighted
-                if (this.classList.length === 3) {
-                    // some course may only have lab slot
-                    highlighted[activeTable.id].push(this.classList[1]);
-                } else {
-                    highlighted[activeTable.id].push(this.classList[2]);
-                }
-            }
-            if (
-                $(`#timetable .${this.classList[1]}`).not('.highlight')
-                    .length === 0
-            ) {
-                $(`.quick-buttons .${this.classList[1]}-tile`).addClass(
-                    'highlight',
-                );
-            }
-        }
-    });
-
-    /*
-        Getting saved data from localforage
-     */
-    localforage
-        .getItem('timetableStorage')
-        .then(function(storedValue) {
-            timetableStorage = storedValue || timetableStorage;
-            activeTable = timetableStorage[0];
-
-            fillPage(activeTable.data);
-            updatePickerLabel(activeTable.name);
-
-            // Renaming the 'Default Table' option
-            $('#tt-picker-dropdown .tt-picker-label a')
-                .first()
-                .attr('data-table-id', activeTable.id)
-                .text(activeTable.name);
-
-            timetableStorage.slice(1).forEach(function(table) {
-                addTableToPicker(table.id, table.name);
-            });
-        })
-        .catch(console.error);
 });
 
 /*
@@ -463,27 +352,31 @@ function updateLocalForage() {
     Function to get the table index
  */
 function getTableIndex(id) {
-    return timetableStorage.findIndex(function(el) {
-        return el.id === id;
-    });
-}
-
-/*
-    Function to get the course index
- */
-function getCourseIndex(id) {
-    return activeTable.data.findIndex(function(el) {
-        return el.courseId === id;
-    });
+    return timetableStorage.findIndex((el) => el.id == id);
 }
 
 /*
     Function to fill the timetable and course list
  */
-function fillPage(data) {
-    $.each(data, function(index, courseData) {
+function fillPage() {
+    $.each(activeTable.data, function(index, courseData) {
         addCourseToCourseList(courseData);
         addCourseToTimetable(courseData);
+    });
+
+    $.each(activeTable.quick, function(index, el) {
+        var $el = $('#timetable')
+            .find('tr')
+            .eq(el[0])
+            .find('td')
+            .eq(el[1]);
+        var slot = $el.get(0).classList[1];
+
+        $(`.quick-buttons .${slot}-tile`).addClass('highlight');
+
+        if ($('#quick-toggle').attr('data-state') == 'enabled') {
+            $el.addClass('highlight');
+        }
     });
 }
 
@@ -492,10 +385,10 @@ function fillPage(data) {
  */
 function switchTable(tableId) {
     resetPage();
+
     activeTable = timetableStorage[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
-    fillPage(activeTable.data);
-    highlighted.highlight(tableId);
+    fillPage();
 }
 
 /*
@@ -514,8 +407,8 @@ function deleteTable(tableId) {
     updateLocalForage();
 
     // Check if the active table is deleted
-    if (activeTable.id === tableId) {
-        if (tableIndex === 0) {
+    if (activeTable.id == tableId) {
+        if (tableIndex == 0) {
             switchTable(timetableStorage[0].id);
         } else {
             switchTable(timetableStorage[tableIndex - 1].id);
@@ -538,7 +431,7 @@ function renameTable(tableId, tableName) {
     updateLocalForage();
 
     // Check if the active table is renamed
-    if (activeTable.id === tableId) {
+    if (activeTable.id == tableId) {
         updatePickerLabel(tableName);
     }
 
@@ -580,7 +473,7 @@ function addTableToPicker(tableId, tableName) {
         </li>`,
     );
 
-    if (timetableStorage.length === 2) {
+    if (timetableStorage.length == 2) {
         $('#tt-picker-dropdown .tt-picker-rename')
             .first()
             .after(
@@ -596,108 +489,332 @@ function addTableToPicker(tableId, tableName) {
 }
 
 /*
-    Function to check is slots are clashing
+    Function to check if slots are clashing
  */
 function checkSlotClash() {
-    // Remove table-danger class (shows clashing) form tr in course list table.
-    $('#course-list tbody tr').removeClass('table-danger');
-    $('#timetable tr .hidden').removeClass('hidden');
+    $('#timetable tr td').removeClass('clash');
+    $('#course-list tr').removeClass('table-danger');
 
-    // Check clash from timetable in each slot area
-    $('#timetable tr .highlight').each(function() {
-        var $highlightedCell = $(this);
-        var $highlightedCellDivs = $(this).children('div[data-course]');
+    const $theoryHours = $('#theory td:not(.lunch)');
+    const $labHours = $('#lab td:not(.lunch)');
 
-        var noPostLabFlag =
-            $(this).hasClass('no-post-lab') &&
-            $(this).children('div[data-is-lab="false"]').length > 0 &&
-            $(this)
-                .next()
-                .children('div[data-is-lab="true"]').length > 0;
-        var noPreTheoryFlag =
-            $(this).hasClass('no-pre-theory') &&
-            $(this).children('div[data-is-lab="true"]').length > 0 &&
-            $(this)
-                .prev()
-                .children('div[data-is-lab="false"]').length > 0;
+    $('#timetable tr').each(function() {
+        $('.highlight', this).each(function() {
+            const index = $(this).index();
+            var currentEnd, nextStart;
 
-        if (
-            $highlightedCellDivs.length > 1 ||
-            noPostLabFlag ||
-            noPreTheoryFlag
-        ) {
-            var isClashing = true;
+            if ($('div', this).data('is-lab')) {
+                currentEnd = parse(
+                    $labHours.eq(index).data('end'),
+                    'h:mm aa',
+                    new Date(),
+                );
 
-            // Check if there are two dissimilar courses or if there is a J
-            // component course and a sibling in this cell.
-            if ($highlightedCellDivs.length === 2) {
-                var $firstCellDiv = $highlightedCellDivs.eq(0),
-                    $secondCellDiv = $highlightedCellDivs.eq(1);
+                if (!isValid(currentEnd)) {
+                    currentEnd = parse(
+                        $labHours.eq(index).data('end'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
+            } else if ($('div', this).data('is-theory')) {
+                currentEnd = parse(
+                    $theoryHours.eq(index).data('end'),
+                    'h:mm aa',
+                    new Date(),
+                );
 
-                var isFirstCourseJComp = $firstCellDiv.data('is-project'),
-                    isSecondCourseJComp = $secondCellDiv.data('is-project');
-
-                if (isFirstCourseJComp && isSecondCourseJComp) {
-                } // Two J components in the same slot is a clash.
-                else if (isFirstCourseJComp || isSecondCourseJComp) {
-                    // Otherwise, check for similarity.
-                    var firstCourseId = +$firstCellDiv
-                        .data('course')
-                        .split(/(\d+)/)[1];
-                    var secondCourseId = +$secondCellDiv
-                        .data('course')
-                        .split(/(\d+)/)[1];
-
-                    var firstCourseIdx = getCourseIndex(firstCourseId);
-                    var secondCourseIdx = getCourseIndex(secondCourseId);
-
-                    var firstCourse = activeTable.data[firstCourseIdx];
-                    var secondCourse = activeTable.data[secondCourseIdx];
-
-                    // Check to see if two courses are similar.
-                    if (
-                        firstCourse[1] === secondCourse[1] && // Course Code
-                        firstCourse[2] === secondCourse[2] // Course Title
-                    ) {
-                        $highlightedCell.removeClass('clash');
-                        var $projectDiv = isFirstCourseJComp
-                            ? $firstCellDiv
-                            : $secondCellDiv;
-                        $projectDiv.addClass('hidden');
-                        isClashing = false;
-                    }
+                if (!isValid(currentEnd)) {
+                    currentEnd = parse(
+                        $theoryHours.eq(index).data('end'),
+                        'HH:mm',
+                        new Date(),
+                    );
                 }
             }
 
-            if (isClashing) {
-                // clash
-                // remove, add clash in timetable
-                $(this).addClass('clash');
-                // show clash in course list table
-                $(this)
-                    .children('div[data-course]')
-                    .each(function() {
-                        var dataCourse = $(this).attr('data-course');
-                        // Add table-danger class to tr of clashing course list table.
-                        $(
-                            `#course-list tbody tr[data-course="${dataCourse}"]`,
-                        ).addClass('table-danger');
-                    });
+            if ($('div', $(this).next()).data('is-lab')) {
+                nextStart = parse(
+                    $labHours.eq(index + 1).data('start'),
+                    'h:mm aa',
+                    new Date(),
+                );
+
+                if (!isValid(nextStart)) {
+                    nextStart = parse(
+                        $labHours.eq(index + 1).data('start'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
+            } else if ($('div', this).data('is-theory')) {
+                nextStart = parse(
+                    $theoryHours.eq(index + 1).data('start'),
+                    'h:mm aa',
+                    new Date(),
+                );
+
+                if (!isValid(nextStart)) {
+                    nextStart = parse(
+                        $theoryHours.eq(index + 1).data('start'),
+                        'HH:mm',
+                        new Date(),
+                    );
+                }
             }
-        } else if ($highlightedCellDivs.length === 1) {
-            // no clash
-            $(this)
-                .removeClass('clash')
-                .addClass('highlight');
-        } else {
-            // no course present
-            $(this).removeClass('clash highlight');
-            $('.quick-buttons .' + this.classList[1] + '-tile').removeClass(
-                'highlight',
-            );
+
+            if ($('div', this).length > 1) {
+                $(this).addClass('clash');
+
+                $('div', this).each(function() {
+                    const dataCourse = $(this).data('course');
+                    $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                        'table-danger',
+                    );
+                });
+            }
+
+            if (nextStart && nextStart < currentEnd) {
+                $(this).addClass('clash');
+                $(this)
+                    .next()
+                    .addClass('clash');
+
+                const dataCourse = $('div', this).data('course');
+                $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                    'table-danger',
+                );
+
+                $('div', $(this).next()).each(function() {
+                    const dataCourse = $(this).data('course');
+                    $(`#course-list tr[data-course=${dataCourse}]`).addClass(
+                        'table-danger',
+                    );
+                });
+            }
+        });
+    });
+}
+
+/*
+    Function to initialize quick visualization
+ */
+function initializeQuickVisualization() {
+    /*
+        Click event for the quick visualization buttons
+     */
+    $('.quick-buttons *[class*="-tile"]').on('click', function() {
+        var slot = this.classList[0].split('-')[0];
+
+        if (
+            !$(`#timetable .${slot}`).hasClass('clash') &&
+            $(`#timetable .${slot}`).children('div').length == 0
+        ) {
+            var slots = [];
+
+            $(`#timetable .${slot}`).each((i, el) => {
+                var row = $(el)
+                    .parent()
+                    .index();
+                var column = $(el).index();
+
+                slots.push([row, column]);
+            });
+
+            if ($(this).hasClass('highlight')) {
+                $(`#timetable .${slot}`).removeClass('highlight');
+
+                activeTable.quick = activeTable.quick.filter((el) => {
+                    for (var i = 0; i < slots.length; ++i) {
+                        if (el[0] == slots[i][0] && el[1] == slots[i][1]) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+            } else {
+                $(`#timetable .${slot}`).addClass('highlight');
+                activeTable.quick.push(...slots);
+            }
+
+            $(this).toggleClass('highlight');
+            updateLocalForage();
+        }
+    });
+
+    /*
+        Click event for the periods when quick visualization is enabled
+     */
+    $('#timetable .period:not([disabled])').on('click', function() {
+        if (
+            $('#quick-toggle').attr('data-state') == 'enabled' &&
+            !$(this).hasClass('clash') &&
+            $(this).children('div').length == 0
+        ) {
+            var slot = this.classList[1];
+            var row = $(this)
+                .parent()
+                .index();
+            var column = $(this).index();
+
+            $(this).toggleClass('highlight');
+
+            if (!$(this).hasClass('highlight')) {
+                activeTable.quick = activeTable.quick.filter(
+                    (el) => el[0] != row || el[1] != column,
+                );
+            } else {
+                activeTable.quick.push([row, column]);
+            }
+
+            if ($(`#timetable .${slot}`).not('.highlight').length == 0) {
+                $(`.quick-buttons .${slot}-tile`).addClass('highlight');
+            } else {
+                $(`.quick-buttons .${slot}-tile`).removeClass('highlight');
+            }
+
+            updateLocalForage();
         }
     });
 }
+
+/*
+    Function to initialize the timetable
+ */
+window.initializeTimetable = () => {
+    var timetable;
+    $('#timetable tr')
+        .slice(2)
+        .hide();
+    $('#timetable tr td:not(:first-child)').remove();
+
+    if (window.campus == 'Chennai') {
+        timetable = require('../schemas/chennai.json');
+    } else {
+        timetable = require('../schemas/vellore.json');
+    }
+
+    var theory = timetable.theory,
+        lab = timetable.lab;
+    var theoryIndex = 0,
+        labIndex = 0;
+    var $quickButtons = $('.quick-buttons').eq(0); // Morning slot quick buttons
+
+    while (theoryIndex < theory.length || labIndex < lab.length) {
+        const theorySlots = theory[theoryIndex];
+        const labSlots = lab[labIndex];
+
+        if (theorySlots && labSlots && !theorySlots.days && !labSlots.days) {
+            $('#timetable tr:first').append(
+                '<td class="lunch" style="width: 8px;" rowspan="9">L<br />U<br />N<br />C<br />H</td>',
+            );
+            $quickButtons = $('.quick-buttons').eq(1); // Afternoon slot quick buttons
+            ++theoryIndex;
+            ++labIndex;
+
+            continue;
+        }
+
+        const $theoryHour = $('<td class="theory-hour"></td>');
+        const $labHour = $('<td class="lab-hour"></td>');
+
+        if (theorySlots && theorySlots.start && theorySlots.end) {
+            $theoryHour.html(
+                `${theorySlots.start}<br />to<br />${theorySlots.end}`,
+            );
+            $theoryHour.data('start', theorySlots.start);
+            $theoryHour.data('end', theorySlots.end);
+        }
+
+        if (labSlots && labSlots.start && labSlots.end) {
+            $labHour.html(`${labSlots.start}<br />to<br />${labSlots.end}`);
+            $labHour.data('start', labSlots.start);
+            $labHour.data('end', labSlots.end);
+        }
+
+        $('#theory').append($theoryHour);
+        $('#lab').append($labHour);
+
+        const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        for (var i = 0; i < days.length; ++i) {
+            const $period = $('<td class="period"></td>');
+            const day = days[i];
+
+            if (theorySlots && theorySlots.days && day in theorySlots.days) {
+                const slot = theorySlots.days[day];
+                $period.text(slot);
+                $period.addClass(slot);
+                $(`#${day}`).show();
+
+                // Add quick buttons for theory slots
+                if (!$(`.${slot}-tile`).get(0)) {
+                    var index = slot.replace(/[^A-Z]/gi, '').length - 1;
+
+                    while (index >= $quickButtons.find('tr').length) {
+                        $quickButtons.find('table').append('<tr></tr>');
+                    }
+
+                    $quickButtons
+                        .find('tr')
+                        .eq(index)
+                        .append(
+                            `<button class="${slot}-tile btn quick-button">${slot}</button>`,
+                        );
+                }
+            }
+
+            if (labSlots && labSlots.days && day in labSlots.days) {
+                const slot = labSlots.days[day];
+                $period.text(
+                    ($period.text() != '' ? $period.text() + ' / ' : '') + slot,
+                );
+                $period.addClass(slot);
+                $(`#${day}`).show();
+            }
+
+            if ($period.text() == '') {
+                $period.attr('disabled', true);
+            }
+
+            $(`#${day}`).append($period);
+        }
+
+        if (theorySlots && !theorySlots.lunch) {
+            ++theoryIndex;
+        }
+
+        if (labSlots && !labSlots.lunch) {
+            ++labIndex;
+        }
+    }
+
+    initializeQuickVisualization();
+
+    /*
+        Getting saved data from localforage
+     */
+    localforage
+        .getItem('timetableStorage')
+        .then(function(storedValue) {
+            timetableStorage = storedValue || timetableStorage;
+            activeTable = timetableStorage[0];
+
+            updatePickerLabel(activeTable.name);
+            fillPage();
+
+            // Renaming the 'Default Table' option
+            $('#tt-picker-dropdown .tt-picker-label a')
+                .first()
+                .attr('data-table-id', activeTable.id)
+                .text(activeTable.name);
+
+            timetableStorage.slice(1).forEach(function(table) {
+                addTableToPicker(table.id, table.name);
+            });
+        })
+        .catch(console.error);
+};
 
 /*
     Function to add a course to the timetable
@@ -707,20 +824,23 @@ window.addCourseToTimetable = (courseData) => {
         var $divElement = $(
             `<div 
                 data-course="course${courseData.courseId}"
-                data-is-lab="${courseData.slots[0][0] == 'L'}"
-                data-is-project="${courseData.isProject}"
-                >${courseData.courseCode +
-                    (courseData.venue != '' ? '-' + courseData.venue : '')}</div
+                >${courseData.courseCode}${
+                courseData.venue != '' ? '-' + courseData.venue : ''
+            }</div
             >`,
         );
+
+        if (courseData.slots[0][0] == 'L') {
+            $divElement.data('is-lab', true);
+        } else {
+            $divElement.data('is-theory', true);
+        }
 
         $(`#timetable tr .${slot}`)
             .addClass('highlight')
             .append($divElement);
 
-        if ($(`.quick-buttons .${slot}-tile`)) {
-            $(`.quick-buttons .${slot}-tile`).addClass('highlight');
-        }
+        $(`.quick-buttons .${slot}-tile`).addClass('highlight');
     });
 
     checkSlotClash();
@@ -731,6 +851,40 @@ window.addCourseToTimetable = (courseData) => {
     Function to remove a course from the timetable
  */
 window.removeCourseFromTimetable = (course) => {
+    $(`#timetable tr td div[data-course="${course}"]`)
+        .parent()
+        .each(function() {
+            if ($(this).children().length != 1) {
+                return;
+            }
+
+            $(this).removeClass('highlight');
+            var slot = this.classList[1];
+
+            if (!$(`.quick-buttons .${slot}-tile`).hasClass('highlight')) {
+                return;
+            }
+
+            var row = $(this)
+                .parent()
+                .index();
+            var column = $(this).index();
+
+            for (var i = 0; i < activeTable.quick.length; ++i) {
+                var el = activeTable.quick[i];
+
+                if (el[0] == row && el[1] == column) {
+                    if ($('#quick-toggle').attr('data-state') == 'enabled') {
+                        $(this).addClass('highlight');
+                    }
+
+                    return;
+                }
+            }
+
+            $(`.quick-buttons .${slot}-tile`).removeClass('highlight');
+        });
+
     $(`#timetable tr td div[data-course="${course}"]`).remove();
     checkSlotClash();
     updateLocalForage();
