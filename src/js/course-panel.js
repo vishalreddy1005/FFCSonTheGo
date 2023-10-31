@@ -3,8 +3,8 @@
  *  the course panel
  */
 
-import '../../node_modules/easy-autocomplete/dist/easy-autocomplete.min.css';
-import '../../node_modules/bootstrap-select/dist/css/bootstrap-select.min.css';
+import 'easy-autocomplete/dist/easy-autocomplete.min.css';
+import 'bootstrap-select/dist/css/bootstrap-select.min.css';
 
 /*
  *  The package bootstrap-select is not compatable with bootstrap 5 at the
@@ -12,65 +12,63 @@ import '../../node_modules/bootstrap-select/dist/css/bootstrap-select.min.css';
  *  version with bootstrap 5 support, the bootstrap 4 javascript import &
  *  it's dependency (bootstrap4) can be removed.
  */
-import '../../node_modules/easy-autocomplete/dist/jquery.easy-autocomplete';
-import '../../node_modules/bootstrap4/dist/js/bootstrap.bundle';
-import '../../node_modules/bootstrap-select/dist/js/bootstrap-select';
+import 'easy-autocomplete/dist/jquery.easy-autocomplete';
+import 'bootstrap4/dist/js/bootstrap.bundle';
+import 'bootstrap-select/dist/js/bootstrap-select';
 
 $(() => {
     /*
         Event to listen to changes in the slot filter
      */
-    $('#slot-filter').on('changed.bs.select', function(
-        e,
-        clickedIndex,
-        isSelected,
-        previousValue,
-    ) {
-        /*
+    $('#slot-filter').on(
+        'changed.bs.select',
+        function (e, clickedIndex, isSelected, previousValue) {
+            /*
             If Select All / Deselect All is clicked, isSelected will be null
          */
-        if (isSelected === null) {
-            $('#slot-buttons button').show();
-            return;
-        }
+            if (isSelected === null) {
+                $('#slot-buttons button').show();
+                return;
+            }
 
-        // If the current state has no selected items, show everything
-        if (previousValue.length === 1 && !isSelected) {
-            $('#slot-buttons button').show();
-            return;
-        }
+            // If the current state has no selected items, show everything
+            if (previousValue.length === 1 && !isSelected) {
+                $('#slot-buttons button').show();
+                return;
+            }
 
-        // If the previous state had nothing selected, hide everything
-        // and display the selected option
-        if (previousValue.length === 0) {
-            $('#slot-buttons button').hide();
-        }
+            // If the previous state had nothing selected, hide everything
+            // and display the selected option
+            if (previousValue.length === 0) {
+                $('#slot-buttons button').hide();
+            }
 
-        var option = $('option', this)[clickedIndex].value;
+            var option = $('option', this)[clickedIndex].value;
 
-        if (isSelected) {
-            $('#slot-buttons button:not(:visible)').each(function() {
-                if ($(this).data('slot') === option) {
-                    $(this).show();
-                }
-            });
-        } else {
-            $('#slot-buttons button:visible').each(function() {
-                if ($(this).data('slot') === option) {
-                    $(this).hide();
-                }
-            });
-        }
+            if (isSelected) {
+                $('#slot-buttons button:not(:visible)').each(function () {
+                    if ($(this).data('slot') === option) {
+                        $(this).show();
+                    }
+                });
+            } else {
+                $('#slot-buttons button:visible').each(function () {
+                    if ($(this).data('slot') === option) {
+                        $(this).hide();
+                    }
+                });
+            }
 
-        if ($('#slot-buttons button.selected:not(:visible)').length > 0) {
-            $('#slot-buttons button.selected').removeClass('selected');
-            $('#advanced-options input').val('');
-        }
-    });
+            if ($('#slot-buttons button.selected:not(:visible)').length > 0) {
+                $('#slot-buttons button.selected').removeClass('selected');
+                $('#advanced-options input').val('');
+            }
+        },
+    );
 
     // Hack to turn off auto focus, should be removed when
     // the bug in bootstrap-select is fixed
-    $('#filter-by-slot').on('change', function() {
+    $('#filter-by-slot').on('change', function () {
         $(this)
             .siblings('.dropdown-menu')
             .children('.bs-searchbox')
@@ -81,7 +79,7 @@ $(() => {
     /*
         Click event for the slot buttons
      */
-    $('#slot-buttons').on('click', 'button', function() {
+    $('#slot-buttons').on('click', 'button', function () {
         $('.slot-button.selected').removeClass('selected');
 
         $(this).attr('class', 'slot-button selected');
@@ -102,7 +100,7 @@ $(() => {
     /*
         Double click event to quickly add a course
      */
-    $('#slot-buttons').on('dblclick', 'button', function() {
+    $('#slot-buttons').on('dblclick', 'button', function () {
         $('#add-course-button').trigger('click');
         $(this).trigger('blur');
     });
@@ -110,7 +108,7 @@ $(() => {
     /*
         Click event to toggle advanced options
      */
-    $('#advanced-toggle').on('click', function() {
+    $('#advanced-toggle').on('click', function () {
         if ($(this).attr('data-state') === 'enabled') {
             $(this).text('Show Advanced Options');
             $(this).attr('class', 'btn btn-outline-secondary');
@@ -127,31 +125,19 @@ $(() => {
     /*
         Click event to clear the panel
      */
-    $('#clear-panel-button').on('click', function() {
+    $('#clear-panel-button').on('click', function () {
         clearPanel();
     });
 
     /*
         Click event to add a course
      */
-    $('#add-course-button').on('click', function() {
-        var course = $('#course-input')
-            .val()
-            .trim()
-            .split('-');
-        var faculty = $('#faculty-input')
-            .val()
-            .trim();
-        var slotString = $('#slot-input')
-            .val()
-            .toUpperCase()
-            .trim();
-        var venue = $('#venue-input')
-            .val()
-            .trim();
-        var credits = $('#credits-input')
-            .val()
-            .trim();
+    $('#add-course-button').on('click', function () {
+        var course = $('#course-input').val().trim().split('-');
+        var faculty = $('#faculty-input').val().trim();
+        var slotString = $('#slot-input').val().toUpperCase().trim();
+        var venue = $('#venue-input').val().trim();
+        var credits = $('#credits-input').val().trim();
         var isProject = $('#is-project-input').val();
 
         // Reset is-project-input once read
@@ -171,11 +157,11 @@ $(() => {
             return;
         }
 
-        var slots = (function() {
+        var slots = (function () {
             var arr = [];
 
             try {
-                slotString.split(/\s*\+\s*/).forEach(function(el) {
+                slotString.split(/\s*\+\s*/).forEach(function (el) {
                     if (el && $('.' + el)) {
                         arr.push(el);
                     }
@@ -194,10 +180,7 @@ $(() => {
         }
 
         var courseCode = course[0].trim();
-        var courseTitle = course
-            .slice(1)
-            .join('-')
-            .trim();
+        var courseTitle = course.slice(1).join('-').trim();
 
         var courseData = {
             courseId: courseId,
@@ -242,7 +225,7 @@ window.getCourses = () => {
 function initializeAutocomplete() {
     const courseOptions = {
         data: courses_data.courses,
-        getValue: function(el) {
+        getValue: function (el) {
             return el.CODE + ' - ' + el.TITLE;
         },
         list: {
@@ -250,7 +233,7 @@ function initializeAutocomplete() {
                 enabled: true,
             },
             maxNumberOfElements: 10,
-            onSelectItemEvent: function() {
+            onSelectItemEvent: function () {
                 var title = $('#course-input').getSelectedItemData().TITLE;
                 var code = $('#course-input').getSelectedItemData().CODE;
 
@@ -275,7 +258,7 @@ function buildSlotButton(courseData) {
     $h6.text(courseData.SLOT);
     $p.text(
         [courseData.FACULTY, courseData.VENUE, courseData.TYPE]
-            .filter(function(el) {
+            .filter(function (el) {
                 if (el != '') {
                     return el;
                 }
@@ -307,7 +290,7 @@ window.addSlotButtons = (courseCode) => {
     var theorySlotGroup = [];
     var labSlotGroup = [];
 
-    $.each(courses_data.all_data, function(key, value) {
+    $.each(courses_data.all_data, function (key, value) {
         if (value.CODE === courseCode) {
             var $slotButton = buildSlotButton(value);
 
@@ -333,7 +316,7 @@ window.addSlotButtons = (courseCode) => {
     if (theorySlotGroup.length) {
         var $theorySlotGroup = $('<optgroup label="Theory"></optgroup>');
 
-        theorySlotGroup.forEach(function(el) {
+        theorySlotGroup.forEach(function (el) {
             var $option = $(`<option value="${el}">${el}</option>`);
             $theorySlotGroup.append($option);
         });
@@ -347,7 +330,7 @@ window.addSlotButtons = (courseCode) => {
     if (labSlotGroup.length) {
         var $labSlotGroup = $('<optgroup label="Lab"></optgroup>');
 
-        labSlotGroup.forEach(function(el) {
+        labSlotGroup.forEach(function (el) {
             var $option = $(`<option value="${el}">${el}</option>`);
             $labSlotGroup.append($option);
         });

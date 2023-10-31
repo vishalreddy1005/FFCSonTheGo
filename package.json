@@ -5,7 +5,6 @@
         "vellore": "Winter Semester 2022 (Freshers)",
         "chennai": "Winter Semester 2022-23"
     },
-    "main": "index.js",
     "repository": "https://github.com/vatz88/FFCSonTheGo.git",
     "author": "Vatsal Joshi <vatz88@gmail.com>",
     "license": "GPL-3.0",
@@ -15,36 +14,37 @@
         "start:noconvert": "parcel src/index.html",
         "build:sw": "workbox generateSW ./src/workbox-config.js",
         "build": "yarn convert && parcel build src/index.html && yarn build:sw",
-        "convert": "node util/convert_xlsx_to_json.js && node util/convert_json_to_data.js"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "pretty-quick --staged"
-        }
+        "convert": "node util/convert_xlsx_to_json.js && node util/convert_json_to_data.js",
+        "prepare": "husky install"
     },
     "engines": {
-        "node": ">=10 <13"
+        "node": ">=18 <21"
     },
-    "devDependencies": {
-        "husky": "^2.4.1",
-        "parcel-bundler": "^1.12.3",
-        "prettier": "^1.18.2",
-        "pretty-quick": "^1.11.1",
-        "sass": "^1.21.0",
-        "workbox-cli": "^5.1.3",
-        "xlsx": "^0.17.0"
-    },
+    "browserslist": "> 0.5%, last 2 versions, not dead",
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^5.15.3",
-        "@popperjs/core": "^2.9.2",
-        "@sentry/browser": "^5.4.3",
-        "bootstrap": "^5.0.2",
+        "@fortawesome/fontawesome-free": "^6.4.2",
+        "@parcel/core": "^2.10.1",
+        "@parcel/packager-raw-url": "2.10.1",
+        "@parcel/transformer-sass": "2.10.1",
+        "@parcel/transformer-webmanifest": "2.10.1",
+        "@popperjs/core": "^2.11.8",
+        "@sentry/browser": "^7.76.0",
+        "bootstrap": "^5.3.2",
         "bootstrap-select": "^1.13.18",
         "bootstrap4": "npm:bootstrap@4.6.0",
-        "date-fns": "^2.28.0",
+        "date-fns": "^2.30.0",
         "easy-autocomplete": "1.3.5",
-        "html2canvas": "^1.1.4",
-        "jquery": "3.5.0",
-        "localforage": "^1.7.3"
+        "html2canvas": "^1.4.1",
+        "jquery": "3.7.1",
+        "localforage": "^1.10.0",
+        "parcel": "^2.10.1",
+        "sass": "^1.69.5",
+        "workbox-cli": "^7.0.0",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "prettier": "^2.8.8",
+        "pretty-quick": "^3.1.3",
+        "husky": "^8.0.0"
     }
 }
