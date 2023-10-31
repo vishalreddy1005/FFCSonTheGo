@@ -3,9 +3,9 @@
  *  the timetable
  */
 
-import localforage from '../../node_modules/localforage/dist/localforage';
-import html2canvas from '../../node_modules/html2canvas/dist/html2canvas';
-import { parse, isValid } from '../../node_modules/date-fns';
+import localforage from 'localforage/dist/localforage';
+import html2canvas from 'html2canvas/dist/html2canvas';
+import { parse, isValid } from 'date-fns';
 
 var timetableStorage = [
     {
@@ -22,7 +22,7 @@ $(() => {
     /*
         Click event for the add table button
      */
-    $('#tt-picker-add').on('click', function() {
+    $('#tt-picker-add').on('click', function () {
         var newTableId = timetableStorage[timetableStorage.length - 1].id + 1;
         var newTableName = 'Table ' + newTableId;
 
@@ -41,40 +41,30 @@ $(() => {
     /*
         Click event for the timetable picker dropdown labels
      */
-    $('#tt-picker-dropdown').on('click', '.tt-picker-label', function() {
-        var selectedTableId = Number(
-            $(this)
-                .children('a')
-                .data('table-id'),
-        );
+    $('#tt-picker-dropdown').on('click', '.tt-picker-label', function () {
+        var selectedTableId = Number($(this).children('a').data('table-id'));
         switchTable(selectedTableId);
     });
 
     /*
         Click event to set the data attribute before opening the rename modal
      */
-    $('#tt-picker-dropdown').on('click', '.tt-picker-rename', function() {
-        var $a = $(this)
-            .closest('li')
-            .find('a:first');
+    $('#tt-picker-dropdown').on('click', '.tt-picker-rename', function () {
+        var $a = $(this).closest('li').find('a:first');
 
         var tableId = Number($a.data('table-id'));
         var tableName = $a.text();
 
-        $('#table-name')
-            .val(tableName)
-            .trigger('focus');
+        $('#table-name').val(tableName).trigger('focus');
         $('#rename-tt-button').data('table-id', tableId);
     });
 
     /*
         Click event for the rename button in the rename modal
      */
-    $('#rename-tt-button').on('click', function() {
+    $('#rename-tt-button').on('click', function () {
         var tableId = $(this).data('table-id');
-        var tableName = $('#table-name')
-            .val()
-            .trim();
+        var tableName = $('#table-name').val().trim();
 
         if (tableName == '') {
             tableName = 'Untitled Table';
@@ -86,7 +76,7 @@ $(() => {
     /*
         Keydown event for the input table name field in the rename modal
      */
-    $('#table-name').on('keydown', function(e) {
+    $('#table-name').on('keydown', function (e) {
         if (e.key == 'Enter') {
             $('#rename-tt-button').trigger('click');
         }
@@ -95,12 +85,9 @@ $(() => {
     /*
         Click event to set the data attribute before opening the delete modal
      */
-    $('#tt-picker-dropdown').on('click', '.tt-picker-delete', function() {
+    $('#tt-picker-dropdown').on('click', '.tt-picker-delete', function () {
         var tableId = Number(
-            $(this)
-                .closest('li')
-                .find('a:first')
-                .data('table-id'),
+            $(this).closest('li').find('a:first').data('table-id'),
         );
 
         $('#delete-tt-button').data('table-id', tableId);
@@ -109,21 +96,19 @@ $(() => {
     /*
         Click event for the delete button in the delete modal
      */
-    $('#delete-tt-button').on('click', function() {
+    $('#delete-tt-button').on('click', function () {
         var tableId = $(this).data('table-id');
         deleteTable(tableId);
 
         if (timetableStorage.length == 1) {
-            $('#tt-picker-dropdown .tt-picker-delete')
-                .first()
-                .remove();
+            $('#tt-picker-dropdown .tt-picker-delete').first().remove();
         }
     });
 
     /*
         Click event for the download timetable button in the download modal
      */
-    $('#download-tt-button').on('click', function() {
+    $('#download-tt-button').on('click', function () {
         var buttonText = $(this).html();
         $(this)
             .html(
@@ -145,11 +130,9 @@ $(() => {
 
         $layout = appendHeader($layout, width);
 
-        const $timetableClone = $('#timetable')
-            .clone()
-            .css({
-                width: width,
-            });
+        const $timetableClone = $('#timetable').clone().css({
+            width: width,
+        });
         $('table', $timetableClone).css({
             margin: 0,
         });
@@ -165,9 +148,7 @@ $(() => {
             scrollY: -window.scrollY,
         }).then((canvas) => {
             $layout.remove();
-            $(this)
-                .html(buttonText)
-                .attr('disabled', false);
+            $(this).html(buttonText).attr('disabled', false);
 
             var $a = $('<a></a>')
                 .css({
@@ -188,7 +169,7 @@ $(() => {
     /*
         Click event for the download course list button in the download modal
      */
-    $('#download-course-list-button').on('click', function() {
+    $('#download-course-list-button').on('click', function () {
         var buttonText = $(this).html();
         $(this)
             .html(
@@ -210,13 +191,11 @@ $(() => {
 
         $layout = appendHeader($layout, width);
 
-        const $courseListClone = $('#course-list')
-            .clone()
-            .css({
-                width: width,
-                border: '1px solid var(--table-border-color)',
-                'border-bottom': 'none',
-            });
+        const $courseListClone = $('#course-list').clone().css({
+            width: width,
+            border: '1px solid var(--table-border-color)',
+            'border-bottom': 'none',
+        });
         $('table', $courseListClone).css({
             margin: 0,
         });
@@ -224,7 +203,7 @@ $(() => {
             .css({
                 border: 'none',
             })
-            .each(function() {
+            .each(function () {
                 if ($(this).children().length == 1) {
                     return;
                 }
@@ -241,9 +220,7 @@ $(() => {
             scrollY: -window.scrollY,
         }).then((canvas) => {
             $layout.remove();
-            $(this)
-                .html(buttonText)
-                .attr('disabled', false);
+            $(this).html(buttonText).attr('disabled', false);
 
             var $a = $('<a></a>')
                 .css({
@@ -264,7 +241,7 @@ $(() => {
     /*
         Click event for the quick visualization button
      */
-    $('#quick-toggle').on('click', function() {
+    $('#quick-toggle').on('click', function () {
         if ($(this).attr('data-state') == 'enabled') {
             $('i', this).prop('class', 'fas fa-eye');
             $('span', this).html('&nbsp;&nbsp;Enable Quick Visualization');
@@ -292,7 +269,7 @@ $(() => {
     /*
         Click event for the reset button in the reset modal
      */
-    $('#reset-tt-button').on('click', function() {
+    $('#reset-tt-button').on('click', function () {
         resetPage();
         activeTable.data = [];
         updateLocalForage();
@@ -359,17 +336,13 @@ function getTableIndex(id) {
     Function to fill the timetable and course list
  */
 function fillPage() {
-    $.each(activeTable.data, function(index, courseData) {
+    $.each(activeTable.data, function (index, courseData) {
         addCourseToCourseList(courseData);
         addCourseToTimetable(courseData);
     });
 
-    $.each(activeTable.quick, function(index, el) {
-        var $el = $('#timetable')
-            .find('tr')
-            .eq(el[0])
-            .find('td')
-            .eq(el[1]);
+    $.each(activeTable.quick, function (index, el) {
+        var $el = $('#timetable').find('tr').eq(el[0]).find('td').eq(el[1]);
         var slot = $el.get(0).classList[1];
 
         $(`.quick-buttons .${slot}-tile`).addClass('highlight');
@@ -498,8 +471,8 @@ function checkSlotClash() {
     const $theoryHours = $('#theory td:not(.lunch)');
     const $labHours = $('#lab td:not(.lunch)');
 
-    $('#timetable tr').each(function() {
-        $('.highlight', this).each(function() {
+    $('#timetable tr').each(function () {
+        $('.highlight', this).each(function () {
             const index = $(this).index();
             var currentEnd, nextStart;
 
@@ -566,7 +539,7 @@ function checkSlotClash() {
             if ($('div', this).length > 1) {
                 $(this).addClass('clash');
 
-                $('div', this).each(function() {
+                $('div', this).each(function () {
                     const dataCourse = $(this).data('course');
                     $(`#course-list tr[data-course=${dataCourse}]`).addClass(
                         'table-danger',
@@ -576,16 +549,14 @@ function checkSlotClash() {
 
             if (nextStart && nextStart < currentEnd) {
                 $(this).addClass('clash');
-                $(this)
-                    .next()
-                    .addClass('clash');
+                $(this).next().addClass('clash');
 
                 const dataCourse = $('div', this).data('course');
                 $(`#course-list tr[data-course=${dataCourse}]`).addClass(
                     'table-danger',
                 );
 
-                $('div', $(this).next()).each(function() {
+                $('div', $(this).next()).each(function () {
                     const dataCourse = $(this).data('course');
                     $(`#course-list tr[data-course=${dataCourse}]`).addClass(
                         'table-danger',
@@ -603,7 +574,7 @@ function initializeQuickVisualization() {
     /*
         Click event for the quick visualization buttons
      */
-    $('.quick-buttons *[class*="-tile"]').on('click', function() {
+    $('.quick-buttons *[class*="-tile"]').on('click', function () {
         var slot = this.classList[0].split('-')[0];
 
         if (
@@ -613,9 +584,7 @@ function initializeQuickVisualization() {
             var slots = [];
 
             $(`#timetable .${slot}`).each((i, el) => {
-                var row = $(el)
-                    .parent()
-                    .index();
+                var row = $(el).parent().index();
                 var column = $(el).index();
 
                 slots.push([row, column]);
@@ -646,16 +615,14 @@ function initializeQuickVisualization() {
     /*
         Click event for the periods when quick visualization is enabled
      */
-    $('#timetable .period:not([disabled])').on('click', function() {
+    $('#timetable .period:not([disabled])').on('click', function () {
         if (
             $('#quick-toggle').attr('data-state') == 'enabled' &&
             !$(this).hasClass('clash') &&
             $(this).children('div').length == 0
         ) {
             var slot = this.classList[1];
-            var row = $(this)
-                .parent()
-                .index();
+            var row = $(this).parent().index();
             var column = $(this).index();
 
             $(this).toggleClass('highlight');
@@ -684,9 +651,7 @@ function initializeQuickVisualization() {
  */
 window.initializeTimetable = () => {
     var timetable;
-    $('#timetable tr')
-        .slice(2)
-        .hide();
+    $('#timetable tr').slice(2).hide();
     $('#timetable tr td:not(:first-child)').remove();
 
     if (window.campus == 'Chennai') {
@@ -796,7 +761,7 @@ window.initializeTimetable = () => {
      */
     localforage
         .getItem('timetableStorage')
-        .then(function(storedValue) {
+        .then(function (storedValue) {
             timetableStorage = storedValue || timetableStorage;
             activeTable = timetableStorage[0];
 
@@ -809,7 +774,7 @@ window.initializeTimetable = () => {
                 .attr('data-table-id', activeTable.id)
                 .text(activeTable.name);
 
-            timetableStorage.slice(1).forEach(function(table) {
+            timetableStorage.slice(1).forEach(function (table) {
                 addTableToPicker(table.id, table.name);
             });
         })
@@ -820,7 +785,7 @@ window.initializeTimetable = () => {
     Function to add a course to the timetable
  */
 window.addCourseToTimetable = (courseData) => {
-    courseData.slots.forEach(function(slot) {
+    courseData.slots.forEach(function (slot) {
         var $divElement = $(
             `<div 
                 data-course="course${courseData.courseId}"
@@ -836,9 +801,7 @@ window.addCourseToTimetable = (courseData) => {
             $divElement.data('is-theory', true);
         }
 
-        $(`#timetable tr .${slot}`)
-            .addClass('highlight')
-            .append($divElement);
+        $(`#timetable tr .${slot}`).addClass('highlight').append($divElement);
 
         $(`.quick-buttons .${slot}-tile`).addClass('highlight');
     });
@@ -853,7 +816,7 @@ window.addCourseToTimetable = (courseData) => {
 window.removeCourseFromTimetable = (course) => {
     $(`#timetable tr td div[data-course="${course}"]`)
         .parent()
-        .each(function() {
+        .each(function () {
             if ($(this).children().length != 1) {
                 return;
             }
@@ -865,9 +828,7 @@ window.removeCourseFromTimetable = (course) => {
                 return;
             }
 
-            var row = $(this)
-                .parent()
-                .index();
+            var row = $(this).parent().index();
             var column = $(this).index();
 
             for (var i = 0; i < activeTable.quick.length; ++i) {

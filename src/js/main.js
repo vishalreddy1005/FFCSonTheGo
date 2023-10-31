@@ -4,15 +4,15 @@
  *  that doesn't fit into any particular section
  */
 
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import '../scss/main.scss';
 import '../scss/course-panel.scss';
 import '../scss/timetable.scss';
 import '../scss/course-list.scss';
 
-import localforage from '../../node_modules/localforage/dist/localforage';
+import localforage from 'localforage/dist/localforage';
 
 import './attacher';
 import './course-panel';
@@ -22,11 +22,11 @@ import * as Utils from './utils';
 
 const lastUpdate = require('../../package.json')['lastUpdate'];
 
-$(function() {
+$(function () {
     /*
         Remove focus from quick buttons once clicked
      */
-    $('.quick-buttons .btn').on('click', function() {
+    $('.quick-buttons .btn').on('click', function () {
         $(this).trigger('blur');
     });
 
@@ -86,7 +86,7 @@ window.switchCampus = () => {
     Redirect to the GitHub page when Ctrl + U is clicked
     instead of showing the page source code
  */
-document.onkeydown = function(e) {
+document.onkeydown = function (e) {
     if (e.ctrlKey && e.key == 'u') {
         window.open('https://github.com/vatz88/FFCSonTheGo');
         return false;

@@ -1,7 +1,7 @@
 node_modules
 .vscode
 dist
-.cache
+.parcel-cache
 src/data/*.json
 **/*.DS_Store
 util/output*.json

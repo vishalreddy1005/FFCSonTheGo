@@ -16,7 +16,7 @@
         />
         <link rel="apple-touch-icon" href="./images/icons/icon-192x192.png" />
         <link rel="icon" href="./images/favicon.png" />
-        <script src="./js/main.js"></script>
+        <script src="./js/main.js" type="module"></script>
         <meta name="author" content="Vatsal Joshi" />
         <meta name="subject" content="Education" />
         <meta
@@ -59,7 +59,7 @@
 
                 window.navigator.serviceWorker.addEventListener(
                     'controllerchange',
-                    function() {
+                    function () {
                         if (
                             jQuery &&
                             bootstrap &&
@@ -83,11 +83,11 @@
 
         <!-- Google Analytics -->
         <script>
-            (function(i, s, o, g, r, a, m) {
+            (function (i, s, o, g, r, a, m) {
                 i['GoogleAnalyticsObject'] = r;
                 (i[r] =
                     i[r] ||
-                    function() {
+                    function () {
                         (i[r].q = i[r].q || []).push(arguments);
                     }),
                     (i[r].l = 1 * new Date());
@@ -303,7 +303,7 @@
                         <div
                             id="advanced-options"
                             class="row my-2"
-                            style="display: none;"
+                            style="display: none"
                         >
                             <div class="col-6 col-md-3">
                                 <label for="slot-input" class="form-label"
@@ -482,7 +482,7 @@
         <!-- Quick selection tiles - Morning slots -->
         <div
             class="container-sm my-2 quick-buttons noselect"
-            style="display: none;"
+            style="display: none"
         >
             <div><table></table></div>
         </div>
@@ -498,25 +498,25 @@
                     <tr id="lab">
                         <td class="day">LAB <br />HOURS</td>
                     </tr>
-                    <tr id="mon" style="display: none;">
+                    <tr id="mon" style="display: none">
                         <td class="day">MON</td>
                     </tr>
-                    <tr id="tue" style="display: none;">
+                    <tr id="tue" style="display: none">
                         <td class="day">TUE</td>
                     </tr>
-                    <tr id="wed" style="display: none;">
+                    <tr id="wed" style="display: none">
                         <td class="day">WED</td>
                     </tr>
-                    <tr id="thu" style="display: none;">
+                    <tr id="thu" style="display: none">
                         <td class="day">THU</td>
                     </tr>
-                    <tr id="fri" style="display: none;">
+                    <tr id="fri" style="display: none">
                         <td class="day">FRI</td>
                     </tr>
-                    <tr id="sat" style="display: none;">
+                    <tr id="sat" style="display: none">
                         <td class="day">SAT</td>
                     </tr>
-                    <tr id="sun" style="display: none;">
+                    <tr id="sun" style="display: none">
                         <td class="day">SUN</td>
                     </tr>
                 </table>
@@ -527,7 +527,7 @@
         <!-- Quick selection tiles - Evening slots -->
         <div
             class="container-sm mt-3 quick-buttons noselect"
-            style="display: none;"
+            style="display: none"
         >
             <div><table></table></div>
         </div>
@@ -908,12 +908,12 @@
         <!-- Initializing Disqus -->
         <!-- DO NOT EDIT THIS SECTION UNLESS NECESSARY -->
         <script>
-            var disqus_config = function() {
+            var disqus_config = function () {
                 this.page.url = 'https://ffcsonthego.vatz88.in/'; // Replace PAGE_URL with your page's canonical URL variable
                 this.page.identifier = 'ffcsonthego_main_page'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
             };
 
-            (function() {
+            (function () {
                 var d = document,
                     s = d.createElement('script');
                 s.src = 'https://ffcsonthego.disqus.com/embed.js';
