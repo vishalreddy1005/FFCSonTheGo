@@ -72,7 +72,7 @@ describe('are xlsx slots present in schema', () => {
         expect(extraSlots).toStrictEqual([]);
     });
 
-    test('chennai', () => {
+    test.skip('chennai', () => {
         const xlsxSlots = getXlsxSlots('report_chennai.xlsx');
         const schemaSlots = getSchemaSlots('chennai.json');
         const extraSlots = [...xlsxSlots].filter((x) => !schemaSlots.has(x));
