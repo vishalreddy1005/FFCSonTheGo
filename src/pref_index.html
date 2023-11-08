@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -7,7 +7,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
-        <title>FFCS On The Go - VIT University</title>
+        <title>FFCS On The Go - Pref TT</title>
         <link rel="manifest" href="./manifest.webmanifest" />
         <link
             rel="icon"
@@ -250,130 +250,9 @@
         <div class="container-xl">
             <div class="card">
                 <div class="card-header text-center fw-bold">
-                    Search Courses
+                    Add Course Preferences
                 </div>
-                <div class="card-body">
-                    <form id="course-panel" class="container">
-                        <div class="row gy-3">
-                            <div class="col-lg-9 col-12">
-                                <label for="course-input" class="form-label"
-                                    >Course</label
-                                >
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="course-input"
-                                    placeholder="CSE1001 or Problem Solving and Programming"
-                                />
-                            </div>
-
-                            <div class="col-lg-3 col-12">
-                                <label for="slot-filter" class="form-label"
-                                    >Filter By Slot</label
-                                >
-                                <select
-                                    id="slot-filter"
-                                    class="selectpicker"
-                                    data-width="100%"
-                                    data-live-search="true"
-                                    data-live-search-placeholder="Search for a slot"
-                                    multiple
-                                    disabled
-                                ></select>
-                            </div>
-                        </div>
-
-                        <div class="row mt-2">
-                            <div class="col-12">
-                                <blockquote>
-                                    <p class="text-black-50 fs-6 fw-light">
-                                        Search for a course, select a slot and
-                                        click the button below or double click
-                                        the slot to add it to your timetable.
-                                    </p>
-                                </blockquote>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div id="slot-buttons"></div>
-                        </div>
-
-                        <div class="row mt-1 mb-3">
-                            <div class="col-12 text-center">
-                                <button
-                                    id="advanced-toggle"
-                                    type="button"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    Show Advanced Options
-                                </button>
-                            </div>
-                        </div>
-
-                        <div
-                            id="advanced-options"
-                            class="row my-2"
-                            style="display: none"
-                        >
-                            <div class="col-6 col-md-3">
-                                <label for="slot-input" class="form-label"
-                                    >Slot</label
-                                >
-                                <input
-                                    id="slot-input"
-                                    class="form-control text-uppercase"
-                                    type="text"
-                                    autocomplete="off"
-                                    placeholder="A1+TA1"
-                                />
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="faculty-input" class="form-label"
-                                    >Faculty</label
-                                >
-                                <input
-                                    id="faculty-input"
-                                    class="form-control text-uppercase"
-                                    type="text"
-                                    autocomplete="off"
-                                    placeholder="JOHN DOE"
-                                />
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="venue-input" class="form-label"
-                                    >Venue</label
-                                >
-                                <input
-                                    id="venue-input"
-                                    class="form-control text-uppercase"
-                                    type="text"
-                                    autocomplete="off"
-                                    placeholder="SJTG01"
-                                />
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="credits-input" class="form-label"
-                                    >Credits</label
-                                >
-                                <input
-                                    id="credits-input"
-                                    class="form-control text-uppercase"
-                                    type="number"
-                                    autocomplete="off"
-                                    placeholder="4"
-                                />
-                            </div>
-
-                            <!-- This input field is to store whether the selected option is a project -->
-                            <input
-                                id="inputIsProject"
-                                type="hidden"
-                                value="false"
-                            />
-                        </div>
-                    </form>
-                </div>
+                <div class="card-body"></div>
 
                 <div class="card-footer">
                     <div class="row align-items-center justify-content-between">
@@ -387,14 +266,28 @@
                                 type="button"
                                 class="btn btn-light me-1"
                             >
-                                Clear
+                                Save
+                            </button>
+                            <button
+                                id="clear-panel-button"
+                                type="button"
+                                class="btn btn-light me-1"
+                            >
+                                Load Last Saved
+                            </button>
+                            <button
+                                id="clear-panel-button"
+                                type="button"
+                                class="btn btn-light me-1"
+                            >
+                                Reset
                             </button>
                             <button
                                 id="add-course-button"
                                 type="button"
                                 class="btn btn-success"
                             >
-                                Add Course
+                                Clear
                             </button>
                         </div>
                     </div>
