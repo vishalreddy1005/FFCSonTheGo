@@ -23,9 +23,18 @@
       "default",
       {
         "ignore": [
-          "width: fit-content"
+          "width: fit-content",
+          "text-align: -webkit-match-parent",
+          "-webkit-text-size-adjust",
+          "-webkit-tap-highlight-color",
+          "text-decoration-skip-ink",
+          "-webkit-overflow-scrolling",
+          "text-decoration-thickness",
+          "text-underline-offset",
+          "overflow-anchor"
         ]
       }
-    ]
+    ],
+    "css-prefix-order": "off"
   }
 }

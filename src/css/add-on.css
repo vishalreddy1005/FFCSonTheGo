@@ -1,0 +1,110 @@
+.header-button {
+    display: flex;
+    flex-direction: row;
+}
+.header-button-element {
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    direction: rtl;
+}
+.header-button-element > * {
+    margin-left: 1%;
+}
+
+.search_btn_course {
+    margin: 0 4px; /* Adjust the margin as desired */ /* Remove height property to allow button height to adjust */
+    height: 2.1em;
+    display: flex; /* Added display: flex */
+    align-items: center;
+}
+
+.dropdown-list {
+    display: none;
+}
+
+.dropdown-list.show {
+    display: block;
+}
+
+.dropdown-heading {
+    cursor: pointer;
+    border: #020202;
+}
+
+.arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.8rem;
+    border-top: 0.5rem solid transparent;
+    border-bottom: 0.5rem solid transparent;
+    border-left: 0.5rem solid rgba(212, 1, 1, 0.766);
+    transition: transform 0.3s ease;
+}
+.dropdown-list h5 h6 {
+    color: #020202;
+    padding-left: 2%;
+}
+
+.dropdown-heading.open .arrow {
+    transform: rotate(90deg);
+    border-left: 0.6rem solid rgba(25, 183, 54, 0.766);
+}
+.content_divider {
+    color: rgba(17, 17, 17, 0.43);
+}
+.content_body {
+    overflow-y: scroll;
+}
+
+/* Change the scrollbar track color */
+.content_body::-webkit-scrollbar {
+    width: 8px;
+    background-color: #f5f5f500; /* Change to your desired color */
+}
+
+.dropdown-list h6 {
+    position: relative;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.dropdown-list h6 span.highlight {
+    color: rgb(229, 63, 63);
+}
+
+.dropdown h2 {
+    color: #070707;
+    font-weight: bold;
+    padding: 1%;
+    padding-left: 3%;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.2);
+    background-color: rgb(252, 252, 252);
+    border-radius: 3px;
+    margin: 0;
+}
+
+.dropdown ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.dropdown li {
+    color: #000000da;
+    padding-right: 5px;
+    font-size: large;
+    font-weight: 600;
+    padding-left: 5%;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: azure;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.2);
+}
+.dropdown li label {
+    padding-left: 3%;
+}
+
+.left-border {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.2);
+}

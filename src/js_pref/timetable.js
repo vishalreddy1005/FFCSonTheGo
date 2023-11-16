@@ -12,6 +12,7 @@ var timetableStoragePref = [
         id: 0,
         name: 'Default Table',
         data: [],
+        subject: [],
         quick: [],
     },
 ];
@@ -273,7 +274,10 @@ $(() => {
     $('#reset-tt-button').on('click', function () {
         resetPage();
         activeTable.data = [];
+        activeTable.quick = [];
+        activeTable['subject'] = {};
         updateLocalForage();
+        showAddTeacherDiv();
     });
 });
 
@@ -363,6 +367,7 @@ function switchTable(tableId) {
     activeTable = timetableStoragePref[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
     fillPage();
+    showAddTeacherDiv();
 }
 
 /*
@@ -370,6 +375,7 @@ function switchTable(tableId) {
  */
 function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
+    showAddTeacherDiv();
 }
 
 /*
@@ -403,6 +409,7 @@ function renameTable(tableId, tableName) {
     var tableIndex = getTableIndex(tableId);
     timetableStoragePref[tableIndex].name = tableName;
     updateLocalForage();
+    console.log(timetableStoragePref);
 
     // Check if the active table is renamed
     if (activeTable.id == tableId) {
@@ -460,6 +467,7 @@ function addTableToPicker(tableId, tableName) {
                 ></a>`,
             );
     }
+    showAddTeacherDiv();
 }
 
 /*
@@ -572,6 +580,7 @@ function checkSlotClash() {
     Function to initialize quick visualization
  */
 function initializeQuickVisualization() {
+    showAddTeacherDiv();
     /*
         Click event for the quick visualization buttons
      */
@@ -754,7 +763,7 @@ window.initializeTimetable = () => {
             ++labIndex;
         }
     }
-
+    showAddTeacherDiv();
     initializeQuickVisualization();
 
     /*
@@ -780,6 +789,7 @@ window.initializeTimetable = () => {
             });
         })
         .catch(console.error);
+    showAddTeacherDiv();
 };
 
 /*
@@ -806,7 +816,7 @@ window.addCourseToTimetable = (courseData) => {
 
         $(`.quick-buttons .${slot}-tile`).addClass('highlight');
     });
-
+    showAddTeacherDiv();
     checkSlotClash();
     updateLocalForage();
 };
@@ -848,6 +858,7 @@ window.removeCourseFromTimetable = (course) => {
         });
 
     $(`#timetable tr td div[data-course="${course}"]`).remove();
+    showAddTeacherDiv();
     checkSlotClash();
     updateLocalForage();
 };
@@ -862,4 +873,115 @@ window.clearTimetable = () => {
     if ($('#timetable tr div[data-course]')) {
         $('#timetable tr div[data-course]').remove();
     }
+    showAddTeacherDiv();
 };
+
+document
+    .getElementById('saveSubjectModal')
+    .addEventListener('click', function () {
+        const courseName = document
+            .getElementById('course-input_remove')
+            .value.trim();
+        const credits = parseInt(
+            document.getElementById('credits-input').value.trim(),
+        );
+        const spanCourseAddSuccess = document.getElementById('span-course-add');
+        var spanMsg = '';
+        var spanMsgColor = '';
+        if (courseName === '' || isNaN(credits)) {
+            if (courseName === '' && isNaN(credits)) {
+                spanMsg = 'Course Name and Credits are empty';
+                spanMsgColor = 'red';
+            } else if (courseName === '') {
+                spanMsg = 'Course Name is empty';
+                spanMsgColor = 'red';
+            } else if (isNaN(credits)) {
+                spanMsg = 'Credits is empty';
+                spanMsgColor = 'red';
+            }
+        } else {
+            if (
+                !timetableStoragePref[window.activeTable.id].hasOwnProperty(
+                    'subject',
+                )
+            ) {
+                timetableStoragePref[window.activeTable.id]['subject'] = {};
+                const subject = { teacher: [], credits: credits };
+                timetableStoragePref[window.activeTable.id].subject[
+                    courseName
+                ] = subject;
+                spanMsg = 'Course Added Successfully';
+                document.getElementById('inputId').value = '';
+                spanMsgColor = 'green';
+                document.getElementById('course-input_remove').value = '';
+            } else if (
+                !Object.keys(
+                    timetableStoragePref[window.activeTable.id].subject,
+                )
+                    .map((key) => key.toLowerCase())
+                    .includes(courseName.toLowerCase())
+            ) {
+                const subject = { teacher: {}, credits: credits };
+                timetableStoragePref[window.activeTable.id].subject[
+                    courseName
+                ] = subject;
+                spanMsg = 'Course Added Successfully';
+                spanMsgColor = 'green';
+                document.getElementById('course-input_remove').value = '';
+            } else {
+                spanMsg = 'Course Already Exists';
+                spanMsgColor = 'orange';
+            }
+            console.log(timetableStoragePref);
+            updateLocalForage();
+        }
+        document.getElementById('hide_br').style.display = 'none';
+        spanCourseAddSuccess.style.color = spanMsgColor;
+        spanCourseAddSuccess.style.fontWeight = 'bolder';
+        spanCourseAddSuccess.textContent = spanMsg;
+        setTimeout(() => {
+            spanCourseAddSuccess.textContent = '';
+            document.getElementById('hide_br').style.display = 'inline';
+        }, 5000);
+    });
+
+function showAddTeacherDiv() {
+    var addCourseDiv = document.getElementById('div-for-add-course');
+    var addTeacherDiv = document.getElementById('div-for-add-teacher');
+    addCourseDiv.style.display = 'none';
+    addTeacherDiv.style.display = 'block';
+    const courseSelect = document.getElementById('course-select-add-teacher');
+    courseSelect.innerHTML = '';
+    if (
+        !timetableStoragePref[window.activeTable.id].hasOwnProperty('subject')
+    ) {
+        courseSelect.innerHTML =
+            '<option selected>You need to add courses</option>';
+        console.log('No subject');
+    } else {
+        if (
+            Object.keys(timetableStoragePref[window.activeTable.id].subject)
+                .length === 0
+        ) {
+            courseSelect.innerHTML =
+                '<option selected>You need to add courses</option>';
+        } else {
+            courseSelect.innerHTML = '<option selected>Select Course</option>';
+            console.log(timetableStoragePref[window.activeTable.id].subject);
+            Object.keys(
+                timetableStoragePref[window.activeTable.id].subject,
+            ).forEach((key) => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = key;
+                courseSelect.appendChild(option);
+            });
+        }
+    }
+}
+
+document
+    .getElementById('tt-teacher-add')
+    .addEventListener('click', function () {
+        showAddTeacherDiv();
+    });
