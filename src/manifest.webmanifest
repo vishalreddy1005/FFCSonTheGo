@@ -1,10 +1,10 @@
 {
     "name": "FFCS On The Go",
-    "short_name": "FFCS On The Go",
+    "short_name": "FFCSOnTheGo",
     "theme_color": "#9c27b0",
     "background_color": "#ffffff",
     "display": "standalone",
-    "Scope": "/",
+    "scope": "/",
     "start_url": "/?utm_source=homescreen",
     "icons": [
         {
@@ -47,6 +47,5 @@
             "sizes": "512x512",
             "type": "image/png"
         }
-    ],
-    "splash_pages": null
+    ]
 }

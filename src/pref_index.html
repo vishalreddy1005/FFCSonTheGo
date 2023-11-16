@@ -3,10 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>FFCS On The Go - Pref TT</title>
         <link rel="manifest" href="./manifest.webmanifest" />
         <link
@@ -16,7 +13,7 @@
         />
         <link rel="apple-touch-icon" href="./images/icons/icon-192x192.png" />
         <link rel="icon" href="./images/favicon.png" />
-        <script src="./js/main.js" type="module"></script>
+        <script src="./js_pref/main.js" type="module"></script>
         <meta name="author" content="Vatsal Joshi" />
         <meta name="subject" content="Education" />
         <meta
@@ -172,6 +169,7 @@
                             >
                                 <li>
                                     <a
+                                        rel="noopener"
                                         class="dropdown-item"
                                         href="https://www.facebook.com/sharer/sharer.php?message=FFCS made hassle free!&u=https://ffcsonthego.vatz88.in/"
                                         target="_blank"
@@ -183,6 +181,7 @@
 
                                 <li>
                                     <a
+                                        rel="noopener"
                                         class="dropdown-item"
                                         href="https://www.linkedin.com/sharing/share-offsite/?url=https://ffcsonthego.vatz88.in/"
                                         target="_blank"
@@ -194,6 +193,7 @@
 
                                 <li>
                                     <a
+                                        rel="noopener"
                                         class="dropdown-item"
                                         href="https://twitter.com/intent/tweet?text=FFCS made hassle free! https://ffcsonthego.vatz88.in/"
                                         target="_blank"
@@ -217,6 +217,7 @@
                         </div>
 
                         <a
+                            rel="noopener"
                             href="https://github.com/vatz88/FFCSonTheGo"
                             target="_blank"
                         >
@@ -262,14 +263,14 @@
 
                         <div class="col-sm-auto my-1 text-center">
                             <button
-                                id="clear-panel-button"
+                                id="save-panel-button"
                                 type="button"
                                 class="btn btn-light me-1"
                             >
                                 Save
                             </button>
                             <button
-                                id="clear-panel-button"
+                                id="load-panel-button"
                                 type="button"
                                 class="btn btn-light me-1"
                             >
@@ -332,10 +333,12 @@
                                                 href="JavaScript:void(0);"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#rename-modal"
-                                                ><i
+                                                title="Rename"
+                                            >
+                                                <i
                                                     class="fas fa-pencil-alt"
-                                                ></i
-                                            ></a>
+                                                ></i>
+                                            </a>
                                         </td>
                                     </table>
                                 </li>
@@ -346,6 +349,7 @@
                             id="tt-picker-add"
                             type="button"
                             class="btn btn-primary"
+                            title="Add Table"
                         >
                             <i class="fas fa-plus"></i>
                         </button>

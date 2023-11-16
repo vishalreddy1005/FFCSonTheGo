@@ -7,7 +7,7 @@ import localforage from 'localforage/dist/localforage';
 import html2canvas from 'html2canvas/dist/html2canvas';
 import { parse, isValid } from 'date-fns';
 
-var timetableStorage = [
+var timetableStoragePref = [
     {
         id: 0,
         name: 'Default Table',
@@ -16,17 +16,18 @@ var timetableStorage = [
     },
 ];
 
-window.activeTable = timetableStorage[0];
+window.activeTable = timetableStoragePref[0];
 
 $(() => {
     /*
         Click event for the add table button
      */
     $('#tt-picker-add').on('click', function () {
-        var newTableId = timetableStorage[timetableStorage.length - 1].id + 1;
+        var newTableId =
+            timetableStoragePref[timetableStoragePref.length - 1].id + 1;
         var newTableName = 'Table ' + newTableId;
 
-        timetableStorage.push({
+        timetableStoragePref.push({
             id: newTableId,
             name: newTableName,
             data: [],
@@ -100,7 +101,7 @@ $(() => {
         var tableId = $(this).data('table-id');
         deleteTable(tableId);
 
-        if (timetableStorage.length == 1) {
+        if (timetableStoragePref.length == 1) {
             $('#tt-picker-dropdown .tt-picker-delete').first().remove();
         }
     });
@@ -110,8 +111,6 @@ $(() => {
      */
     $('#download-tt-button').on('click', function () {
         var buttonText = $(this).html();
-        console.log(timetableStorage);
-
         $(this)
             .html(
                 `<span
@@ -172,7 +171,6 @@ $(() => {
         Click event for the download course list button in the download modal
      */
     $('#download-course-list-button').on('click', function () {
-        console.log(timetableStorage);
         var buttonText = $(this).html();
         $(this)
             .html(
@@ -324,7 +322,7 @@ function appendHeader($layout, width) {
  */
 function updateLocalForage() {
     localforage
-        .setItem('timetableStorage', timetableStorage)
+        .setItem('timetableStoragePref', timetableStoragePref)
         .catch(console.error);
 }
 
@@ -332,7 +330,7 @@ function updateLocalForage() {
     Function to get the table index
  */
 function getTableIndex(id) {
-    return timetableStorage.findIndex((el) => el.id == id);
+    return timetableStoragePref.findIndex((el) => el.id == id);
 }
 
 /*
@@ -362,7 +360,7 @@ function fillPage() {
 function switchTable(tableId) {
     resetPage();
 
-    activeTable = timetableStorage[getTableIndex(tableId)];
+    activeTable = timetableStoragePref[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
     fillPage();
 }
@@ -379,15 +377,15 @@ function updatePickerLabel(tableName) {
  */
 function deleteTable(tableId) {
     var tableIndex = getTableIndex(tableId);
-    timetableStorage.splice(tableIndex, 1);
+    timetableStoragePref.splice(tableIndex, 1);
     updateLocalForage();
 
     // Check if the active table is deleted
     if (activeTable.id == tableId) {
         if (tableIndex == 0) {
-            switchTable(timetableStorage[0].id);
+            switchTable(timetableStoragePref[0].id);
         } else {
-            switchTable(timetableStorage[tableIndex - 1].id);
+            switchTable(timetableStoragePref[tableIndex - 1].id);
         }
     }
 
@@ -403,7 +401,7 @@ function deleteTable(tableId) {
  */
 function renameTable(tableId, tableName) {
     var tableIndex = getTableIndex(tableId);
-    timetableStorage[tableIndex].name = tableName;
+    timetableStoragePref[tableIndex].name = tableName;
     updateLocalForage();
 
     // Check if the active table is renamed
@@ -449,7 +447,7 @@ function addTableToPicker(tableId, tableName) {
         </li>`,
     );
 
-    if (timetableStorage.length == 2) {
+    if (timetableStoragePref.length == 2) {
         $('#tt-picker-dropdown .tt-picker-rename')
             .first()
             .after(
@@ -763,10 +761,10 @@ window.initializeTimetable = () => {
         Getting saved data from localforage
      */
     localforage
-        .getItem('timetableStorage')
+        .getItem('timetableStoragePref')
         .then(function (storedValue) {
-            timetableStorage = storedValue || timetableStorage;
-            activeTable = timetableStorage[0];
+            timetableStoragePref = storedValue || timetableStoragePref;
+            activeTable = timetableStoragePref[0];
 
             updatePickerLabel(activeTable.name);
             fillPage();
@@ -777,7 +775,7 @@ window.initializeTimetable = () => {
                 .attr('data-table-id', activeTable.id)
                 .text(activeTable.name);
 
-            timetableStorage.slice(1).forEach(function (table) {
+            timetableStoragePref.slice(1).forEach(function (table) {
                 addTableToPicker(table.id, table.name);
             });
         })
