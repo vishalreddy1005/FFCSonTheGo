@@ -911,9 +911,9 @@ document
                     courseName
                 ] = subject;
                 spanMsg = 'Course Added Successfully';
-                document.getElementById('inputId').value = '';
                 spanMsgColor = 'green';
                 document.getElementById('course-input_remove').value = '';
+                document.getElementById('credits-input').value = '';
             } else if (
                 !Object.keys(
                     timetableStoragePref[window.activeTable.id].subject,
@@ -928,6 +928,7 @@ document
                 spanMsg = 'Course Added Successfully';
                 spanMsgColor = 'green';
                 document.getElementById('course-input_remove').value = '';
+                document.getElementById('credits-input').value = '';
             } else {
                 spanMsg = 'Course Already Exists';
                 spanMsgColor = 'orange';
@@ -985,3 +986,15 @@ document
     .addEventListener('click', function () {
         showAddTeacherDiv();
     });
+
+function closeEditPref() {
+    document.getElementById('tt-subject-edit').style.display = 'block';
+    document.getElementById('tt-subject-add').style.display = 'block';
+    document.getElementById('tt-teacher-add').style.display = 'block';
+    document.getElementById('tt-subject-collapse').style.display = 'none';
+    document.getElementById('tt-subject-done').style.display = 'none';
+    document.getElementById('div-for-add-teacher').style.display = 'block';
+}
+document
+    .getElementById('tt-subject-done')
+    .addEventListener('click', closeEditPref);

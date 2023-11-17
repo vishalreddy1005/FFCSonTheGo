@@ -251,7 +251,7 @@
         <div class="container-xl">
             <div class="card">
                 <div class="card-header text-left fw-bold header-button">
-                    <div style="width: 30%; align-self: center">
+                    <div class="c_pref" style="width: 28%; align-self: center">
                         Course Preferences
                     </div>
                     <div class="text-left header-button-element">
@@ -260,7 +260,7 @@
                             type="button"
                             class="btn btn-success"
                         >
-                            <i class="fas fa-plus"></i> &emsp13;Add Teachers
+                            <i class="fas fa-plus"></i> &emsp13;Teachers
                         </button>
                         <button
                             id="tt-subject-add"
@@ -270,13 +270,32 @@
                         >
                             <!-- data-toggle="modal"
                             data-target="#exampleModal" -->
-                            <i class="fas fa-plus"></i> &emsp13;Add Course
+                            <i class="fas fa-plus"></i> &emsp13;Course
                         </button>
-
+                        <button
+                            style="display: none"
+                            id="tt-subject-collapse"
+                            class="btn btn-outline-secondary ms-1 me-1"
+                            type="button"
+                            onclick="editPrefCollapse()"
+                        >
+                            <i class="fas fa-close"></i>
+                            <span>&nbsp;&nbsp;Collapse All</span>
+                        </button>
+                        <button
+                            style="display: none"
+                            id="tt-subject-done"
+                            class="btn btn-primary ms-1 me-1"
+                            type="button"
+                            onclick="closeEditPref1()"
+                        >
+                            <span>&nbsp;Done</span>
+                        </button>
                         <button
                             id="tt-subject-edit"
                             class="btn btn-warning ms-1 me-1"
                             type="button"
+                            onclick="editPref()"
                         >
                             <i class="fas fa-pencil"></i>
                             <span>&nbsp;&nbsp;Edit</span>
@@ -289,13 +308,14 @@
                         padding: 0%;
                         display: flex;
                         flex-direction: row;
-                        min-height: 500px;
+                        min-height: 470px;
+                        max-height: 470px;
                     "
                     class="card-body"
                 >
                     <section
-                        style="width: 64%; height: 100%"
-                        class="left-border"
+                        style="height: 470px; width: 64%"
+                        class="left-border left-box"
                     >
                         <div class="dropdown">
                             <div
@@ -305,13 +325,14 @@
                                 <h2>Maths <span class="arrow"></span></h2>
                             </div>
                             <ul class="dropdown-list" id="dropdownList">
-                                <li>
+                                <li style="display: flex; flex-direction: row">
                                     <input
                                         type="radio"
                                         id="option1"
                                         name="option"
+                                        value="option1"
                                     />
-                                    <label for="option1">Option 1</label>
+                                    <div style="padding-left: 4%">Option 1</div>
                                 </li>
                                 <li>
                                     <input
@@ -319,7 +340,7 @@
                                         id="option2"
                                         name="option"
                                     />
-                                    <label for="option2">Option 2</label>
+                                    <div style="padding-left: 4%">Option 2</div>
                                 </li>
                                 <li>
                                     <input
@@ -327,7 +348,7 @@
                                         id="option3"
                                         name="option"
                                     />
-                                    <label for="option3">Option 3</label>
+                                    <div style="padding-left: 4%">Option 3</div>
                                 </li>
                             </ul>
                         </div>
@@ -337,7 +358,7 @@
                                 class="dropdown-heading"
                                 onclick="toggleDropdown(this)"
                             >
-                                <h2>Maths <span class="arrow"></span></h2>
+                                <h2>CSE <span class="arrow"></span></h2>
                             </div>
                             <ul class="dropdown-list" id="dropdownList">
                                 <li>Hello</li>
@@ -350,7 +371,7 @@
                                 class="dropdown-heading"
                                 onclick="toggleDropdown(this)"
                             >
-                                <h2>Maths <span class="arrow"></span></h2>
+                                <h2>Physics <span class="arrow"></span></h2>
                             </div>
                             <ul class="dropdown-list" id="dropdownList">
                                 <li>Hello</li>
@@ -360,9 +381,9 @@
                         </div>
                     </section>
 
-                    <section style="width: 34%" class="left-border">
+                    <section class="left-border right-box">
                         <!-- add course div -->
-                        <div id="div-for-add-course">
+                        <div style="display: none" id="div-for-add-course">
                             <div>
                                 <h4 style="padding: 4.5%; padding-bottom: 0">
                                     Add Course
@@ -1121,7 +1142,7 @@
                         <input
                             type="text"
                             class="form-control"
-                            id="course-input_remove"
+                            id="course-input_removem"
                             placeholder="CSE1001 Problem Solving and Programming"
                             autocomplete="off"
                         />
@@ -1130,7 +1151,7 @@
                             >&emsp14;&emsp14;Credits</label
                         >
                         <input
-                            id="credits-input"
+                            id="credits-inputm"
                             class="form-control text-uppercase"
                             type="number"
                             style="max-width: 25%"
@@ -1139,7 +1160,7 @@
                         />
 
                         <br />
-                        <span id="span-course-add"></span>
+                        <span id="span-course-addm"></span>
                     </div>
 
                     <!-- use 'course-input' this as id for above input to get the list of couses-->
@@ -1156,7 +1177,7 @@
                         <button
                             type="button"
                             class="btn btn-primary"
-                            id="saveSubjectModal"
+                            id="saveSubjectModalm"
                         >
                             Save
                         </button>
@@ -1214,7 +1235,7 @@
 
         <!-- Initializing Disqus -->
         <!-- DO NOT EDIT THIS SECTION UNLESS NECESSARY -->
-
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
         <script src="./js_pref/add_on.js"></script>
 
         <script>

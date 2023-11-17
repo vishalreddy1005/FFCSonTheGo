@@ -108,3 +108,49 @@
 .left-border {
     border-left: 0.5px solid rgba(0, 0, 0, 0.2);
 }
+
+.left-box {
+    width: 64%;
+    overflow: auto;
+}
+.right-box {
+    width: 34%;
+}
+
+@media screen and (max-width: 630px) {
+    .left-box {
+        width: 100%;
+    }
+    .right-box {
+        display: none;
+    }
+    .header-button {
+        padding-right: 0;
+        margin-right: -1.2%;
+    }
+    .c_pref {
+        font-size: small;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .c_pref {
+        font-size: 0;
+    }
+}
+
+.sortable-chosen h2 {
+    transform: scale(1.01);
+    background-color: aqua;
+    border: 0.5px solid rgba(0, 0, 0, 0.2);
+    color: #650a0aac;
+}
+.sortable-chosen {
+    transform: scale(1.01);
+    border: 0.5px solid rgba(0, 0, 0, 0.2);
+}
+
+.dropdown ul li {
+    display: flex;
+    flex-direction: row;
+}
