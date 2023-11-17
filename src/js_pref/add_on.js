@@ -82,39 +82,33 @@ function openAllDropdowns() {
 }
 
 // Keep references to the Sortable instances
-var sortableInstances = [];
-
 function activateSortable() {
     var leftBox = document.querySelector('.left-box');
-    sortableInstances.push(
-        Sortable.create(leftBox, {
-            animation: 150,
-            delay: 100,
-            chosenClass: 'sortable-chosen',
-        }),
-    );
+    Sortable.create(leftBox, {
+        animation: 150,
+        delay: 100,
+        chosenClass: 'sortable-chosen',
+    });
 
     var dropdownLists = document.querySelectorAll('.dropdown-list');
     dropdownLists.forEach((dropdownList) => {
-        sortableInstances.push(
-            Sortable.create(dropdownList, {
-                animation: 150,
-                delay: 100,
-                chosenClass: 'sortable-chosen',
-            }),
-        );
+        Sortable.create(dropdownList, {
+            animation: 150,
+            delay: 100,
+            chosenClass: 'sortable-chosen',
+        });
     });
 }
 
 function deactivateSortable() {
-    // Call destroy on each Sortable instance
-    sortableInstances.forEach((sortable) => {
-        sortable.destroy();
-    });
-    // Clear the array of Sortable instances
-    // sortableInstances = [];
-}
+    var leftBox = document.querySelector('.left-box');
+    Sortable.get(leftBox).destroy();
 
+    var dropdownLists = document.querySelectorAll('.dropdown-list');
+    dropdownLists.forEach((dropdownList) => {
+        Sortable.get(dropdownList).destroy();
+    });
+}
 function closeEditPref1() {
     deactivateSortable();
 }
