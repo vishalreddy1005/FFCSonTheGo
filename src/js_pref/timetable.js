@@ -906,7 +906,7 @@ document
                 )
             ) {
                 timetableStoragePref[window.activeTable.id]['subject'] = {};
-                const subject = { teacher: [], credits: credits };
+                const subject = { teacher: {}, credits: credits };
                 timetableStoragePref[window.activeTable.id].subject[
                     courseName
                 ] = subject;
@@ -998,3 +998,103 @@ function closeEditPref() {
 document
     .getElementById('tt-subject-done')
     .addEventListener('click', closeEditPref);
+
+document
+    .getElementById('saveTeacherModal')
+    .addEventListener('click', function () {
+        const courseName = document.getElementById(
+            'course-select-add-teacher',
+        ).value;
+        const teacherName = document
+            .getElementById('teacher-input_remove')
+            .value.trim();
+        const slotsInput = document
+            .getElementById('slot-input')
+            .value.trim()
+            .toUpperCase();
+        const venueInput = document
+            .getElementById('venue-input')
+            .value.trim()
+            .toUpperCase();
+        const colorInput = document.getElementById('color1-select').value;
+        const spanTeacherAddSuccess =
+            document.getElementById('span-teacher-add');
+        console.log(colorInput);
+        var spanMsg = '';
+        var spanMsgColor = '';
+        if (courseName === 'Select Course' || teacherName === '') {
+            if (courseName === 'Select Course' && teacherName === '') {
+                spanMsg = 'Course Name and Teacher Name are empty';
+                spanMsgColor = 'red';
+            } else if (courseName === 'Select Course') {
+                spanMsg = 'Course Name is empty';
+                spanMsgColor = 'red';
+            } else if (teacherName === '') {
+                spanMsg = 'Teacher Name is empty';
+                spanMsgColor = 'red';
+            }
+        } else {
+            if (
+                !timetableStoragePref[window.activeTable.id].hasOwnProperty(
+                    'subject',
+                )
+            ) {
+                spanMsg = 'You need to add courses first';
+                spanMsgColor = 'red';
+            } else if (
+                !Object.keys(
+                    timetableStoragePref[window.activeTable.id].subject,
+                )
+                    .map((key) => key.toLowerCase())
+                    .includes(courseName.toLowerCase())
+            ) {
+                spanMsg = 'Course Does Not Exist';
+                spanMsgColor = 'red';
+            } else {
+                if (
+                    !Object.keys(
+                        timetableStoragePref[window.activeTable.id].subject[
+                            courseName
+                        ].teacher,
+                    )
+                        .map((key) => key.toLowerCase())
+                        .includes(teacherName.toLowerCase())
+                ) {
+                    timetableStoragePref[window.activeTable.id].subject[
+                        courseName
+                    ].teacher[teacherName] = {
+                        slots: '',
+                        venue: '',
+                        color: '',
+                    };
+                    timetableStoragePref[window.activeTable.id].subject[
+                        courseName
+                    ].teacher[teacherName]['slots'] = slotsInput;
+                    timetableStoragePref[window.activeTable.id].subject[
+                        courseName
+                    ].teacher[teacherName]['venue'] = venueInput;
+                    timetableStoragePref[window.activeTable.id].subject[
+                        courseName
+                    ].teacher[teacherName]['color'] = colorInput;
+                    spanMsg = 'Teacher Added Successfully';
+                    spanMsgColor = 'green';
+                    document.getElementById('teacher-input_remove').value = '';
+                    document.getElementById('slot-input').value = '';
+                    document.getElementById('venue-input').value = '';
+                } else {
+                    spanMsg = 'Teacher Already Exists';
+                    spanMsgColor = 'orange';
+                }
+            }
+            updateLocalForage();
+        }
+        document.getElementById('hide_br').style.display = 'none';
+        spanTeacherAddSuccess.style.color = spanMsgColor;
+        spanTeacherAddSuccess.style.fontWeight = 'bolder';
+        spanTeacherAddSuccess.textContent = spanMsg;
+        setTimeout(() => {
+            spanTeacherAddSuccess.textContent = '';
+            document.getElementById('hide_br').style.display = 'inline';
+        }, 5000);
+        console.log(timetableStoragePref);
+    });
