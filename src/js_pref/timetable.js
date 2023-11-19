@@ -5,8 +5,8 @@
 
 import localforage from 'localforage/dist/localforage';
 import html2canvas from 'html2canvas/dist/html2canvas';
-import { parse, isValid } from 'date-fns';
-import { fi } from 'date-fns/locale';
+import { parse, isValid, add } from 'date-fns';
+import { fi, te } from 'date-fns/locale';
 
 var timetableStoragePref = [
     {
@@ -874,6 +874,7 @@ window.removeCourseFromTimetable = (course) => {
 /*
     Function to clear the timetable from the body but not delete it's data
  */
+
 window.clearTimetable = () => {
     $('#timetable .period').removeClass('highlight clash');
     $('.quick-buttons *[class*="-tile"]').removeClass('highlight');
@@ -884,6 +885,7 @@ window.clearTimetable = () => {
     showAddTeacherDiv();
 };
 
+// save
 document
     .getElementById('saveSubjectModal')
     .addEventListener('click', function () {
@@ -893,6 +895,39 @@ document
         const credits = parseInt(
             document.getElementById('credits-input').value.trim(),
         );
+
+        function addSubDiv(subjectName, credits) {
+            const div = document.createElement('div');
+            div.classList.add('dropdown');
+            div.classList.add('dropdown-teacher');
+            const divHeading = document.createElement('div');
+            divHeading.classList.add('dropdown-heading');
+            divHeading.setAttribute('onclick', 'toggleDropdown(this)');
+            const divH2s = document.createElement('div');
+            divH2s.classList.add('h2s');
+            divH2s.style.display = 'flex';
+            divH2s.style.flexDirection = 'row';
+            const h2 = document.createElement('h2');
+            const spanCname = document.createElement('span');
+            spanCname.classList.add('cname');
+            spanCname.textContent = subjectName;
+            const pArrow = document.createElement('p');
+            pArrow.classList.add('arrow');
+            const h4 = document.createElement('h4');
+            h4.textContent = `[${credits}]`;
+            divH2s.appendChild(h2);
+            divH2s.appendChild(h4);
+            h2.appendChild(spanCname);
+            h2.appendChild(pArrow);
+            divHeading.appendChild(divH2s);
+            div.appendChild(divHeading);
+            const ul = document.createElement('ul');
+            ul.classList.add('dropdown-list');
+            div.appendChild(ul);
+            document.getElementById('subjectArea').appendChild(div);
+        }
+        // <div class="dropdown dropdown-teacher"><div class="dropdown-heading" onclick="toggleDropdown(this)"><div class="h2s" style="display: flex; flex-direction: row;"><h2><span class="cname">sss</span><p class="arrow"></p></h2><h4>[1]</h4></div></div><ul class="dropdown-list"></ul></div>
+
         const spanCourseAddSuccess = document.getElementById('span-course-add');
         var spanMsg = '';
         var spanMsgColor = '';
@@ -922,6 +957,7 @@ document
                 spanMsgColor = 'green';
                 document.getElementById('course-input_remove').value = '';
                 document.getElementById('credits-input').value = '';
+                addSubDiv(courseName, credits);
             } else if (
                 !Object.keys(
                     timetableStoragePref[window.activeTable.id].subject,
@@ -937,6 +973,7 @@ document
                 spanMsgColor = 'green';
                 document.getElementById('course-input_remove').value = '';
                 document.getElementById('credits-input').value = '';
+                addSubDiv(courseName, credits);
             } else {
                 spanMsg = 'Course Already Exists';
                 spanMsgColor = 'orange';
@@ -954,6 +991,7 @@ document
         }, 5000);
     });
 
+// show teacher view + refresh and build the course select input
 function showAddTeacherDiv() {
     var addCourseDiv = document.getElementById('div-for-add-course');
     var addTeacherDiv = document.getElementById('div-for-add-teacher');
@@ -989,6 +1027,7 @@ function showAddTeacherDiv() {
     }
 }
 
+// load teacher view
 document
     .getElementById('tt-teacher-add')
     .addEventListener('click', function () {
@@ -996,10 +1035,10 @@ document
         console.log(
             JSON.stringify(timetableStoragePref[window.activeTable.id]),
         );
-        fillPage();
         addEventListeners();
     });
 
+// close the edit view
 function closeEditPref() {
     document.getElementById('tt-subject-edit').style.display = 'block';
     document.getElementById('tt-subject-add').style.display = 'block';
@@ -1007,16 +1046,16 @@ function closeEditPref() {
     document.getElementById('tt-subject-collapse').style.display = 'none';
     document.getElementById('tt-subject-done').style.display = 'none';
     document.getElementById('div-for-add-teacher').style.display = 'block';
-    console.log(
-        JSON.stringify(timetableStoragePref[window.activeTable.id].subject),
-    );
-    console.log('@@@@@@');
+    document.getElementById('tt-sub-edit-switch-div').style.display = 'none';
+    document.getElementById('tt-sub-edit-switch').checked = false;
+    editSub = false;
     createSubjectJsonFromHtml();
 }
 document
     .getElementById('tt-subject-done')
     .addEventListener('click', closeEditPref);
 
+// Save teacher
 document
     .getElementById('saveTeacherModal')
     .addEventListener('click', function () {
@@ -1166,6 +1205,7 @@ document
         console.log(timetableStoragePref);
     });
 
+// Targets the li to make it toggable when clicked anywhere on the li element eg the teacher name list
 function addEventListeners() {
     // Get all the list items
     var listItems = document.querySelectorAll('.dropdown li');
@@ -1179,14 +1219,22 @@ function addEventListeners() {
 
             // If this radio button is already selected, deselect it
             if (radioButton === current) {
-                radioButton.checked = false;
-                current = null; // No radio button is currently selected
+                try {
+                    radioButton.checked = false;
+                    current = null; // No radio button is currently selected
+                } catch (error) {
+                    console.log('error');
+                }
             }
             // Otherwise, deselect the currently selected radio button (if any) and select this one
             else {
                 if (current) current.checked = false;
-                radioButton.checked = true;
-                current = radioButton; // This radio button is now the currently selected one
+                try {
+                    radioButton.checked = true;
+                    current = radioButton; // This radio button is now the currently selected one
+                } catch (error) {
+                    console.log('error');
+                }
             }
         });
     }
@@ -1273,7 +1321,7 @@ function createSubjectDropdown(courseName, subject) {
     return dropdown;
 }
 
-// Function to fill the timetable and course list
+// Function to fill the timetable and course list/ subjectArea
 function fillPage() {
     const activeId = window.activeTable.id;
     const activeTable = timetableStoragePref[activeId];
@@ -1295,6 +1343,7 @@ function fillPage() {
 }
 
 // Function to be executed on page load'
+// Load the subjectArea show all info
 document.addEventListener('DOMContentLoaded', onPageLoad);
 function onPageLoad() {
     fillPage();
@@ -1322,7 +1371,7 @@ function createSubjectJsonFromHtml() {
         let teacherData = {};
 
         teachers.forEach((teacher) => {
-            let teacherName = teacher.querySelector('input').value;
+            let teacherName = teacher.querySelectorAll('div')[0].textContent;
             let slots = teacher.querySelectorAll('div')[1].textContent;
             let venue = teacher.querySelectorAll('div')[2].textContent;
             let color = teacher.style.backgroundColor;
@@ -1342,6 +1391,150 @@ function createSubjectJsonFromHtml() {
     timetableStoragePref[window.activeTable.id].subject = result;
     updateLocalForage();
     showAddTeacherDiv();
-    fillPage();
     addEventListeners();
 }
+
+function editPref() {
+    document.getElementById('tt-subject-edit').style.display = 'none';
+    document.getElementById('tt-subject-add').style.display = 'none';
+    document.getElementById('tt-teacher-add').style.display = 'none';
+    document.getElementById('div-for-add-teacher').style.display = 'none';
+    document.getElementById('div-for-add-course').style.display = 'none';
+    document.getElementById('tt-subject-collapse').style.display = 'block';
+    document.getElementById('tt-subject-done').style.display = 'block';
+    document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
+    activateSortable();
+    openAllDropdowns();
+    removeInputFieldsInSection('subjectArea');
+    // Add event listeners to .h2s div elements
+    document.querySelectorAll('.h2s').forEach((div) => {
+        div.addEventListener('click', function () {
+            if (editSub === true) {
+                const subjectName = this.querySelector('.cname').innerText;
+                let credit = this.querySelector('h4')
+                    .innerText.replace('[', '')
+                    .replace(']', '');
+                credit = parseInt(credit);
+                let courseDiv = document.getElementById('div-for-edit-course');
+                courseDiv.style.display = 'block';
+                courseDiv.querySelector('#course-input_edit').value =
+                    subjectName;
+                courseDiv.querySelector('#credits-input-edit').value = credit;
+                courseDiv.querySelector('#course-input-edit-pre').innerText =
+                    subjectName;
+            }
+        });
+    });
+
+    document
+        .getElementById('saveSubjectEditModal')
+        .addEventListener('click', function () {
+            console.log('Save button clicked');
+            let courseDiv = document.getElementById('div-for-edit-course');
+            let subjectArea = document.getElementById('subjectArea');
+            let allSpan = subjectArea.querySelectorAll('.cname');
+            console.log(allSpan);
+            console.log(
+                courseDiv.querySelector('#course-input-edit-pre').innerText,
+            );
+            spanMsg = 'Course not updated';
+            spanMsgColor = 'red';
+            if (courseDiv.querySelector('#credits-input-edit').value === '') {
+                spanMsg = 'Credits cannot be empty';
+                spanMsgColor = 'red';
+            } else if (
+                courseDiv.querySelector('#course-input-edit-pre').innerText ===
+                courseDiv.querySelector('#course-input_edit').value
+            ) {
+                spanMsg = 'Course name is same as before';
+                spanMsgColor = 'orange';
+            } else {
+                allSpan.forEach((span) => {
+                    if (
+                        span.innerText ===
+                        courseDiv.querySelector('#course-input-edit-pre')
+                            .innerText
+                    ) {
+                        var tempSwitchToPassUpdates = 1;
+                        console.log(allSpan);
+                        // check if there is a course with same name
+                        allSpan.forEach((span2) => {
+                            if (
+                                span2.innerText.toLowerCase() ===
+                                courseDiv
+                                    .querySelector('#course-input_edit')
+                                    .value.toLowerCase()
+                            ) {
+                                tempSwitchToPassUpdates = 0;
+                            }
+                        });
+
+                        if (tempSwitchToPassUpdates === 1) {
+                            console.log(span.innerText);
+                            span.innerText =
+                                courseDiv.querySelector(
+                                    '#course-input_edit',
+                                ).value;
+                            courseDiv.querySelector(
+                                '#course-input-edit-pre',
+                            ).innerText = span.innerText;
+                            span.parentElement.parentElement.querySelector(
+                                'h4',
+                            ).innerText =
+                                '[' +
+                                courseDiv.querySelector('#credits-input-edit')
+                                    .value +
+                                ']';
+                            spanMsg = 'Course updated succesfully';
+                            spanMsgColor = 'green';
+                            createSubjectJsonFromHtml();
+                        } else {
+                            spanMsg = 'Course already exists';
+                            spanMsgColor = 'red';
+                        }
+                    }
+                });
+            }
+
+            spanMsgDiv = document.getElementById('span-course-edit');
+            spanMsgDiv.innerText = spanMsg;
+            spanMsgDiv.style.color = spanMsgColor;
+            spanMsgDiv.style.display = 'block';
+            hrHide = document.getElementById('hide_br-edit');
+            hrHide.style.display = 'none';
+            setTimeout(function () {
+                spanMsgDiv.style.display = 'none';
+                hrHide.style.display = 'inline';
+            }, 4000);
+        });
+
+    // Add event listeners to li items
+    document.querySelectorAll('li').forEach((li) => {
+        li.addEventListener('click', function () {
+            allDivInLi = this.querySelectorAll('div');
+            const teacherName = allDivInLi[0].innerText;
+            const slot = allDivInLi[1].innerText;
+            const venue = allDivInLi[2].innerText;
+            console.log('Teacher Name:', teacherName);
+            console.log('Slot:', slot);
+            console.log('Venue:', venue);
+        });
+    });
+
+    // Rest of the code...
+
+    // Add event listeners to li items
+    document.querySelectorAll('li').forEach((li) => {
+        li.addEventListener('click', function () {
+            allDivInLi = this.querySelectorAll('div');
+            const teacherName = allDivInLi[0].innerText;
+            const slot = allDivInLi[1].innerText;
+            const venue = allDivInLi[2].innerText;
+            console.log('Teacher Name:', teacherName);
+            console.log('Slot:', slot);
+            console.log('Venue:', venue);
+        });
+    });
+}
+
+document.getElementById('tt-subject-edit').addEventListener('click', editPref);

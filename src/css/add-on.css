@@ -155,14 +155,10 @@
 }
 
 .sortable-chosen .h2s {
-    transform: scale(1.01);
     background-color: rgb(217, 234, 255);
-    border: 0.5px solid rgba(0, 0, 0, 0.2);
 }
-.sortable-chosen {
-    transform: scale(1.01);
-    border: 0.5px solid rgba(0, 0, 0, 0.2);
-    background-color: rgb(217, 234, 255);
+li.sortable-chosen {
+    background-color: rgb(53, 132, 229);
 }
 
 .dropdown ul li {
