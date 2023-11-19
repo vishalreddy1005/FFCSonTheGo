@@ -1,3 +1,9 @@
+document.addEventListener('DOMContentLoaded', onPageLoad);
+function onPageLoad() {
+    console.log(timetableStoragePref);
+    console.log('hello');
+}
+
 function toggleDropdown(dropdownHeading) {
     var dropdownList = dropdownHeading.nextElementSibling;
     dropdownList.classList.toggle('show');

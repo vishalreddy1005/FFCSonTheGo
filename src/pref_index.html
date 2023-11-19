@@ -314,72 +314,10 @@
                     class="card-body"
                 >
                     <section
-                        style="height: 470px; width: 64%"
+                        style="height: 470px"
                         class="left-border left-box"
-                    >
-                        <div class="dropdown">
-                            <div
-                                class="dropdown-heading"
-                                onclick="toggleDropdown(this)"
-                            >
-                                <h2>Maths <span class="arrow"></span></h2>
-                            </div>
-                            <ul class="dropdown-list" id="dropdownList">
-                                <li style="display: flex; flex-direction: row">
-                                    <input
-                                        type="radio"
-                                        id="option1"
-                                        name="option"
-                                        value="option1"
-                                    />
-                                    <div style="padding-left: 4%">Option 1</div>
-                                </li>
-                                <li>
-                                    <input
-                                        type="radio"
-                                        id="option2"
-                                        name="option"
-                                    />
-                                    <div style="padding-left: 4%">Option 2</div>
-                                </li>
-                                <li>
-                                    <input
-                                        type="radio"
-                                        id="option3"
-                                        name="option"
-                                    />
-                                    <div style="padding-left: 4%">Option 3</div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="dropdown">
-                            <div
-                                class="dropdown-heading"
-                                onclick="toggleDropdown(this)"
-                            >
-                                <h2>CSE <span class="arrow"></span></h2>
-                            </div>
-                            <ul class="dropdown-list" id="dropdownList">
-                                <li>Hello</li>
-                                <li>BYE</li>
-                            </ul>
-                        </div>
-
-                        <div class="dropdown">
-                            <div
-                                class="dropdown-heading"
-                                onclick="toggleDropdown(this)"
-                            >
-                                <h2>Physics <span class="arrow"></span></h2>
-                            </div>
-                            <ul class="dropdown-list" id="dropdownList">
-                                <li>Hello</li>
-                                <li>BYE</li>
-                            </ul>
-                            <hr style="padding: 0%; margin: 0; opacity: 0.09" />
-                        </div>
-                    </section>
+                        id="subjectArea"
+                    ></section>
 
                     <section class="left-border right-box">
                         <!-- add course div -->
@@ -497,13 +435,12 @@
                                             onchange=""
                                         >
                                             <option
-                                                value="rgba(0, 128, 0, 0.2)"
+                                                value="rgb(214, 255, 214)"
                                                 style="
-                                                    background-color: rgba(
-                                                        0,
-                                                        128,
-                                                        0,
-                                                        0.2
+                                                    background-color: rgb(
+                                                        214,
+                                                        255,
+                                                        214
                                                     );
                                                 "
                                                 selected
@@ -511,26 +448,24 @@
                                                 Green
                                             </option>
                                             <option
-                                                value="rgba(255, 165, 0, 0.2)"
+                                                value="rgb(255, 227, 174)"
                                                 style="
-                                                    background-color: rgba(
+                                                    background-color: rgb(
                                                         255,
-                                                        165,
-                                                        0,
-                                                        0.2
+                                                        227,
+                                                        174
                                                     );
                                                 "
                                             >
                                                 Orange
                                             </option>
                                             <option
-                                                value="rgba(255, 0, 0, 0.2)"
+                                                value="rgb(255, 205, 205)"
                                                 style="
-                                                    background-color: rgba(
+                                                    background-color: rgb(
                                                         255,
-                                                        0,
-                                                        0,
-                                                        0.2
+                                                        205,
+                                                        205
                                                     );
                                                 "
                                             >
@@ -1235,6 +1170,7 @@
 
         <!-- Initializing Disqus -->
         <!-- DO NOT EDIT THIS SECTION UNLESS NECESSARY -->
+
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
         <script src="./js_pref/add_on.js"></script>
 
