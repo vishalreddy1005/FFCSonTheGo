@@ -1347,6 +1347,7 @@ function fillPage() {
 document.addEventListener('DOMContentLoaded', onPageLoad);
 function onPageLoad() {
     fillPage();
+    console.log(timetableStoragePref);
 }
 // Add event listener for DOMContentLoaded event
 

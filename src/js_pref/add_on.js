@@ -1,5 +1,3 @@
-document.addEventListener('DOMContentLoaded', onPageLoad);
-function onPageLoad() {}
 var editSub = false;
 
 function toggleDropdown(dropdownHeading) {
