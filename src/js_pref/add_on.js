@@ -1,5 +1,5 @@
 var editSub = false;
-
+var editTeacher = false;
 function toggleDropdown(dropdownHeading) {
     if (editSub === false) {
         var dropdownList = dropdownHeading.nextElementSibling;
@@ -77,6 +77,7 @@ function addInputFieldsInSection(sectionId) {
 }
 
 function editPref() {
+    editTeacher = true;
     document.getElementById('tt-subject-edit').style.display = 'none';
     document.getElementById('tt-subject-add').style.display = 'none';
     document.getElementById('tt-teacher-add').style.display = 'none';
@@ -85,6 +86,7 @@ function editPref() {
     document.getElementById('tt-subject-collapse').style.display = 'block';
     document.getElementById('tt-subject-done').style.display = 'block';
     document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
+    document.getElementById('edit_msg_').style.display = 'block';
     activateSortable();
     openAllDropdowns();
     removeInputFieldsInSection('subjectArea');
@@ -92,6 +94,7 @@ function editPref() {
     document.querySelectorAll('.h2s').forEach((div) => {
         div.addEventListener('click', function () {
             if (editSub === true) {
+                document.getElementById('edit_msg_').style.display = 'none';
                 const subjectName = this.querySelector('.cname').innerText;
                 let credit = this.querySelector('h4')
                     .innerText.replace('[', '')
@@ -113,28 +116,27 @@ function editPref() {
     // Add event listeners to li items
     document.querySelectorAll('li').forEach((li) => {
         li.addEventListener('click', function () {
-            allDivInLi = this.querySelectorAll('div');
-            const teacherName = allDivInLi[0].innerText;
-            const slot = allDivInLi[1].innerText;
-            const venue = allDivInLi[2].innerText;
-            console.log('Teacher Name:', teacherName);
-            console.log('Slot:', slot);
-            console.log('Venue:', venue);
-        });
-    });
-
-    // Rest of the code...
-
-    // Add event listeners to li items
-    document.querySelectorAll('li').forEach((li) => {
-        li.addEventListener('click', function () {
-            allDivInLi = this.querySelectorAll('div');
-            const teacherName = allDivInLi[0].innerText;
-            const slot = allDivInLi[1].innerText;
-            const venue = allDivInLi[2].innerText;
-            console.log('Teacher Name:', teacherName);
-            console.log('Slot:', slot);
-            console.log('Venue:', venue);
+            if (editSub === false && editTeacher === true) {
+                document.getElementById('edit_msg_').style.display = 'none';
+                document.getElementById('div-for-edit-teacher').style.display =
+                    'block';
+                allDivInLi = this.querySelectorAll('div');
+                const courseName =
+                    this.parentElement.parentElement.querySelector(
+                        '.cname',
+                    ).innerText;
+                const teacherName = allDivInLi[0].innerText;
+                const slot = allDivInLi[1].innerText;
+                const venue = allDivInLi[2].innerText;
+                const color = this.style.backgroundColor;
+                document.getElementById('teacher-input_remove-edit').value =
+                    teacherName;
+                document.getElementById('slot-input-edit').value = slot;
+                document.getElementById('venue-input-edit').value = venue;
+                document.getElementById('teacher-edit-course').value =
+                    courseName;
+                document.getElementById('color1-select-edit').value = color;
+            }
         });
     });
 }
@@ -195,8 +197,11 @@ function deactivateSortable() {
     });
 }
 function closeEditPref1() {
+    editTeacher = false;
     deactivateSortable();
     addInputFieldsInSection('subjectArea');
+    document.getElementById('edit_msg_').style.display = 'none';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
 }
 
 document
@@ -213,6 +218,12 @@ document
         document.querySelector('#saveTeacherModal').click(); // Programmatically click the "Save" button
     });
 
+document
+    .querySelector('#teacherSaveFormEdit')
+    .addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the form from being submitted normally
+        document.querySelector('#saveTeacherEdit').click(); // Programmatically click the "Save" button
+    });
 // Add event listener to the toggle checkbox
 document
     .querySelector('#tt-sub-edit-switch')
@@ -221,5 +232,16 @@ document
         editSub = this.checked;
         if (this.checked) {
             closeAllDropdowns();
+            document.getElementById('div-for-edit-teacher').style.display =
+                'none';
+            document.getElementById('edit_msg_').style.display = 'block';
+            document.getElementById('edit_msg_').innerText =
+                'Click on the Subject to edit it.';
+        } else {
+            document.getElementById('div-for-edit-course').style.display =
+                'none';
+            document.getElementById('edit_msg_').style.display = 'block';
+            document.getElementById('edit_msg_').innerText =
+                'Click on the Teacher to edit it.';
         }
     });

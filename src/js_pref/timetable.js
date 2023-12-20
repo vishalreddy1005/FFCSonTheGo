@@ -1111,6 +1111,7 @@ document
                 spanMsg = 'Course Does Not Exist';
                 spanMsgColor = 'red';
             } else {
+                var addSwitch = false;
                 if (
                     !Object.keys(
                         timetableStoragePref[window.activeTable.id].subject[
@@ -1185,10 +1186,11 @@ document
                                 ul.appendChild(li);
                                 addEventListeners();
                             }
+                            addSwitch = true;
                             break; // Exit the loop once we've found the matching element
                         }
                     }
-                } else {
+                } else if (addSwitch === false) {
                     spanMsg = 'Teacher Already Exists';
                     spanMsgColor = 'orange';
                 }
@@ -1505,3 +1507,5 @@ document
             hrHide.style.display = 'inline';
         }, 4000);
     });
+
+// Edit Teacher Save button click event
