@@ -184,7 +184,6 @@ $(() => {
 
         var courseData = {
             courseId: courseId,
-            courseCode: courseCode,
             courseTitle: courseTitle,
             faculty: faculty,
             slots: slots,
