@@ -1092,6 +1092,8 @@ document
                 spanMsgColor = 'red';
             }
         } else {
+            var addSwitch = false;
+
             if (
                 !timetableStoragePref[window.activeTable.id].hasOwnProperty(
                     'subject',
@@ -1111,7 +1113,6 @@ document
                 spanMsg = 'Course Does Not Exist';
                 spanMsgColor = 'red';
             } else {
-                var addSwitch = false;
                 if (
                     !Object.keys(
                         timetableStoragePref[window.activeTable.id].subject[
@@ -1177,7 +1178,7 @@ document
                     li.appendChild(venueDiv);
 
                     const dropdownDivs = document.querySelectorAll('.dropdown');
-
+                    console.log('test 1 pass');
                     for (let dropdownDiv of dropdownDivs) {
                         const cname = dropdownDiv.querySelector('.cname');
                         if (cname && cname.textContent === courseName) {
@@ -1186,11 +1187,14 @@ document
                                 ul.appendChild(li);
                                 addEventListeners();
                             }
-                            addSwitch = true;
-                            break; // Exit the loop once we've found the matching element
+                            // Exit the loop once we've found the matching element
                         }
                     }
+                    console.log('test 2 pass');
+                    addSwitch = true;
                 } else if (addSwitch === false) {
+                    console.log('else if');
+
                     spanMsg = 'Teacher Already Exists';
                     spanMsgColor = 'orange';
                 }
@@ -1509,3 +1513,24 @@ document
     });
 
 // Edit Teacher Save button click event
+document
+    .getElementById('saveTeacherEdit')
+    .addEventListener('click', function () {
+        const courseName = document.getElementById('teacher-edit-course').value;
+        const teacherName = document.getElementById(
+            'teacher-input_remove-edit',
+        ).value;
+        const slotsInput = document
+            .getElementById('slot-input-edit')
+            .value.trim()
+            .toUpperCase();
+        const venueInput = document
+            .getElementById('venue-input-edit')
+            .value.trim()
+            .toUpperCase();
+        const colorInput = document.getElementById('color1-select-edit').value;
+        const spanTeacherMsg = document.getElementById('span-teacher-edit');
+        const brHideTeacher = document.getElementById('hide_br-edit-teacher');
+        var subjectArea = document.getElementById('subjectArea');
+        var allSpan = subjectArea.querySelectorAll('.cname');
+    });
