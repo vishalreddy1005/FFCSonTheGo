@@ -439,6 +439,10 @@
                                         hidden
                                         id="course-input-edit-pre"
                                     ></div>
+                                    <div
+                                        hidden
+                                        id="credit-input-edit-pre"
+                                    ></div>
                                     <input
                                         id="credits-input-edit"
                                         class="form-control text-uppercase"
@@ -447,6 +451,7 @@
                                         autocomplete="off"
                                         placeholder="4"
                                     />
+
                                     <span id="span-course-edit"></span>
                                     <br
                                         style="display: none"
@@ -1153,84 +1158,8 @@
             </div>
         </div>
         <!-- End of switch campus modal -->
-
-        <!-- Modal for Adding Courses -->
-        <div
-            class="modal fade"
-            id="exampleModal"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="addSubjectModal"
-            aria-hidden="true"
-        >
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addSubjectModal">
-                            Add Course
-                        </h5>
-
-                        <button
-                            data-dismiss="modal"
-                            class="btn ms-1 me-1"
-                            type="button"
-                        >
-                            <i class="fas fa-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <label for="course-input_remove"
-                            >&emsp14;&emsp14;Course Name</label
-                        >
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="course-input_removem"
-                            placeholder="CSE1001 Problem Solving and Programming"
-                            autocomplete="off"
-                        />
-
-                        <label style="margin-top: 15px" for="credits-input"
-                            >&emsp14;&emsp14;Credits</label
-                        >
-                        <input
-                            id="credits-inputm"
-                            class="form-control text-uppercase"
-                            type="number"
-                            style="max-width: 25%"
-                            autocomplete="off"
-                            placeholder="4"
-                        />
-
-                        <br />
-                        <span id="span-course-addm"></span>
-                    </div>
-
-                    <!-- use 'course-input' this as id for above input to get the list of couses-->
-                    <!-- Disabling this by changing id to make it useful for all batches -->
-
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-dismiss="modal"
-                        >
-                            Close
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            id="saveSubjectModalm"
-                        >
-                            Save
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End of the adding Course Modal -->
-
         <!-- The Download Timetable Modal -->
+
         <div
             id="download-modal"
             class="modal fade"

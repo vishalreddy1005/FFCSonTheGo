@@ -104,81 +104,11 @@ function editPref() {
                 courseDiv.querySelector('#credits-input-edit').value = credit;
                 courseDiv.querySelector('#course-input-edit-pre').innerText =
                     subjectName;
+                courseDiv.querySelector('#credit-input-edit-pre').innerText =
+                    credit;
             }
         });
     });
-
-    document
-        .getElementById('saveSubjectEditModal')
-        .addEventListener('click', function () {
-            console.log('Save button clicked');
-            let courseDiv = document.getElementById('div-for-edit-course');
-            let subjectArea = document.getElementById('subjectArea');
-            let allSpan = subjectArea.querySelectorAll('.cname');
-            spanMsg = 'Course not updated';
-            spanMsgColor = 'red';
-            if (courseDiv.querySelector('#credits-input-edit').value === '') {
-                spanMsg = 'Credits cannot be empty';
-                spanMsgColor = 'red';
-            } else {
-                allSpan.forEach((span) => {
-                    if (
-                        span.innerText ===
-                        courseDiv.querySelector('#course-input-edit-pre')
-                            .innerText
-                    ) {
-                        var tempSwitchToPassUpdates = 1;
-                        console.log(allSpan);
-                        // check if there is a course with same name
-                        allSpan.forEach((span2) => {
-                            if (
-                                span2.innerText.toLowerCase() ===
-                                courseDiv
-                                    .querySelector('#course-input_edit')
-                                    .value.toLowerCase()
-                            ) {
-                                tempSwitchToPassUpdates = 0;
-                            }
-                        });
-
-                        if (tempSwitchToPassUpdates === 1) {
-                            console.log(span.innerText);
-                            span.innerText =
-                                courseDiv.querySelector(
-                                    '#course-input_edit',
-                                ).value;
-                            courseDiv.querySelector(
-                                '#course-input-edit-pre',
-                            ).innerText = span.innerText;
-                            span.parentElement.parentElement.querySelector(
-                                'h4',
-                            ).innerText =
-                                '[' +
-                                courseDiv.querySelector('#credits-input-edit')
-                                    .value +
-                                ']';
-                            spanMsg = 'Course updated succesfully';
-                            spanMsgColor = 'green';
-                            createSubjectJsonFromHtml();
-                        } else {
-                            spanMsg = 'Course already exists';
-                            spanMsgColor = 'red';
-                        }
-                    }
-                });
-            }
-
-            spanMsgDiv = document.getElementById('span-course-edit');
-            spanMsgDiv.innerText = spanMsg;
-            spanMsgDiv.style.color = spanMsgColor;
-            spanMsgDiv.style.display = 'block';
-            hrHide = document.getElementById('hide_br-edit');
-            hrHide.style.display = 'none';
-            setTimeout(function () {
-                spanMsgDiv.style.display = 'none';
-                hrHide.style.display = 'inline';
-            }, 4000);
-        });
 
     // Add event listeners to li items
     document.querySelectorAll('li').forEach((li) => {

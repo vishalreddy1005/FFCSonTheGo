@@ -1048,6 +1048,7 @@ function closeEditPref() {
     document.getElementById('div-for-add-teacher').style.display = 'block';
     document.getElementById('tt-sub-edit-switch-div').style.display = 'none';
     document.getElementById('tt-sub-edit-switch').checked = false;
+    document.getElementById('div-for-edit-course').style.display = 'none';
     editSub = false;
     createSubjectJsonFromHtml();
 }
@@ -1391,6 +1392,116 @@ function createSubjectJsonFromHtml() {
     });
     timetableStoragePref[window.activeTable.id].subject = result;
     updateLocalForage();
-    showAddTeacherDiv();
     addEventListeners();
 }
+
+// Edit Subject Save button cliuck event
+
+document
+    .getElementById('saveSubjectEditModal')
+    .addEventListener('click', function () {
+        console.log('Save button clicked');
+        let courseDiv = document.getElementById('div-for-edit-course');
+        let subjectArea = document.getElementById('subjectArea');
+        let allSpan = subjectArea.querySelectorAll('.cname');
+        spanMsg = 'Course not updated';
+        spanMsgColor = 'red';
+        if (
+            courseDiv.querySelector('#credits-input-edit').value === '' ||
+            courseDiv.querySelector('#credits-input-edit').value < 0
+        ) {
+            spanMsg = 'Credits cannot be empty';
+            spanMsgColor = 'red';
+        } else if (courseDiv.querySelector('#course-input_edit').value === '') {
+            spanMsg = 'Course name cannot be empty';
+            spanMsgColor = 'red';
+        } else {
+            allSpan.forEach((span) => {
+                if (
+                    span.innerText.toLowerCase() ===
+                    courseDiv
+                        .querySelector('#course-input-edit-pre')
+                        .innerText.toLowerCase()
+                ) {
+                    var tempSwitchToPassUpdates = 1;
+                    var countSameCourseName = 0;
+                    console.log(allSpan);
+                    // check if there is a course with same name
+
+                    allSpan.forEach((span2) => {
+                        if (
+                            span2.innerText.toLowerCase() ===
+                            courseDiv
+                                .querySelector('#course-input_edit')
+                                .value.trim()
+                                .toLowerCase()
+                        ) {
+                            countSameCourseName += 1;
+                        }
+                    });
+                    if (
+                        countSameCourseName > 0 &&
+                        courseDiv
+                            .querySelector('#course-input_edit')
+                            .value.trim()
+                            .toLowerCase() !==
+                            courseDiv
+                                .querySelector('#course-input-edit-pre')
+                                .innerText.toLowerCase()
+                    ) {
+                        tempSwitchToPassUpdates = 0;
+                    }
+                    if (
+                        courseDiv
+                            .querySelector('#course-input_edit')
+                            .value.toString() ===
+                            courseDiv
+                                .querySelector('#course-input-edit-pre')
+                                .innerText.toString() &&
+                        courseDiv.querySelector('#credits-input-edit').value ===
+                            courseDiv.querySelector('#credit-input-edit-pre')
+                                .innerText
+                    ) {
+                        spanMsg = 'No changes made';
+                        spanMsgColor = 'orange';
+                    } else if (tempSwitchToPassUpdates === 1) {
+                        console.log(span.innerText);
+                        span.innerText =
+                            courseDiv.querySelector('#course-input_edit').value;
+                        courseDiv.querySelector(
+                            '#course-input-edit-pre',
+                        ).innerText = span.innerText;
+                        span.parentElement.parentElement.querySelector(
+                            'h4',
+                        ).innerText =
+                            '[' +
+                            courseDiv.querySelector('#credits-input-edit')
+                                .value +
+                            ']';
+                        spanMsg = 'Course updated succesfully';
+                        spanMsgColor = 'green';
+                        createSubjectJsonFromHtml();
+                        courseDiv.querySelector(
+                            '#credit-input-edit-pre',
+                        ).innerText = courseDiv.querySelector(
+                            '#credits-input-edit',
+                        ).value;
+                    } else {
+                        spanMsg = 'Course already exists';
+                        spanMsgColor = 'red';
+                    }
+                }
+            });
+        }
+
+        spanMsgDiv = document.getElementById('span-course-edit');
+        spanMsgDiv.innerText = spanMsg;
+        spanMsgDiv.style.color = spanMsgColor;
+        spanMsgDiv.style.display = 'block';
+        hrHide = document.getElementById('hide_br-edit');
+        hrHide.style.display = 'none';
+        setTimeout(function () {
+            spanMsgDiv.style.display = 'none';
+            hrHide.style.display = 'inline';
+        }, 4000);
+    });
