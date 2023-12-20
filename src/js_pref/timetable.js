@@ -1092,8 +1092,6 @@ document
                 spanMsgColor = 'red';
             }
         } else {
-            var addSwitch = false;
-
             if (
                 !timetableStoragePref[window.activeTable.id].hasOwnProperty(
                     'subject',
@@ -1190,9 +1188,7 @@ document
                             // Exit the loop once we've found the matching element
                         }
                     }
-                    console.log('test 2 pass');
-                    addSwitch = true;
-                } else if (addSwitch === false) {
+                } else {
                     console.log('else if');
 
                     spanMsg = 'Teacher Already Exists';

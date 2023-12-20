@@ -651,6 +651,166 @@
 
                         <!-- Edit Teacher starts Here -->
 
+                        <div id="div-for-edit-teacher" style="display: none">
+                            <form id="teacherSaveFormEdit">
+                                <div>
+                                    <h4
+                                        style="padding: 4.5%; padding-bottom: 0"
+                                    >
+                                        Edit Teachers
+                                    </h4>
+                                    <hr style="margin-left: 4.5%" />
+                                </div>
+                                <div
+                                    style="
+                                        margin: 4.5%;
+                                        padding-top: 10px;
+                                        padding-bottom: 0;
+                                        padding-right: 0%;
+                                    "
+                                >
+                                    <!--  course select option dropdown input -->
+                                    <label for="teacher-edit-course">
+                                        Course
+                                    </label>
+                                    <input
+                                        disabled
+                                        type="text"
+                                        class="form-control"
+                                        id="teacher-edit-course"
+                                        placeholder="Course"
+                                        autocomplete="off"
+                                    />
+                                    <br />
+
+                                    <div
+                                        style="
+                                            display: flex;
+                                            flex-direction: row;
+                                        "
+                                    >
+                                        <div style="width: 72%">
+                                            <label
+                                                for="teacher-input_remove-edit"
+                                                >&emsp14;Teacher Name</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="teacher-input_remove-edit"
+                                                placeholder="JOHN DOE"
+                                                autocomplete="off"
+                                            />
+                                        </div>
+                                        <div style="width: 2%"></div>
+                                        <div style="width: 26%">
+                                            <label for="color1-select-edit"
+                                                >&emsp14;Color</label
+                                            >
+                                            <select
+                                                id="color1-select-edit"
+                                                class="form-select"
+                                                onchange=""
+                                            >
+                                                <option
+                                                    value="rgb(214, 255, 214)"
+                                                    style="
+                                                        background-color: rgb(
+                                                            214,
+                                                            255,
+                                                            214
+                                                        );
+                                                    "
+                                                    selected
+                                                >
+                                                    Green
+                                                </option>
+                                                <option
+                                                    value="rgb(255, 227, 174)"
+                                                    style="
+                                                        background-color: rgb(
+                                                            255,
+                                                            227,
+                                                            174
+                                                        );
+                                                    "
+                                                >
+                                                    Orange
+                                                </option>
+                                                <option
+                                                    value="rgb(255, 205, 205)"
+                                                    style="
+                                                        background-color: rgb(
+                                                            255,
+                                                            205,
+                                                            205
+                                                        );
+                                                    "
+                                                >
+                                                    Red
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        style="
+                                            display: flex;
+                                            flex-direction: row;
+                                        "
+                                    >
+                                        <div style="width: 58%">
+                                            <label
+                                                style="margin-top: 15px"
+                                                for="slot-input-edit"
+                                                >&emsp14;Slots</label
+                                            >
+                                            <input
+                                                id="slot-input-edit"
+                                                class="form-control text-uppercase"
+                                                type="text"
+                                                style="max-width: 100%"
+                                                autocomplete="off"
+                                                placeholder="A1+TA1"
+                                            />
+                                        </div>
+
+                                        <div style="width: 10%"></div>
+
+                                        <div style="width: 30%">
+                                            <label
+                                                style="margin-top: 15px"
+                                                for="venue-input-edit"
+                                                >&emsp14;Venue</label
+                                            >
+                                            <input
+                                                id="venue-input-edit"
+                                                class="form-control text-uppercase"
+                                                type="text"
+                                                style="max-width: 100%"
+                                                autocomplete="off"
+                                                placeholder="SJTG01"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <span id="span-teacher-edit"></span>
+                                    <br id="hide_br_teacher-edit" />
+                                    <hr />
+                                </div>
+                                <div class="modal-footer">
+                                    <button
+                                        style="width: 30%"
+                                        type="submit"
+                                        class="btn btn-primary"
+                                        id="saveTeacherEdit"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                         <!-- Edit Teacher ends Here -->
                     </section>
                 </div>
