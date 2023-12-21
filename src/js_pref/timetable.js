@@ -1123,15 +1123,15 @@ document
                     timetableStoragePref[window.activeTable.id].subject[
                         courseName
                     ].teacher[teacherName] = {
-                        slots: 'Slots',
-                        venue: 'Venue',
+                        slots: 'SLOTS',
+                        venue: 'VENUE',
                         color: '',
                     };
                     if (slotsInput === '') {
-                        slotsInput = 'Slots';
+                        slotsInput = 'SLOTS';
                     }
                     if (venueInput === '') {
-                        venueInput = 'Venue';
+                        venueInput = 'VENUE';
                     }
 
                     timetableStoragePref[window.activeTable.id].subject[
@@ -1157,16 +1157,16 @@ document
 
                     const teacherNameDiv = document.createElement('div');
                     teacherNameDiv.style.paddingLeft = '4%';
-                    teacherNameDiv.style.width = '50%';
+                    teacherNameDiv.style.width = '47%';
                     teacherNameDiv.innerText = teacherName;
 
                     const slotsDiv = document.createElement('div');
-                    slotsDiv.style.width = '30%';
+                    slotsDiv.style.width = '38%';
                     slotsDiv.style.opacity = '70%';
                     slotsDiv.innerText = slotsInput;
 
                     const venueDiv = document.createElement('div');
-                    venueDiv.style.width = '20%';
+                    venueDiv.style.width = '15%';
                     venueDiv.style.opacity = '70%';
                     venueDiv.innerText = venueInput;
 
@@ -1297,16 +1297,16 @@ function createSubjectDropdown(courseName, subject) {
 
         const teacherNameDiv = document.createElement('div');
         teacherNameDiv.style.paddingLeft = '4%';
-        teacherNameDiv.style.width = '50%';
+        teacherNameDiv.style.width = '47%';
         teacherNameDiv.innerText = teacherName;
 
         const slotsDiv = document.createElement('div');
-        slotsDiv.style.width = '30%';
+        slotsDiv.style.width = '38%';
         slotsDiv.style.opacity = '70%';
         slotsDiv.innerText = teacher.slots;
 
         const venueDiv = document.createElement('div');
-        venueDiv.style.width = '20%';
+        venueDiv.style.width = '15%';
         venueDiv.style.opacity = '70%';
         venueDiv.innerText = teacher.venue;
 
@@ -1513,9 +1513,12 @@ document
     .getElementById('saveTeacherEdit')
     .addEventListener('click', function () {
         const courseName = document.getElementById('teacher-edit-course').value;
-        const teacherName = document.getElementById(
-            'teacher-input_remove-edit',
+        const teacherNamePre = document.getElementById(
+            'teacher-input_remove-edit-pre',
         ).value;
+        const teacherName = document
+            .getElementById('teacher-input_remove-edit')
+            .value.trim();
         const slotsInput = document
             .getElementById('slot-input-edit')
             .value.trim()
@@ -1524,9 +1527,203 @@ document
             .getElementById('venue-input-edit')
             .value.trim()
             .toUpperCase();
+        console.log('hello testing 123');
         const colorInput = document.getElementById('color1-select-edit').value;
         const spanTeacherMsg = document.getElementById('span-teacher-edit');
-        const brHideTeacher = document.getElementById('hide_br-edit-teacher');
+        const brHideTeacher = document.getElementById('hide_br_teacher-edit');
         var subjectArea = document.getElementById('subjectArea');
         var allSpan = subjectArea.querySelectorAll('.cname');
+        var spanMsg = 'Not Updated';
+        var spanMsgColor = 'red';
+        for (const span of allSpan) {
+            console.log(span.innerText);
+            if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+                if (teacherName === '') {
+                    spanMsg = 'Teacher name cannot be empty';
+                    spanMsgColor = 'red';
+                } else if (
+                    teacherNamePre.toLowerCase() === teacherName.toLowerCase()
+                ) {
+                    allLi =
+                        span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                            'li',
+                        );
+                    for (const li of allLi) {
+                        const allDiv = li.querySelectorAll('div');
+                        if (
+                            allDiv[0].innerText.toLowerCase() ===
+                            teacherNamePre.toLowerCase()
+                        ) {
+                            allDiv[0].innerText = teacherName;
+                            allDiv[1].innerText = slotsInput;
+                            allDiv[2].innerText = venueInput;
+                            li.style.backgroundColor = colorInput;
+                            document.getElementById(
+                                'teacher-input_remove-edit-pre',
+                            ).value = teacherName;
+                            spanMsg = 'Teacher updated successfully';
+                            createSubjectJsonFromHtml();
+                            spanMsgColor = 'green';
+                            break;
+                        }
+                    }
+                } else {
+                    allLi =
+                        span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                            'li',
+                        );
+                    editTeacherSwitch = 1;
+                    for (const li of allLi) {
+                        const allDiv = li.querySelectorAll('div');
+                        if (
+                            allDiv[0].innerText.toLowerCase() ===
+                            teacherName.toLowerCase()
+                        ) {
+                            spanMsg = 'Teacher already exists';
+                            spanMsgColor = 'orange';
+                            editTeacherSwitch = 0;
+                            break;
+                        }
+                    }
+                    if (editTeacherSwitch === 1) {
+                        for (const li of allLi) {
+                            const allDiv = li.querySelectorAll('div');
+                            if (
+                                allDiv[0].innerText.toLowerCase() ===
+                                teacherNamePre.toLowerCase()
+                            ) {
+                                allDiv[0].innerText = teacherName;
+                                allDiv[1].innerText = slotsInput;
+                                allDiv[2].innerText = venueInput;
+                                li.style.backgroundColor = colorInput;
+                                document.getElementById(
+                                    'teacher-input_remove-edit-pre',
+                                ).value = teacherName;
+                                spanMsg = 'Teacher updated successfully';
+                                spanMsgColor = 'green';
+                                createSubjectJsonFromHtml();
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+        console.log('TEST 1 PASS', spanMsg);
+        spanTeacherMsg.innerText = spanMsg;
+        spanTeacherMsg.style.color = spanMsgColor;
+        spanTeacherMsg.style.display = 'block';
+        brHideTeacher.style.display = 'none';
+        setTimeout(function () {
+            spanTeacherMsg.style.display = 'none';
+            brHideTeacher.style.display = 'inline';
+        }, 4000);
+        return;
+    });
+
+// Delete Teacher button click event
+document
+    .getElementById('deleteTeacherEdit')
+    .addEventListener('click', function () {
+        const courseName = document.getElementById('teacher-edit-course').value;
+        const teacherName = document.getElementById(
+            'teacher-input_remove-edit-pre',
+        ).value;
+        var subjectArea = document.getElementById('subjectArea');
+        var allSpan = subjectArea.querySelectorAll('.cname');
+
+        // Confirmation popup
+        if (
+            !confirm(
+                `Are you sure you want to delete ${teacherName} from ${courseName}?`,
+            )
+        ) {
+            spanMsg = 'Teacher not deleted';
+            spanMsgColor = 'red';
+            const spanTeacherMsg = document.getElementById('span-teacher-edit');
+            const brHideTeacher = document.getElementById(
+                'hide_br_teacher-edit',
+            );
+            spanTeacherMsg.innerText = spanMsg;
+            spanTeacherMsg.style.color = spanMsgColor;
+            spanTeacherMsg.style.display = 'block';
+            brHideTeacher.style.display = 'none';
+            setTimeout(function () {
+                spanTeacherMsg.style.display = 'none';
+                brHideTeacher.style.display = 'inline';
+            }, 4000);
+            return;
+        }
+
+        for (const span of allSpan) {
+            console.log(span.innerText);
+            if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+                allLi =
+                    span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                        'li',
+                    );
+                for (const li of allLi) {
+                    const allDiv = li.querySelectorAll('div');
+                    if (
+                        allDiv[0].innerText.toLowerCase() ===
+                        teacherName.toLowerCase()
+                    ) {
+                        li.remove();
+                        spanMsg = 'Teacher deleted successfully';
+                        spanMsgColor = 'green';
+                        createSubjectJsonFromHtml();
+                        if (true) {
+                            document.getElementById(
+                                'div-for-edit-teacher',
+                            ).style.display = 'none';
+                            document.getElementById('edit_msg_').innerText =
+                                'Click on the Teacher to edit it.';
+                            document.getElementById('edit_msg_').style.display =
+                                'block';
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    });
+
+// Delete for Subject Edit
+document
+    .getElementById('deleteSubjectEdit')
+    .addEventListener('click', function () {
+        const courseName = document
+            .getElementById('course-input-edit-pre')
+            .innerText.trim();
+        var subjectArea = document.getElementById('subjectArea');
+        var allSpan = subjectArea.querySelectorAll('.cname');
+        if (!confirm(`Are you sure you want to delete ${courseName}?`)) {
+            spanMsg = 'Course not deleted';
+            spanMsgColor = 'red';
+            const spanCourseMsg = document.getElementById('span-course-edit');
+            const brHideCourse = document.getElementById('hide_br-edit');
+            spanCourseMsg.innerText = spanMsg;
+            spanCourseMsg.style.color = spanMsgColor;
+            spanCourseMsg.style.display = 'block';
+            brHideCourse.style.display = 'none';
+            setTimeout(function () {
+                spanCourseMsg.style.display = 'none';
+                brHideCourse.style.display = 'inline';
+            }, 4000);
+            return;
+        }
+        for (const span of allSpan) {
+            if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+                span.parentElement.parentElement.parentElement.parentElement.remove();
+                document.getElementById('div-for-edit-course').style.display =
+                    'none';
+                document.getElementById('edit_msg_').innerText =
+                    'Click on the Subject to edit it.';
+                document.getElementById('edit_msg_').style.display = 'block';
+                createSubjectJsonFromHtml();
+                break;
+            }
+        }
     });

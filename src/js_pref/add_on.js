@@ -136,6 +136,8 @@ function editPref() {
                 document.getElementById('teacher-edit-course').value =
                     courseName;
                 document.getElementById('color1-select-edit').value = color;
+                document.getElementById('teacher-input_remove-edit-pre').value =
+                    teacherName;
             }
         });
     });
@@ -204,26 +206,6 @@ function closeEditPref1() {
     document.getElementById('div-for-edit-teacher').style.display = 'none';
 }
 
-document
-    .querySelector('#courseSaveForm')
-    .addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the form from being submitted normally
-        document.querySelector('#saveSubjectModal').click(); // Programmatically click the "Save" button
-    });
-
-document
-    .querySelector('#teacherSaveForm')
-    .addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the form from being submitted normally
-        document.querySelector('#saveTeacherModal').click(); // Programmatically click the "Save" button
-    });
-
-document
-    .querySelector('#teacherSaveFormEdit')
-    .addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the form from being submitted normally
-        document.querySelector('#saveTeacherEdit').click(); // Programmatically click the "Save" button
-    });
 // Add event listener to the toggle checkbox
 document
     .querySelector('#tt-sub-edit-switch')
@@ -239,6 +221,8 @@ document
                 'Click on the Subject to edit it.';
         } else {
             document.getElementById('div-for-edit-course').style.display =
+                'none';
+            document.getElementById('div-for-edit-teacher').style.display =
                 'none';
             document.getElementById('edit_msg_').style.display = 'block';
             document.getElementById('edit_msg_').innerText =
