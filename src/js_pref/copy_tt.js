@@ -39,7 +39,8 @@ $(() => {
         addTableToPicker(newTableId, newTableName);
         switchTable(newTableId);
         updateLocalForage();
-        fillPage1();
+        fillPage();
+        addEventListeners();
     });
 
     /*
@@ -106,7 +107,8 @@ $(() => {
 
         if (timetableStoragePref.length == 1) {
             $('#tt-picker-dropdown .tt-picker-delete').first().remove();
-            fillPage1();
+            fillPage();
+            addEventListeners();
         }
     });
 
@@ -281,7 +283,8 @@ $(() => {
         activeTable['subject'] = {};
         updateLocalForage();
         showAddTeacherDiv();
-        fillPage1();
+        fillPage();
+        addEventListeners();
     });
 });
 
@@ -371,8 +374,8 @@ function switchTable(tableId) {
     activeTable = timetableStoragePref[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
     showAddTeacherDiv();
-    fillPage1();
     fillPage();
+    addEventListeners();
 }
 
 /*
@@ -381,7 +384,6 @@ function switchTable(tableId) {
 function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
     showAddTeacherDiv();
-    fillPage1();
     fillPage();
 }
 
@@ -1033,6 +1035,7 @@ document
         console.log(
             JSON.stringify(timetableStoragePref[window.activeTable.id]),
         );
+        addEventListeners();
     });
 
 // close the edit view
@@ -1048,7 +1051,6 @@ function closeEditPref() {
     document.getElementById('div-for-edit-course').style.display = 'none';
     editSub = false;
     createSubjectJsonFromHtml();
-    addEventListeners();
 }
 document
     .getElementById('tt-subject-done')
@@ -1150,16 +1152,16 @@ document
 
                     const input = document.createElement('input');
                     input.type = 'radio';
-                    input.name = courseName;
+                    input.name = 'option';
                     input.value = teacherName;
 
                     const teacherNameDiv = document.createElement('div');
                     teacherNameDiv.style.paddingLeft = '4%';
-                    teacherNameDiv.style.width = '47%';
+                    teacherNameDiv.style.width = '45%';
                     teacherNameDiv.innerText = teacherName;
 
                     const slotsDiv = document.createElement('div');
-                    slotsDiv.style.width = '38%';
+                    slotsDiv.style.width = '40%';
                     slotsDiv.style.opacity = '70%';
                     slotsDiv.innerText = slotsInput;
 
@@ -1173,7 +1175,6 @@ document
                     li.appendChild(slotsDiv);
                     li.appendChild(venueDiv);
 
-                    li.addEventListener('click', liClick);
                     const dropdownDivs = document.querySelectorAll('.dropdown');
                     console.log('test 1 pass');
                     for (let dropdownDiv of dropdownDivs) {
@@ -1182,6 +1183,7 @@ document
                             const ul = dropdownDiv.querySelector('ul');
                             if (ul && ul.tagName === 'UL') {
                                 ul.appendChild(li);
+                                addEventListeners();
                             }
                             // Exit the loop once we've found the matching element
                         }
@@ -1204,81 +1206,9 @@ document
             document.getElementById('hide_br').style.display = 'inline';
         }, 5000);
         console.log(timetableStoragePref);
-        addEventListeners();
     });
-
-// On click of edit button
-document.getElementById('tt-subject-edit').addEventListener('click', editPref);
-function editPref() {
-    editTeacher = true;
-    document.getElementById('tt-subject-edit').style.display = 'none';
-    document.getElementById('tt-subject-add').style.display = 'none';
-    document.getElementById('tt-teacher-add').style.display = 'none';
-    document.getElementById('div-for-add-teacher').style.display = 'none';
-    document.getElementById('div-for-add-course').style.display = 'none';
-    document.getElementById('tt-subject-collapse').style.display = 'block';
-    document.getElementById('tt-subject-done').style.display = 'block';
-    document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
-    document.getElementById('edit_msg_').style.display = 'block';
-    activateSortable();
-    openAllDropdowns();
-    removeEventListeners();
-    removeInputFieldsInSection('subjectArea');
-    // Add event listeners to .h2s div elements
-    document.querySelectorAll('.h2s').forEach((div) => {
-        div.addEventListener('click', function () {
-            if (editSub === true) {
-                document.getElementById('edit_msg_').style.display = 'none';
-                const subjectName = this.querySelector('.cname').innerText;
-                let credit = this.querySelector('h4')
-                    .innerText.replace('[', '')
-                    .replace(']', '');
-                credit = parseInt(credit);
-                let courseDiv = document.getElementById('div-for-edit-course');
-                courseDiv.style.display = 'block';
-                courseDiv.querySelector('#course-input_edit').value =
-                    subjectName;
-                courseDiv.querySelector('#credits-input-edit').value = credit;
-                courseDiv.querySelector('#course-input-edit-pre').innerText =
-                    subjectName;
-                courseDiv.querySelector('#credit-input-edit-pre').innerText =
-                    credit;
-            }
-        });
-    });
-
-    // Add event listeners to li items
-    document.querySelectorAll('li').forEach((li) => {
-        li.addEventListener('click', function () {
-            if (editSub === false && editTeacher === true) {
-                document.getElementById('edit_msg_').style.display = 'none';
-                document.getElementById('div-for-edit-teacher').style.display =
-                    'block';
-                allDivInLi = this.querySelectorAll('div');
-                const courseName =
-                    this.parentElement.parentElement.querySelector(
-                        '.cname',
-                    ).innerText;
-                const teacherName = allDivInLi[0].innerText;
-                const slot = allDivInLi[1].innerText;
-                const venue = allDivInLi[2].innerText;
-                const color = this.style.backgroundColor;
-                document.getElementById('teacher-input_remove-edit').value =
-                    teacherName;
-                document.getElementById('slot-input-edit').value = slot;
-                document.getElementById('venue-input-edit').value = venue;
-                document.getElementById('teacher-edit-course').value =
-                    courseName;
-                document.getElementById('color1-select-edit').value = color;
-                document.getElementById('teacher-input_remove-edit-pre').value =
-                    teacherName;
-            }
-        });
-    });
-}
 
 // Targets the li to make it toggable when clicked anywhere on the li element eg the teacher name list
-// Call the function after the HTML is generated
 function addEventListeners() {
     // Get all the list items
     var listItems = document.querySelectorAll('.dropdown li');
@@ -1286,45 +1216,108 @@ function addEventListeners() {
     var current = null;
     // Add a click event listener to each list item
     for (var i = 0; i < listItems.length; i++) {
-        listItems[i].addEventListener('click', liClick);
+        listItems[i].addEventListener('click', function () {
+            // Get the radio button inside this list item
+            var radioButton = this.querySelector('input[type="radio"]');
+
+            // If this radio button is already selected, deselect it
+            if (radioButton === current) {
+                try {
+                    radioButton.checked = false;
+                    current = null; // No radio button is currently selected
+                    radioButton.parentElement.querySelectorAll('div');
+                    console.log(
+                        'Deselect',
+                        radioButton.parentElement.querySelectorAll('div')[0]
+                            .innerText,
+                    );
+                } catch (error) {
+                    console.log('error');
+                }
+            }
+            // Otherwise, deselect the currently selected radio button (if any) and select this one
+            else {
+                if (current) current.checked = false;
+                try {
+                    radioButton.checked = true;
+                    if (current !== null) {
+                        console.log(
+                            'Deselect 2',
+                            current.parentElement.querySelectorAll('div')[0]
+                                .innerText,
+                        );
+                    }
+
+                    current = radioButton; // This radio button is now the currently selected one
+                    console.log(
+                        'Select',
+                        current.parentElement.querySelectorAll('div')[0]
+                            .innerText,
+                    );
+                    var course =
+                        current.parentElement.parentElement.parentElement.parentElement.querySelector(
+                            'h2 .cname',
+                        ).innerText;
+                    var faculty =
+                        current.parentElement.querySelectorAll('div')[0]
+                            .innerText;
+                    var slotString =
+                        current.parentElement.querySelectorAll('div')[1]
+                            .innerText;
+                    var venue =
+                        current.parentElement.querySelectorAll('div')[2]
+                            .innerText;
+                    var credits = parseInt(
+                        current.parentElement.parentElement.parentElement.parentElement
+                            .querySelector('h4')
+                            .textContent.replace('[', '')
+                            .replace(']', ''),
+                    );
+                    var isProject = false;
+                    var slots = (function () {
+                        var arr = [];
+
+                        try {
+                            slotString.split(/\s*\+\s*/).forEach(function (el) {
+                                if (el && $('.' + el)) {
+                                    arr.push(el);
+                                }
+                            });
+                        } catch (error) {
+                            arr = [];
+                        }
+
+                        return arr;
+                    })();
+                    var courseId = 0;
+                    if (activeTable.data.length != 0) {
+                        var lastAddedCourse =
+                            activeTable.data[activeTable.data.length - 1];
+                        courseId = lastAddedCourse.courseId + 1;
+                    }
+                    courseTitle = course;
+                    var courseData = {
+                        courseId: courseId,
+                        courseTitle: course,
+                        faculty: faculty,
+                        slots: slots,
+                        venue: venue,
+                        credits: credits,
+                        isProject: isProject,
+                        courseCode: 'course',
+                    };
+                    activeTable.data.push(courseData);
+                    addCourseToCourseList(courseData);
+                    addCourseToTimetable(courseData);
+                } catch (error) {
+                    console.log('error');
+                }
+            }
+        });
     }
 }
+
 // Call the function after the HTML is generated
-// Function to remove all event listeners
-function removeEventListeners() {
-    var listItems = document.querySelectorAll('.dropdown li');
-    for (var i = 0; i < listItems.length; i++) {
-        listItems[i].removeEventListener('click', liClick);
-    }
-}
-
-// What happens after cliking on li element anywhere
-function liClick() {
-    // Get the radio button inside this list item
-    var radioButton = this.querySelector('input[type="radio"]');
-
-    // If this radio button is already selected, deselect it
-    try {
-        if (radioButton.checked) {
-            try {
-                radioButton.checked = false;
-                // No radio button is currently selected
-            } catch (error) {
-                console.log('error');
-            }
-        }
-        // Otherwise, deselect the currently selected radio button (if any) and select this one
-        else {
-            try {
-                radioButton.checked = true; // This radio button is now the currently selected one
-            } catch (error) {
-                console.log('error');
-            }
-        }
-    } catch (error) {
-        console.log('error');
-    }
-}
 
 // Function to create the HTML for subject dropdown
 function createSubjectDropdown(courseName, subject) {
@@ -1373,16 +1366,16 @@ function createSubjectDropdown(courseName, subject) {
 
         const input = document.createElement('input');
         input.type = 'radio';
-        input.name = courseName;
+        input.name = 'option';
         input.value = teacherName;
 
         const teacherNameDiv = document.createElement('div');
         teacherNameDiv.style.paddingLeft = '4%';
-        teacherNameDiv.style.width = '47%';
+        teacherNameDiv.style.width = '45%';
         teacherNameDiv.innerText = teacherName;
 
         const slotsDiv = document.createElement('div');
-        slotsDiv.style.width = '38%';
+        slotsDiv.style.width = '40%';
         slotsDiv.style.opacity = '70%';
         slotsDiv.innerText = teacher.slots;
 
@@ -1406,7 +1399,7 @@ function createSubjectDropdown(courseName, subject) {
 }
 
 // Function to fill the timetable and course list/ subjectArea
-function fillPage1() {
+function fillPage() {
     const activeId = window.activeTable.id;
     const activeTable = timetableStoragePref[activeId];
 
@@ -1430,13 +1423,11 @@ function fillPage1() {
 // Load the subjectArea show all info
 document.addEventListener('DOMContentLoaded', onPageLoad);
 function onPageLoad() {
-    fillPage1();
     fillPage();
     console.log(timetableStoragePref);
 }
 // Add event listener for DOMContentLoaded event
 
-//function to save the json format of current state of the subject area
 function createSubjectJsonFromHtml() {
     let result = {};
     let dropdowns = document.querySelectorAll('.dropdown-teacher');
@@ -1477,6 +1468,7 @@ function createSubjectJsonFromHtml() {
     });
     timetableStoragePref[window.activeTable.id].subject = result;
     updateLocalForage();
+    addEventListeners();
 }
 
 // Edit Subject Save button cliuck event
@@ -1756,7 +1748,6 @@ document
                         spanMsg = 'Teacher deleted successfully';
                         spanMsgColor = 'green';
                         createSubjectJsonFromHtml();
-
                         if (true) {
                             document.getElementById(
                                 'div-for-edit-teacher',
@@ -1806,7 +1797,6 @@ document
                     'Click on the Subject to edit it.';
                 document.getElementById('edit_msg_').style.display = 'block';
                 createSubjectJsonFromHtml();
-
                 break;
             }
         }

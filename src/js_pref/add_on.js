@@ -24,30 +24,6 @@ function removeRadioClickEvent() {
 
 // Call the function to remove the click event listener
 
-function disableSelectOptions() {
-    var selectOptions = document.querySelectorAll(
-        '.dropdown-list input[type="radio"]',
-    );
-    selectOptions.forEach(function (option) {
-        option.disabled = true;
-    });
-    var selectOptions = document.querySelectorAll(
-        '.dropdown-list input[type="radio"]',
-    );
-    selectOptions.forEach(function (option) {
-        option.disabled = false;
-    });
-}
-
-function enableSelectOptions() {
-    var selectOptions = document.querySelectorAll(
-        '.dropdown-list input[type="radio"]',
-    );
-    selectOptions.forEach(function (option) {
-        option.disabled = false;
-    });
-}
-
 function removeInputFieldsInSection(sectionId) {
     var section = document.getElementById(sectionId);
     var listItems = section.querySelectorAll('li');
@@ -65,6 +41,12 @@ function addInputFieldsInSection(sectionId) {
     listItems.forEach(function (item) {
         var inputField = document.createElement('input');
         inputField.setAttribute('type', 'radio');
+        inputField.setAttribute(
+            'name',
+            item.parentElement.parentElement.parentElement.querySelector(
+                'h2 .cname',
+            ).innerText,
+        );
         liData = item.querySelectorAll('div');
         teacherName = liData[0].innerText;
         inputField.setAttribute('value', teacherName);
