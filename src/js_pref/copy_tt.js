@@ -1254,10 +1254,18 @@ function addEventListeners() {
                         current.parentElement.querySelectorAll('div')[0]
                             .innerText,
                     );
-                    var course =
-                        current.parentElement.parentElement.parentElement.parentElement.querySelector(
-                            'h2 .cname',
-                        ).innerText;
+                    var courseTitle =
+                        current.parentElement.parentElement.parentElement.parentElement
+                            .querySelector('h2 .cname')
+                            .innerText.split('-');
+                    if (courseTitle.length > 1) {
+                        var courseCode = courseTitle[0];
+                        var course = courseTitle[1];
+                    } else {
+                        var course = courseTitle[0];
+                        var courseCode = '';
+                    }
+
                     var faculty =
                         current.parentElement.querySelectorAll('div')[0]
                             .innerText;
@@ -1304,7 +1312,7 @@ function addEventListeners() {
                         venue: venue,
                         credits: credits,
                         isProject: isProject,
-                        courseCode: 'course',
+                        courseCode: courseCode,
                     };
                     activeTable.data.push(courseData);
                     addCourseToCourseList(courseData);

@@ -883,13 +883,31 @@ window.clearTimetable = () => {
     showAddTeacherDiv();
 };
 
-// save
+function generateCourseName(courseInput) {
+    var courseListStr = courseInput.split('-');
+    for (i = 0; i < courseListStr.length; i++) {
+        courseListStr[i] = courseListStr[i].trim();
+    }
+    if (courseListStr.length > 1) {
+        var part2 = '';
+        for (var i = 1; i < courseListStr.length; i++) {
+            part2 += '-' + courseListStr[i];
+        }
+        courseName = courseListStr[0] + part2;
+    } else {
+        courseName = courseListStr[0];
+    }
+    return courseName;
+}
+// save added course
 document
     .getElementById('saveSubjectModal')
     .addEventListener('click', function () {
-        const courseName = document
+        var courseName = document
             .getElementById('course-input_remove')
             .value.trim();
+
+        courseName = generateCourseName(courseName);
         const credits = parseInt(
             document.getElementById('credits-input').value.trim(),
         );
@@ -1047,6 +1065,7 @@ function closeEditPref() {
     document.getElementById('tt-sub-edit-switch').checked = false;
     document.getElementById('div-for-edit-course').style.display = 'none';
     editSub = false;
+    showAddTeacherDiv();
     createSubjectJsonFromHtml();
     addEventListeners();
 }
@@ -1211,6 +1230,7 @@ document
 document.getElementById('tt-subject-edit').addEventListener('click', editPref);
 function editPref() {
     editTeacher = true;
+    console.log('editPref');
     document.getElementById('tt-subject-edit').style.display = 'none';
     document.getElementById('tt-subject-add').style.display = 'none';
     document.getElementById('tt-teacher-add').style.display = 'none';
@@ -1308,7 +1328,6 @@ function liClick() {
         if (radioButton.checked) {
             try {
                 radioButton.checked = false;
-                // No radio button is currently selected
             } catch (error) {
                 console.log('error');
             }
@@ -1317,6 +1336,12 @@ function liClick() {
         else {
             try {
                 radioButton.checked = true; // This radio button is now the currently selected one
+                console.log(
+                    'Select',
+                    radioButton.parentElement.querySelectorAll('div')[0]
+                        .innerText,
+                );
+                addOnRadioTrue(radioButton);
             } catch (error) {
                 console.log('error');
             }
@@ -1324,6 +1349,80 @@ function liClick() {
     } catch (error) {
         console.log('error');
     }
+}
+
+// Function to add to timetable and in course table when clicked on radio button
+function addOnRadioTrue(radioButton) {
+    console.log(timetableStoragePref[window.activeTable.id].data);
+    current = radioButton; // This radio button is now the currently selected one
+    console.log(
+        'Select',
+        current.parentElement.querySelectorAll('div')[0].innerText,
+    );
+    var courseTitle = current.parentElement.parentElement.parentElement
+        .querySelector('h2 .cname')
+        .innerText.split('-');
+    if (courseTitle.length > 1) {
+        var courseCode = courseTitle[0].trim();
+        var part2 = '';
+        for (var i = 1; i < courseTitle.length; i++) {
+            part2 += courseTitle[i].trim() + '-';
+        }
+        var course = part2.slice(0, -1);
+    } else {
+        var course = courseTitle[0].trim();
+        var courseCode = '';
+    }
+    // Removing all element related to that course code from tt and course list
+    var courseList = document
+        .getElementById('courseList-tbody')
+        .querySelectorAll('tr');
+    // To do Later
+
+    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
+    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
+    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
+    var credits = parseInt(
+        current.parentElement.parentElement.parentElement
+            .querySelector('h4')
+            .textContent.replace('[', '')
+            .replace(']', ''),
+    );
+    var isProject = false;
+    var slots = (function () {
+        var arr = [];
+
+        try {
+            slotString.split(/\s*\+\s*/).forEach(function (el) {
+                if (el && $('.' + el)) {
+                    arr.push(el);
+                }
+            });
+        } catch (error) {
+            arr = [];
+        }
+
+        return arr;
+    })();
+    var courseId = 0;
+    if (activeTable.data.length != 0) {
+        var lastAddedCourse = activeTable.data[activeTable.data.length - 1];
+        courseId = lastAddedCourse.courseId + 1;
+    }
+    courseTitle = course;
+    var courseData = {
+        courseId: courseId,
+        courseTitle: course,
+        faculty: faculty,
+        slots: slots,
+        venue: venue,
+        credits: credits,
+        isProject: isProject,
+        courseCode: courseCode,
+    };
+    activeTable.data.push(courseData);
+    addCourseToCourseList(courseData);
+    addCourseToTimetable(courseData);
 }
 
 // Function to create the HTML for subject dropdown
@@ -1480,23 +1579,27 @@ function createSubjectJsonFromHtml() {
 }
 
 // Edit Subject Save button cliuck event
-
 document
     .getElementById('saveSubjectEditModal')
     .addEventListener('click', function () {
         console.log('Save button clicked');
         let courseDiv = document.getElementById('div-for-edit-course');
+        var courseName = generateCourseName(
+            courseDiv.querySelector('#course-input_edit').value.trim(),
+        );
+
         let subjectArea = document.getElementById('subjectArea');
         let allSpan = subjectArea.querySelectorAll('.cname');
         spanMsg = 'Course not updated';
         spanMsgColor = 'red';
         if (
-            courseDiv.querySelector('#credits-input-edit').value === '' ||
+            courseDiv.querySelector('#credits-input-edit').value.trim() ===
+                '' ||
             courseDiv.querySelector('#credits-input-edit').value < 0
         ) {
             spanMsg = 'Credits cannot be empty';
             spanMsgColor = 'red';
-        } else if (courseDiv.querySelector('#course-input_edit').value === '') {
+        } else if (courseName === '') {
             spanMsg = 'Course name cannot be empty';
             spanMsgColor = 'red';
         } else {
@@ -1515,20 +1618,14 @@ document
                     allSpan.forEach((span2) => {
                         if (
                             span2.innerText.toLowerCase() ===
-                            courseDiv
-                                .querySelector('#course-input_edit')
-                                .value.trim()
-                                .toLowerCase()
+                            courseName.toLowerCase()
                         ) {
                             countSameCourseName += 1;
                         }
                     });
                     if (
                         countSameCourseName > 0 &&
-                        courseDiv
-                            .querySelector('#course-input_edit')
-                            .value.trim()
-                            .toLowerCase() !==
+                        courseName.toLowerCase() !==
                             courseDiv
                                 .querySelector('#course-input-edit-pre')
                                 .innerText.toLowerCase()
@@ -1536,12 +1633,10 @@ document
                         tempSwitchToPassUpdates = 0;
                     }
                     if (
-                        courseDiv
-                            .querySelector('#course-input_edit')
-                            .value.toString() ===
+                        courseName.toLowerCase() ===
                             courseDiv
                                 .querySelector('#course-input-edit-pre')
-                                .innerText.toString() &&
+                                .innerText.toLowerCase() &&
                         courseDiv.querySelector('#credits-input-edit').value ===
                             courseDiv.querySelector('#credit-input-edit-pre')
                                 .innerText
@@ -1549,9 +1644,7 @@ document
                         spanMsg = 'No changes made';
                         spanMsgColor = 'orange';
                     } else if (tempSwitchToPassUpdates === 1) {
-                        console.log(span.innerText);
-                        span.innerText =
-                            courseDiv.querySelector('#course-input_edit').value;
+                        span.innerText = courseName;
                         courseDiv.querySelector(
                             '#course-input-edit-pre',
                         ).innerText = span.innerText;
@@ -1559,8 +1652,9 @@ document
                             'h4',
                         ).innerText =
                             '[' +
-                            courseDiv.querySelector('#credits-input-edit')
-                                .value +
+                            courseDiv
+                                .querySelector('#credits-input-edit')
+                                .value.trim() +
                             ']';
                         spanMsg = 'Course updated succesfully';
                         spanMsgColor = 'green';

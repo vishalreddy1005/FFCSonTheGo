@@ -33,3 +33,12 @@ $colors-light: (
         --#{$name}-color: #{$color};
     }
 }
+
+input::placeholder, // Standard
+input::-webkit-input-placeholder, // WebKit browsers
+input::-moz-placeholder, // Mozilla Firefox 19+
+input:-ms-input-placeholder, // Internet Explorer 10+
+input:-moz-placeholder {
+    // Mozilla Firefox 4 to 18
+    opacity: 0.55 !important; // Set the desired opacity (e.g., 0.1 for 10% opacity)
+}

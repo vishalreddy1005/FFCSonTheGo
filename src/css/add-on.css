@@ -165,3 +165,7 @@ li.sortable-chosen {
     display: flex;
     flex-direction: row;
 }
+
+input::placeholder {
+    opacity: 0.2; /* Set the opacity of all placeholder text */
+}
