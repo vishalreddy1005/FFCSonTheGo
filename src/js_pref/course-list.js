@@ -66,46 +66,6 @@ $(() => {
             }
         }
     });
-
-    /*
-        Double click event to add a course beck to the panel
-     */
-    // $('#course-list').on('dblclick', 'tbody tr', function (e) {
-    //     var slotString = $(this)
-    //         .find('td')
-    //         .not('[colspan]')
-    //         .eq(getColumnIndex('Slot'))
-    //         .text();
-    //     var courseCode = $(this)
-    //         .find('td')
-    //         .eq(getColumnIndex('Course Code'))
-    //         .text();
-    //     var courseTitle = $(this)
-    //         .find('td')
-    //         .eq(getColumnIndex('Course Title'))
-    //         .text();
-    //     var faculty = $(this).find('td').eq(getColumnIndex('Faculty')).text();
-    //     var venue = $(this).find('td').eq(getColumnIndex('Venue')).text();
-    //     var credits = $(this).find('td').eq(getColumnIndex('Credits')).text();
-
-    //     $('#course-input').val(courseCode + ' - ' + courseTitle);
-    //     $('#faculty-input').val(faculty);
-    //     $('#slot-input').val(slotString);
-    //     $('#venue-input').val(venue);
-    //     $('#credits-input').val(credits);
-
-    //     addSlotButtons(courseCode);
-
-    //     // Scroll back to the course panel and delete the course
-    //     $('html, body')
-    //         .animate({
-    //             scrollTop: 0,
-    //         })
-    //         .promise()
-    //         .done(() => {
-    //             $(this).find('.close').trigger('click');
-    //         });
-    // });
 });
 
 /*
@@ -212,7 +172,7 @@ window.addCourseToCourseList = (courseData) => {
     Function to remove a course
  */
 function removeCourseFromCourseList(course) {
-    $(`#course-list tbody tr[data-course="${course}"]`).remove();
+    $(`#courseList-tbody tr[data-course="${course}"]`).remove();
     updateCredits();
 }
 

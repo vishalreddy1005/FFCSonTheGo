@@ -2,6 +2,194 @@
  *  This file contains the events and functions applied to
  *  the timetable
  */
+/*
+ *  This file contains the events and functions applied to
+ *  the course list
+ */
+
+$(() => {
+    /*
+        Click event to sort the course list
+     */
+    $('#course-list th:not(:last)').on('click', function () {
+        var isAscending = (isDescending = false);
+        var $items = retrieveColumnItems($(this));
+
+        if ($(this).hasClass('ascending')) {
+            isAscending = true;
+        } else if ($(this).hasClass('descending')) {
+            isDescending = true;
+        }
+
+        $('#course-list th').removeClass('ascending descending');
+
+        // Sort the course list in ascending, descending or the default order
+        if (!isAscending && !isDescending) {
+            $items.sort(function (a, b) {
+                return $(a).text() > $(b).text() ? 1 : -1;
+            });
+
+            $(this).addClass('ascending');
+        } else if (isAscending && !isDescending) {
+            $items.sort(function (a, b) {
+                return $(a).text() < $(b).text() ? 1 : -1;
+            });
+
+            $(this).addClass('descending');
+        } else {
+            $items.sort(function (a, b) {
+                return $(a).parent().data('course') >
+                    $(b).parent().data('course')
+                    ? 1
+                    : -1;
+            });
+        }
+
+        var sortedRows = $items.map(function (i, item) {
+            return $(item).parent()[0];
+        });
+
+        $('#course-list tbody tr').remove();
+        $('#course-list tbody').append(sortedRows);
+    });
+
+    /*
+        Click event to delete a course from the course list
+     */
+    $('#course-list').on('click', '.close', function () {
+        var course = $(this).closest('tr').attr('data-course');
+
+        removeCourseFromCourseList(course);
+        removeCourseFromTimetable(course);
+
+        var courseId = Number(course.split(/(\d+)/)[1]);
+        for (var i = 0; i < activeTable.data.length; ++i) {
+            if (activeTable.data[i].courseId == courseId) {
+                activeTable.data.splice(i, 1);
+                break;
+            }
+        }
+    });
+});
+
+/*
+    Function to get a columns index from the course list
+ */
+function getColumnIndex(column) {
+    var columns = Array.from($('#course-list th'), function (el) {
+        return el.innerText;
+    });
+
+    return columns.indexOf(column.innerText || column);
+}
+
+/*
+    Function to retrive items from a column in the course list
+ */
+function retrieveColumnItems($column) {
+    var index = getColumnIndex($column.text());
+
+    var $rows = $('#course-list tbody tr');
+
+    var items = $rows.map(function (i, row) {
+        return $(row).find('td')[index];
+    });
+
+    return items;
+}
+
+/*
+    Function to update the total credits
+ */
+function updateCredits() {
+    var totalCredits = 0;
+
+    $('#course-list tbody tr').each(function () {
+        totalCredits += Number(
+            $(this).children('td').eq(getColumnIndex('Credits')).text(),
+        );
+    });
+
+    $('#total-credits').text(totalCredits);
+}
+
+/*
+    Function to insert a course into the course list
+ */
+window.addCourseToCourseList = (courseData) => {
+    var $courseListItem = $(
+        `<tr
+            data-course="course${courseData.courseId}"
+            data-is-project="${courseData.isProject}"
+        >
+            <td>${courseData.slots.join('+')}</td>
+            <td>${courseData.courseCode}</td>
+            <td>${courseData.courseTitle}</td>
+            <td>${courseData.faculty}</td>
+            <td>${courseData.venue}</td>
+            <td>${courseData.credits}</td>
+            <td><i class="fas fa-times close"></i></td>
+        </tr>`,
+    );
+
+    var nextRow = null;
+    var sortedColumn =
+        $('#course-list th.ascending')[0] || $('#course-list th.descending')[0];
+    var isAscending = $('#course-list th.ascending')[0] != undefined;
+
+    /*
+        If the course list is sorted, the course should be
+        inserted at the appropriate position
+     */
+    if (sortedColumn != undefined) {
+        var index = getColumnIndex(sortedColumn);
+        var $items = retrieveColumnItems($(sortedColumn));
+        var currentItem = $courseListItem.find('td')[index];
+
+        for (var i = 0; i < $items.length; i++) {
+            var item = $items[i];
+
+            if (isAscending) {
+                if ($(currentItem).text() <= $(item).text()) {
+                    nextRow = $(item).parent();
+                    break;
+                }
+            } else {
+                if ($(currentItem).text() >= $(item).text()) {
+                    nextRow = $(item).parent();
+                    break;
+                }
+            }
+        }
+    }
+
+    if (nextRow === null) {
+        $('#course-list tbody').append($courseListItem);
+    } else {
+        nextRow.before($courseListItem);
+    }
+
+    updateCredits();
+};
+
+/*
+    Function to remove a course
+ */
+function removeCourseFromCourseList(course) {
+    $(`#courseList-tbody tr[data-course="${course}"]`).remove();
+    updateCredits();
+}
+
+/*
+    Function to clear the course list from the body but not delete it's data
+ */
+window.clearCourseList = () => {
+    if ($('#course-list tbody tr[data-course]')) {
+        $('#course-list tbody tr[data-course]').remove();
+    }
+
+    updateCredits();
+};
 
 import localforage from 'localforage/dist/localforage';
 import html2canvas from 'html2canvas/dist/html2canvas';
@@ -1324,30 +1512,22 @@ function liClick() {
     var radioButton = this.querySelector('input[type="radio"]');
 
     // If this radio button is already selected, deselect it
-    try {
-        if (radioButton.checked) {
-            try {
-                radioButton.checked = false;
-            } catch (error) {
-                console.log('error');
-            }
+
+    if (radioButton.checked) {
+        try {
+            radioButton.checked = false;
+        } catch (error) {
+            console.log('error');
         }
-        // Otherwise, deselect the currently selected radio button (if any) and select this one
-        else {
-            try {
-                radioButton.checked = true; // This radio button is now the currently selected one
-                console.log(
-                    'Select',
-                    radioButton.parentElement.querySelectorAll('div')[0]
-                        .innerText,
-                );
-                addOnRadioTrue(radioButton);
-            } catch (error) {
-                console.log('error');
-            }
-        }
-    } catch (error) {
-        console.log('error');
+    }
+    // Otherwise, deselect the currently selected radio button (if any) and select this one
+    else {
+        radioButton.checked = true; // This radio button is now the currently selected one
+        console.log(
+            'Select',
+            radioButton.parentElement.querySelectorAll('div')[0].innerText,
+        );
+        addOnRadioTrue(radioButton);
     }
 }
 
@@ -1373,11 +1553,48 @@ function addOnRadioTrue(radioButton) {
         var course = courseTitle[0].trim();
         var courseCode = '';
     }
+
     // Removing all element related to that course code from tt and course list
-    var courseList = document
-        .getElementById('courseList-tbody')
-        .querySelectorAll('tr');
-    // To do Later
+    var courseList = document.getElementById('courseList-tbody');
+    console.log(courseList.querySelectorAll('tr'));
+    //ToRemove
+    // Loop through each <tr> element and log the value of the data-course attribute
+    var trElements = courseList.querySelectorAll('tr');
+    var courseToRemove =
+        current.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    console.log(courseToRemove);
+    trElements.forEach(function (trElement) {
+        var dataCourseValue = trElement.getAttribute('data-course');
+        var td = trElement.querySelectorAll('td');
+        if (td[1].innerText === '') {
+            var courseII = td[2].innerText;
+        } else {
+            var courseII = td[1].innerText + '-' + td[2].innerText;
+        }
+        console.log(
+            courseToRemove,
+            courseII,
+            courseToRemove === courseII,
+            dataCourseValue,
+        );
+        if (courseToRemove === courseII) {
+            removeCourseFromTimetable(dataCourseValue);
+            removeCourseFromCourseList(dataCourseValue);
+            console.log(
+                '12234345567',
+                timetableStoragePref[window.activeTable.id].data,
+            );
+            var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
+            for (var i = 0; i < activeTable.data.length; ++i) {
+                if (activeTable.data[i].courseId == courseId) {
+                    activeTable.data.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    });
 
     var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
     var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
@@ -1423,6 +1640,7 @@ function addOnRadioTrue(radioButton) {
     activeTable.data.push(courseData);
     addCourseToCourseList(courseData);
     addCourseToTimetable(courseData);
+    updateLocalForage();
 }
 
 // Function to create the HTML for subject dropdown

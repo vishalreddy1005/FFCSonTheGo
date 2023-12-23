@@ -100,10 +100,10 @@ $(() => {
     /*
         Double click event to quickly add a course
      */
-    $('#slot-buttons').on('dblclick', 'button', function () {
-        $('#add-course-button').trigger('click');
-        $(this).trigger('blur');
-    });
+    // $('#slot-buttons').on('dblclick', 'button', function () {
+    //     $('#add-course-button').trigger('click');
+    //     $(this).trigger('blur');
+    // });
 
     /*
         Click event to toggle advanced options
@@ -190,6 +190,7 @@ $(() => {
             venue: venue,
             credits: credits,
             isProject: isProject,
+            courseCode: courseCode,
         };
 
         activeTable.data.push(courseData);
