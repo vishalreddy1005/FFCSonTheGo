@@ -2411,7 +2411,7 @@ function rearrangeTeacherRefresh() {
     courseList.forEach((courseName) => {
         rearrangeTeacherLiInSubjectArea(courseName);
     });
-
+}
 function rearrangeTeacherLiInSubjectArea(courseName) {
     var ul = getSubjectDivInSubjectArea(courseName);
     var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
