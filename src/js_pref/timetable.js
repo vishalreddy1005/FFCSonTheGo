@@ -3,9 +3,7 @@ function getSlots() {
     var slots = [];
     activeTable.data.forEach((el) => {
         el.slots.forEach((slot) => {
-            if (!slots.includes(slot)) {
-                slots.push(slot);
-            }
+            slots.push(slot);
         });
     });
     return slots;
@@ -31,13 +29,17 @@ function getSlotsOfCourse(courseName) {
 
 // find the subtraction of two arrays
 function subtractArray(arr1, arr2) {
-    var result = [];
+    //Array2 -Array1
     arr1.forEach((el) => {
-        if (!arr2.includes(el)) {
-            result.push(el);
+        if (arr2.includes(el)) {
+            let index = arr2.indexOf(el);
+            if (index !== -1) {
+                // Remove the first occurrence of the element using splice
+                arr2.splice(index, 1);
+            }
         }
     });
-    return result;
+    return arr2;
 }
 
 function getAllTeacherLiInSubjectArea(courseName) {
@@ -1625,6 +1627,7 @@ function liClick() {
             radioButton.checked = false;
             removeRadioFalse(radioButton);
             updateDataJsonFromCourseList();
+            rearrangeTeacherRefresh();
         } catch (error) {
             console.log('error');
         }
@@ -1634,7 +1637,7 @@ function liClick() {
         addOnRadioTrue(radioButton);
         console.log(true, activeTable.data);
         updateDataJsonFromCourseList();
-        rearrangeTeacherLiInSubjectArea('CSE2001-cse');
+        rearrangeTeacherRefresh();
         console.log('after update', activeTable.data);
     }
 }
@@ -2403,12 +2406,18 @@ document
     });
 
 //reaarange the teacherli within the subjectArea if slots are clashing
+function rearrangeTeacherRefresh() {
+    const courseList = getCourseListFromSubjectArea();
+    courseList.forEach((courseName) => {
+        rearrangeTeacherLiInSubjectArea(courseName);
+    });
+
 function rearrangeTeacherLiInSubjectArea(courseName) {
     var ul = getSubjectDivInSubjectArea(courseName);
     var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
     var slotsOfCourse = getSlotsOfCourse(courseName);
     var activeSlots = getSlots();
-    var consideredSlots = subtractArray(activeSlots, slotsOfCourse);
+    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
     var nonActiveTeacherLi = [];
     var activeTeacherLi = [];
     allTeacherLi.forEach((teacherLi) => {
