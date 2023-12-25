@@ -1,3 +1,92 @@
+// make the list of all slots in the activeTabe.data
+function getSlots() {
+    var slots = [];
+    activeTable.data.forEach((el) => {
+        el.slots.forEach((slot) => {
+            if (!slots.includes(slot)) {
+                slots.push(slot);
+            }
+        });
+    });
+    return slots;
+}
+
+// get the slots of the course in activeTable.data with Course Name
+function getSlotsOfCourse(courseName) {
+    var slots = [];
+    activeTable.data.forEach((el) => {
+        const CourseNameData = getCourseNameFromCourseData(el);
+        if (
+            CourseNameData.toLocaleLowerCase() == courseName.toLocaleLowerCase()
+        ) {
+            el.slots.forEach((slot) => {
+                if (!slots.includes(slot)) {
+                    slots.push(slot);
+                }
+            });
+        }
+    });
+    return slots;
+}
+
+// find the subtraction of two arrays
+function subtractArray(arr1, arr2) {
+    var result = [];
+    arr1.forEach((el) => {
+        if (!arr2.includes(el)) {
+            result.push(el);
+        }
+    });
+    return result;
+}
+
+function getAllTeacherLiInSubjectArea(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            allLi =
+                span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                    'li',
+                );
+            return allLi;
+        }
+    }
+}
+// function to check is there any common slot between two arrays
+function isCommonSlot(arr1, arr2) {
+    var result = false;
+    arr1.forEach((el) => {
+        if (arr2.includes(el)) {
+            result = true;
+        }
+    });
+    return result;
+}
+
+// function to get the courseName from subject area
+function getCourseListFromSubjectArea() {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    var courseList = [];
+    for (const span of allSpan) {
+        courseList.push(span.innerText);
+    }
+    return courseList;
+}
+
+function getSubjectDivInSubjectArea(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            return span.parentElement.parentElement.parentElement.parentElement.querySelector(
+                'ul',
+            );
+        }
+    }
+}
+
 /*
  *  This file contains the events and functions applied to
  *  the timetable
@@ -64,7 +153,7 @@ $(() => {
         if (allTd[1].innerText == '') {
             var courseName = allTd[2].innerText;
         } else {
-            var courseName = allTd[1].innerText + ' - ' + allTd[2].innerText;
+            var courseName = allTd[1].innerText + '-' + allTd[2].innerText;
         }
         var facultuName = allTd[3].innerText;
         var teacherLi = getTeacherLiInSubjectArea(courseName, facultuName);
@@ -1240,6 +1329,17 @@ function showAddTeacherDiv() {
     }
 }
 
+// course name from course data
+function getCourseNameFromCourseData(courseData) {
+    var courseName = '';
+    if (courseData.courseCode === '') {
+        courseName = courseData.courseTitle;
+    } else {
+        courseName = courseData.courseCode + '-' + courseData.courseTitle;
+    }
+    return courseName;
+}
+
 // load teacher view
 document
     .getElementById('tt-teacher-add')
@@ -1534,6 +1634,7 @@ function liClick() {
         addOnRadioTrue(radioButton);
         console.log(true, activeTable.data);
         updateDataJsonFromCourseList();
+        rearrangeTeacherLiInSubjectArea('CSE2001-cse');
         console.log('after update', activeTable.data);
     }
 }
@@ -1834,7 +1935,6 @@ document
             '#course-input-edit-pre',
         ).innerText;
         const courseTr = getCourseTrInCourseList(courseNamePre);
-        console.log(123456789, courseTr);
         function updateCourseList(courseTr, courseName, credits) {
             var td = courseTr.querySelectorAll('td');
             const courseTitle = getCourseCodeAndCourseTitle(courseName)[1];
@@ -2105,8 +2205,6 @@ document
         const teacherName = document.getElementById(
             'teacher-input_remove-edit-pre',
         ).value;
-        var subjectArea = document.getElementById('subjectArea');
-        var allSpan = subjectArea.querySelectorAll('.cname');
 
         // Confirmation popup
         if (
@@ -2303,3 +2401,36 @@ document
             }
         }
     });
+
+//reaarange the teacherli within the subjectArea if slots are clashing
+function rearrangeTeacherLiInSubjectArea(courseName) {
+    var ul = getSubjectDivInSubjectArea(courseName);
+    var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
+    var slotsOfCourse = getSlotsOfCourse(courseName);
+    var activeSlots = getSlots();
+    var consideredSlots = subtractArray(activeSlots, slotsOfCourse);
+    var nonActiveTeacherLi = [];
+    var activeTeacherLi = [];
+    allTeacherLi.forEach((teacherLi) => {
+        const teacherSlot = slotsProcessingForCourseList(
+            teacherLi.querySelectorAll('div')[1].innerText,
+        );
+        if (isCommonSlot(teacherSlot, consideredSlots)) {
+            teacherLi.querySelector('div').classList.add('clash');
+            nonActiveTeacherLi.push(teacherLi);
+        } else {
+            try {
+                teacherLi.querySelector('div').classList.remove('clash');
+            } catch (error) {}
+            activeTeacherLi.push(teacherLi);
+        }
+    });
+    // get the ul under that course name in subject area
+    ul.innerHTML = '';
+    activeTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+    nonActiveTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+}
