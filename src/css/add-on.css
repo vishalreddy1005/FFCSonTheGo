@@ -158,14 +158,21 @@
     background-color: rgb(217, 234, 255);
 }
 li.sortable-chosen {
-    background-color: rgb(53, 132, 229);
+    background-color: rgb(217, 234, 255) !important;
+}
+tr.sortable-chosen {
+    background-color: rgb(53, 132, 229) !important;
 }
 
 .dropdown ul li {
     display: flex;
     flex-direction: row;
 }
-
-input::placeholder {
-    opacity: 0.2; /* Set the opacity of all placeholder text */
+input[type='radio'] {
+    display: block;
+    align-self: center;
 }
+/* BEGIN: only for safari */
+@supports (-webkit-appearance: none) {
+}
+/* END: only for safari */

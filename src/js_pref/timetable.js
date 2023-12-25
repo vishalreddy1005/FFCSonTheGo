@@ -57,11 +57,20 @@ $(() => {
         Click event to delete a course from the course list
      */
     $('#course-list').on('click', '.close', function () {
-        var course = $(this).closest('tr').attr('data-course');
-
+        const tr = $(this).closest('tr');
+        var course = tr.attr('data-course');
+        const allTd = tr.find('td');
+        console.log(allTd[2].innerText);
+        if (allTd[1].innerText == '') {
+            var courseName = allTd[2].innerText;
+        } else {
+            var courseName = allTd[1].innerText + ' - ' + allTd[2].innerText;
+        }
+        var facultuName = allTd[3].innerText;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, facultuName);
+        teacherLi.querySelector('input[type="radio"]').checked = false;
         removeCourseFromCourseList(course);
         removeCourseFromTimetable(course);
-
         var courseId = Number(course.split(/(\d+)/)[1]);
         for (var i = 0; i < activeTable.data.length; ++i) {
             if (activeTable.data[i].courseId == courseId) {
@@ -468,7 +477,6 @@ $(() => {
         activeTable.quick = [];
         activeTable['subject'] = {};
         updateLocalForage();
-        showAddTeacherDiv();
         fillPage1();
     });
 });
@@ -555,12 +563,8 @@ function fillPage() {
  */
 function switchTable(tableId) {
     resetPage();
-
     activeTable = timetableStoragePref[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
-    showAddTeacherDiv();
-    fillPage1();
-    fillPage();
 }
 
 /*
@@ -568,9 +572,9 @@ function switchTable(tableId) {
  */
 function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
-    showAddTeacherDiv();
     fillPage1();
     fillPage();
+    closeEditPref();
 }
 
 /*
@@ -775,7 +779,6 @@ function checkSlotClash() {
     Function to initialize quick visualization
  */
 function initializeQuickVisualization() {
-    showAddTeacherDiv();
     /*
         Click event for the quick visualization buttons
      */
@@ -958,7 +961,6 @@ window.initializeTimetable = () => {
             ++labIndex;
         }
     }
-    showAddTeacherDiv();
     initializeQuickVisualization();
 
     /*
@@ -983,7 +985,6 @@ window.initializeTimetable = () => {
             });
         })
         .catch(console.error);
-    showAddTeacherDiv();
 };
 
 /*
@@ -991,15 +992,25 @@ window.initializeTimetable = () => {
  */
 window.addCourseToTimetable = (courseData) => {
     courseData.slots.forEach(function (slot) {
-        var $divElement = $(
-            `<div 
-                data-course="course${courseData.courseId}"
-                >${courseData.courseCode}${
-                courseData.venue != '' ? '-' + courseData.venue : ''
-            }</div
-            >`,
-        );
-
+        if (courseData.courseCode == '') {
+            var $divElement = $(
+                `<div 
+                    data-course="course${courseData.courseId}"
+                    >${courseData.courseCode}${
+                    courseData.venue != '' ? '' + courseData.venue : ''
+                }</div
+                >`,
+            );
+        } else {
+            var $divElement = $(
+                `<div 
+                    data-course="course${courseData.courseId}"
+                    >${courseData.courseCode}${
+                    courseData.venue != '' ? '-' + courseData.venue : ''
+                }</div
+                >`,
+            );
+        }
         if (courseData.slots[0][0] == 'L') {
             $divElement.data('is-lab', true);
         } else {
@@ -1010,7 +1021,6 @@ window.addCourseToTimetable = (courseData) => {
 
         $(`.quick-buttons .${slot}-tile`).addClass('highlight');
     });
-    showAddTeacherDiv();
     checkSlotClash();
     updateLocalForage();
 };
@@ -1052,7 +1062,6 @@ window.removeCourseFromTimetable = (course) => {
         });
 
     $(`#timetable tr td div[data-course="${course}"]`).remove();
-    showAddTeacherDiv();
     checkSlotClash();
     updateLocalForage();
 };
@@ -1068,7 +1077,6 @@ window.clearTimetable = () => {
     if ($('#timetable tr div[data-course]')) {
         $('#timetable tr div[data-course]').remove();
     }
-    showAddTeacherDiv();
 };
 
 function generateCourseName(courseInput) {
@@ -1197,6 +1205,7 @@ document
 
 // show teacher view + refresh and build the course select input
 function showAddTeacherDiv() {
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
     var addCourseDiv = document.getElementById('div-for-add-course');
     var addTeacherDiv = document.getElementById('div-for-add-teacher');
     addCourseDiv.style.display = 'none';
@@ -1252,6 +1261,7 @@ function closeEditPref() {
     document.getElementById('tt-sub-edit-switch-div').style.display = 'none';
     document.getElementById('tt-sub-edit-switch').checked = false;
     document.getElementById('div-for-edit-course').style.display = 'none';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
     editSub = false;
     showAddTeacherDiv();
     createSubjectJsonFromHtml();
@@ -1351,7 +1361,7 @@ document
                     spanMsg = 'Teacher Added Successfully';
                     spanMsgColor = 'green';
                     document.getElementById('slot-input').value = '';
-
+                    document.getElementById('teacher-input_remove').value = '';
                     const li = document.createElement('li');
                     li.style.backgroundColor = colorInput;
 
@@ -1418,7 +1428,6 @@ document
 document.getElementById('tt-subject-edit').addEventListener('click', editPref);
 function editPref() {
     editTeacher = true;
-    console.log('editPref');
     document.getElementById('tt-subject-edit').style.display = 'none';
     document.getElementById('tt-subject-add').style.display = 'none';
     document.getElementById('tt-teacher-add').style.display = 'none';
@@ -1428,7 +1437,7 @@ function editPref() {
     document.getElementById('tt-subject-done').style.display = 'block';
     document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
     document.getElementById('edit_msg_').style.display = 'block';
-    activateSortable();
+    activateSortableLi();
     openAllDropdowns();
     removeEventListeners();
     removeInputFieldsInSection('subjectArea');
@@ -1468,9 +1477,15 @@ function editPref() {
                         '.cname',
                     ).innerText;
                 const teacherName = allDivInLi[0].innerText;
-                const slot = allDivInLi[1].innerText;
-                const venue = allDivInLi[2].innerText;
+                let slot = allDivInLi[1].innerText;
+                let venue = allDivInLi[2].innerText;
                 const color = this.style.backgroundColor;
+                if (slot === 'SLOTS') {
+                    slot = '';
+                }
+                if (venue === 'VENUE') {
+                    venue = '';
+                }
                 document.getElementById('teacher-input_remove-edit').value =
                     teacherName;
                 document.getElementById('slot-input-edit').value = slot;
@@ -1486,18 +1501,13 @@ function editPref() {
 }
 
 // Targets the li to make it toggable when clicked anywhere on the li element eg the teacher name list
-// Call the function after the HTML is generated
 function addEventListeners() {
-    // Get all the list items
     var listItems = document.querySelectorAll('.dropdown li');
-    // Variable to keep track of the currently selected radio button
-    var current = null;
-    // Add a click event listener to each list item
     for (var i = 0; i < listItems.length; i++) {
         listItems[i].addEventListener('click', liClick);
     }
 }
-// Call the function after the HTML is generated
+
 // Function to remove all event listeners
 function removeEventListeners() {
     var listItems = document.querySelectorAll('.dropdown li');
@@ -1510,102 +1520,74 @@ function removeEventListeners() {
 function liClick() {
     // Get the radio button inside this list item
     var radioButton = this.querySelector('input[type="radio"]');
-
-    // If this radio button is already selected, deselect it
-
     if (radioButton.checked) {
         try {
             radioButton.checked = false;
+            removeRadioFalse(radioButton);
+            updateDataJsonFromCourseList();
         } catch (error) {
             console.log('error');
         }
-    }
-    // Otherwise, deselect the currently selected radio button (if any) and select this one
-    else {
+    } else {
         radioButton.checked = true; // This radio button is now the currently selected one
-        console.log(
-            'Select',
-            radioButton.parentElement.querySelectorAll('div')[0].innerText,
-        );
+        console.log(true, activeTable.data);
         addOnRadioTrue(radioButton);
+        console.log(true, activeTable.data);
+        updateDataJsonFromCourseList();
+        console.log('after update', activeTable.data);
     }
 }
 
-// Function to add to timetable and in course table when clicked on radio button
-function addOnRadioTrue(radioButton) {
-    console.log(timetableStoragePref[window.activeTable.id].data);
-    current = radioButton; // This radio button is now the currently selected one
-    console.log(
-        'Select',
-        current.parentElement.querySelectorAll('div')[0].innerText,
-    );
-    var courseTitle = current.parentElement.parentElement.parentElement
-        .querySelector('h2 .cname')
-        .innerText.split('-');
-    if (courseTitle.length > 1) {
-        var courseCode = courseTitle[0].trim();
-        var part2 = '';
-        for (var i = 1; i < courseTitle.length; i++) {
-            part2 += courseTitle[i].trim() + '-';
+// delete from subject
+function removeCourseFromSubject(dataCourseValue) {
+    var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
+    for (var i = 0; i < activeTable.data.length; ++i) {
+        if (activeTable.data[i].courseId == courseId) {
+            activeTable.data.splice(i, 1);
+            break;
         }
-        var course = part2.slice(0, -1);
+    }
+}
+// get course from tr
+function getCourseNameAndFacultyFromTr(trElement) {
+    var td = trElement.querySelectorAll('td');
+    if (td[1].innerText === '') {
+        var courseII = td[2].innerText;
     } else {
-        var course = courseTitle[0].trim();
-        var courseCode = '';
+        var courseII = td[1].innerText + '-' + td[2].innerText;
     }
 
-    // Removing all element related to that course code from tt and course list
+    return [courseII, td[3].innerText];
+}
+
+// Remove Course
+// Removing all element related to that course code from tt and course list
+function courseRemove(courseToRemove) {
     var courseList = document.getElementById('courseList-tbody');
-    console.log(courseList.querySelectorAll('tr'));
-    //ToRemove
     // Loop through each <tr> element and log the value of the data-course attribute
     var trElements = courseList.querySelectorAll('tr');
-    var courseToRemove =
-        current.parentElement.parentElement.parentElement.querySelector(
-            'h2 .cname',
-        ).innerText;
-    console.log(courseToRemove);
     trElements.forEach(function (trElement) {
         var dataCourseValue = trElement.getAttribute('data-course');
-        var td = trElement.querySelectorAll('td');
-        if (td[1].innerText === '') {
-            var courseII = td[2].innerText;
-        } else {
-            var courseII = td[1].innerText + '-' + td[2].innerText;
-        }
-        console.log(
-            courseToRemove,
-            courseII,
-            courseToRemove === courseII,
-            dataCourseValue,
-        );
+        var courseII = getCourseNameAndFacultyFromTr(trElement)[0];
         if (courseToRemove === courseII) {
             removeCourseFromTimetable(dataCourseValue);
             removeCourseFromCourseList(dataCourseValue);
-            console.log(
-                '12234345567',
-                timetableStoragePref[window.activeTable.id].data,
-            );
-            var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
-            for (var i = 0; i < activeTable.data.length; ++i) {
-                if (activeTable.data[i].courseId == courseId) {
-                    activeTable.data.splice(i, 1);
-                    break;
-                }
-            }
+            removeCourseFromSubject(dataCourseValue);
         }
     });
+}
 
-    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
-    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
-    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
-    var credits = parseInt(
-        current.parentElement.parentElement.parentElement
-            .querySelector('h4')
-            .textContent.replace('[', '')
-            .replace(']', ''),
-    );
-    var isProject = false;
+// Remove the course from time table on deselection of radio button
+function removeRadioFalse(radioButton) {
+    var courseToRemove =
+        radioButton.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    courseRemove(courseToRemove);
+}
+
+// slots processing for course list
+function slotsProcessingForCourseList(slotString) {
     var slots = (function () {
         var arr = [];
 
@@ -1621,15 +1603,52 @@ function addOnRadioTrue(radioButton) {
 
         return arr;
     })();
+    return slots;
+}
+//function to get courseCode and Course Title from courseName
+function getCourseCodeAndCourseTitle(courseName) {
+    var courseName = courseName.split('-');
+    if (courseName.length > 1) {
+        var courseCode = courseName[0].trim();
+        var part2 = '';
+        for (var i = 1; i < courseName.length; i++) {
+            part2 += courseName[i].trim() + '-';
+        }
+        var courseTitle = part2.slice(0, -1);
+    } else {
+        var courseTitle = courseName[0].trim();
+        var courseCode = '';
+    }
+    return [courseCode, courseTitle];
+}
+
+// Function to add to timetable and in course table when clicked on radio button
+function addOnRadioTrue(radioButton) {
+    var current = radioButton; // This radio button is now the currently selected one
+    var courseToRemove =
+        current.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
+    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
+    courseRemove(courseToRemove);
+
+    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
+    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
+    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
+    var credits = getCreditsFromCourseName(courseToRemove);
+
+    var isProject = false;
+
+    var slots = slotsProcessingForCourseList(slotString);
     var courseId = 0;
     if (activeTable.data.length != 0) {
         var lastAddedCourse = activeTable.data[activeTable.data.length - 1];
         courseId = lastAddedCourse.courseId + 1;
     }
-    courseTitle = course;
     var courseData = {
         courseId: courseId,
-        courseTitle: course,
+        courseTitle: courseTitle,
         faculty: faculty,
         slots: slots,
         venue: venue,
@@ -1741,6 +1760,7 @@ function fillPage1() {
         leftBox.innerHTML = '';
     }
     addEventListeners();
+    makeRadioTrueOnPageLoad();
 }
 
 // Function to be executed on page load'
@@ -1749,6 +1769,8 @@ document.addEventListener('DOMContentLoaded', onPageLoad);
 function onPageLoad() {
     fillPage1();
     fillPage();
+
+    activateSortableForCourseList();
     console.log(timetableStoragePref);
 }
 // Add event listener for DOMContentLoaded event
@@ -1805,6 +1827,33 @@ document
         var courseName = generateCourseName(
             courseDiv.querySelector('#course-input_edit').value.trim(),
         );
+        var credits = parseInt(
+            courseDiv.querySelector('#credits-input-edit').value,
+        );
+        var courseNamePre = courseDiv.querySelector(
+            '#course-input-edit-pre',
+        ).innerText;
+        const courseTr = getCourseTrInCourseList(courseNamePre);
+        console.log(123456789, courseTr);
+        function updateCourseList(courseTr, courseName, credits) {
+            var td = courseTr.querySelectorAll('td');
+            const courseTitle = getCourseCodeAndCourseTitle(courseName)[1];
+            const courseCode = getCourseCodeAndCourseTitle(courseName)[0];
+            td[1].innerText = courseCode;
+            td[2].innerText = courseTitle;
+            td[5].innerText = credits;
+            updateDataJsonFromCourseList();
+            var courseIdNum = courseTr.getAttribute('data-course');
+            removeCourseFromTimetable(courseIdNum);
+            courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
+            for (var i = 0; i < activeTable.data.length; ++i) {
+                if (activeTable.data[i].courseId == courseIdNum) {
+                    addCourseToTimetable(activeTable.data[i]);
+                    break;
+                }
+            }
+            updateCredits();
+        }
 
         let subjectArea = document.getElementById('subjectArea');
         let allSpan = subjectArea.querySelectorAll('.cname');
@@ -1823,10 +1872,7 @@ document
         } else {
             allSpan.forEach((span) => {
                 if (
-                    span.innerText.toLowerCase() ===
-                    courseDiv
-                        .querySelector('#course-input-edit-pre')
-                        .innerText.toLowerCase()
+                    span.innerText.toLowerCase() === courseNamePre.toLowerCase()
                 ) {
                     var tempSwitchToPassUpdates = 1;
                     var countSameCourseName = 0;
@@ -1843,18 +1889,13 @@ document
                     });
                     if (
                         countSameCourseName > 0 &&
-                        courseName.toLowerCase() !==
-                            courseDiv
-                                .querySelector('#course-input-edit-pre')
-                                .innerText.toLowerCase()
+                        courseName.toLowerCase() !== courseNamePre.toLowerCase()
                     ) {
                         tempSwitchToPassUpdates = 0;
                     }
                     if (
                         courseName.toLowerCase() ===
-                            courseDiv
-                                .querySelector('#course-input-edit-pre')
-                                .innerText.toLowerCase() &&
+                            courseNamePre.toLowerCase() &&
                         courseDiv.querySelector('#credits-input-edit').value ===
                             courseDiv.querySelector('#credit-input-edit-pre')
                                 .innerText
@@ -1863,9 +1904,7 @@ document
                         spanMsgColor = 'orange';
                     } else if (tempSwitchToPassUpdates === 1) {
                         span.innerText = courseName;
-                        courseDiv.querySelector(
-                            '#course-input-edit-pre',
-                        ).innerText = span.innerText;
+                        courseNamePre.innerText = span.innerText;
                         span.parentElement.parentElement.querySelector(
                             'h4',
                         ).innerText =
@@ -1876,10 +1915,11 @@ document
                             ']';
                         spanMsg = 'Course updated succesfully';
                         spanMsgColor = 'green';
+                        if (courseTr) {
+                            updateCourseList(courseTr, courseName, credits);
+                        }
                         createSubjectJsonFromHtml();
-                        courseDiv.querySelector(
-                            '#credit-input-edit-pre',
-                        ).innerText = courseDiv.querySelector(
+                        courseNamePre.innerText = courseDiv.querySelector(
                             '#credits-input-edit',
                         ).value;
                     } else {
@@ -1910,6 +1950,10 @@ document
         const teacherNamePre = document.getElementById(
             'teacher-input_remove-edit-pre',
         ).value;
+        const trElementCourseList = getCourseTrInCourseList(
+            courseName,
+            teacherNamePre,
+        );
         const teacherName = document
             .getElementById('teacher-input_remove-edit')
             .value.trim();
@@ -1921,7 +1965,27 @@ document
             .getElementById('venue-input-edit')
             .value.trim()
             .toUpperCase();
-        console.log('hello testing 123');
+        function updateTeacherInCourseList(
+            trElementCourseList,
+            teacherName,
+            slotsInput,
+            venueInput,
+        ) {
+            var td = trElementCourseList.querySelectorAll('td');
+            td[3].innerText = teacherName;
+            td[0].innerText = slotsInput;
+            td[4].innerText = venueInput;
+            updateDataJsonFromCourseList();
+            var courseIdNum = trElementCourseList.getAttribute('data-course');
+            removeCourseFromTimetable(courseIdNum);
+            courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
+            for (var i = 0; i < activeTable.data.length; ++i) {
+                if (activeTable.data[i].courseId == courseIdNum) {
+                    addCourseToTimetable(activeTable.data[i]);
+                    break;
+                }
+            }
+        }
         const colorInput = document.getElementById('color1-select-edit').value;
         const spanTeacherMsg = document.getElementById('span-teacher-edit');
         const brHideTeacher = document.getElementById('hide_br_teacher-edit');
@@ -1958,6 +2022,14 @@ document
                             spanMsg = 'Teacher updated successfully';
                             createSubjectJsonFromHtml();
                             spanMsgColor = 'green';
+                            if (trElementCourseList) {
+                                updateTeacherInCourseList(
+                                    trElementCourseList,
+                                    teacherName,
+                                    slotsInput,
+                                    venueInput,
+                                );
+                            }
                             break;
                         }
                     }
@@ -1995,6 +2067,14 @@ document
                                 ).value = teacherName;
                                 spanMsg = 'Teacher updated successfully';
                                 spanMsgColor = 'green';
+                                if (trElementCourseList) {
+                                    updateTeacherInCourseList(
+                                        trElementCourseList,
+                                        teacherName,
+                                        slotsInput,
+                                        venueInput,
+                                    );
+                                }
                                 createSubjectJsonFromHtml();
                                 break;
                             }
@@ -2050,40 +2130,140 @@ document
             }, 4000);
             return;
         }
-
-        for (const span of allSpan) {
-            console.log(span.innerText);
-            if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-                allLi =
-                    span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
-                        'li',
-                    );
-                for (const li of allLi) {
-                    const allDiv = li.querySelectorAll('div');
-                    if (
-                        allDiv[0].innerText.toLowerCase() ===
-                        teacherName.toLowerCase()
-                    ) {
-                        li.remove();
-                        spanMsg = 'Teacher deleted successfully';
-                        spanMsgColor = 'green';
-                        createSubjectJsonFromHtml();
-
-                        if (true) {
-                            document.getElementById(
-                                'div-for-edit-teacher',
-                            ).style.display = 'none';
-                            document.getElementById('edit_msg_').innerText =
-                                'Click on the Teacher to edit it.';
-                            document.getElementById('edit_msg_').style.display =
-                                'block';
-                        }
-                        break;
-                    }
-                }
+        const li = getTeacherLiInSubjectArea(courseName, teacherName);
+        if (li) {
+            li.remove();
+            courseRemove(courseName);
+            spanMsg = 'Teacher deleted successfully';
+            spanMsgColor = 'green';
+            createSubjectJsonFromHtml();
+            if (true) {
+                document.getElementById('div-for-edit-teacher').style.display =
+                    'none';
+                document.getElementById('edit_msg_').innerText =
+                    'Click on the Teacher to edit it.';
+                document.getElementById('edit_msg_').style.display = 'block';
             }
         }
     });
+
+// Function to find the li element of the teacher
+function getTeacherLiInSubjectArea(courseName, teacherName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            allLi =
+                span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                    'li',
+                );
+            for (const li of allLi) {
+                const allDiv = li.querySelectorAll('div');
+                if (
+                    allDiv[0].innerText.toLowerCase() ===
+                    teacherName.toLowerCase()
+                ) {
+                    return li;
+                }
+            }
+        }
+    }
+}
+
+// Function to find/get tr element of the course
+function getCourseTrInCourseList(courseName, teacherName) {
+    var courseList = document.getElementById('courseList-tbody');
+    var trElements = courseList.querySelectorAll('tr');
+    for (const trElement of trElements) {
+        var tempData = getCourseNameAndFacultyFromTr(trElement); // [courseName,faculty]
+        if (tempData[0] === courseName) {
+            if (teacherName) {
+                if (tempData[1] === teacherName) {
+                    return trElement;
+                }
+            } else {
+                return trElement;
+            }
+        }
+    }
+}
+
+//function to create sunject json from the course list
+function updateDataJsonFromCourseList() {
+    let courseList = document.getElementById('courseList-tbody');
+    let trElements = courseList.querySelectorAll('tr');
+    activeTable.data = [];
+    trElements.forEach((trElement) => {
+        let td = trElement.querySelectorAll('td');
+        let courseName = td[2].innerText;
+        let faculty = td[3].innerText;
+        let courseCode = td[1].innerText;
+        let slots = slotsProcessingForCourseList(td[0].innerText);
+        let venue = td[4].innerText;
+        let credits = parseInt(td[5].innerText);
+        let isProject = trElement.getAttribute('data-is-project');
+        let dataCourseValue = trElement.getAttribute('data-course');
+        let courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
+
+        let courseData = {
+            courseId: courseId,
+            courseTitle: courseName,
+            faculty: faculty,
+            slots: slots,
+            venue: venue,
+            credits: credits,
+            isProject: isProject,
+            courseCode: courseCode,
+        };
+        activeTable.data.push(courseData);
+        console.log(activeTable.data);
+    });
+    updateLocalForage();
+}
+
+// Sortable for course list after dropping should do something
+function activateSortableForCourseList() {
+    var courseList = document.querySelector('#course-list tbody');
+    Sortable.create(courseList, {
+        animation: 150,
+        chosenClass: 'sortable-chosen',
+        onEnd: function (evt) {
+            updateDataJsonFromCourseList();
+            console.log(activeTable.data);
+        },
+    });
+}
+
+// function to get credits from course name in subject area
+function getCreditsFromCourseName(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            return parseInt(
+                span.parentElement.parentElement
+                    .querySelector('h4')
+                    .innerText.replace('[', '')
+                    .replace(']', ''),
+            );
+        }
+    }
+}
+
+// Make input radio true on the bases of activeTable.data values
+function makeRadioTrueOnPageLoad() {
+    activeTable.data.forEach((courseData) => {
+        if (courseData.courseCode === '') {
+            var courseName = courseData.courseTitle;
+        } else {
+            var courseName =
+                courseData.courseCode + '-' + courseData.courseTitle;
+        }
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = true;
+    });
+}
 
 // Delete for Subject Edit
 document
@@ -2112,13 +2292,13 @@ document
         for (const span of allSpan) {
             if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
                 span.parentElement.parentElement.parentElement.parentElement.remove();
+                courseRemove(span.innerText);
                 document.getElementById('div-for-edit-course').style.display =
                     'none';
                 document.getElementById('edit_msg_').innerText =
-                    'Click on the Subject to edit it.';
+                    'Click on the Course to edit it.';
                 document.getElementById('edit_msg_').style.display = 'block';
                 createSubjectJsonFromHtml();
-
                 break;
             }
         }
