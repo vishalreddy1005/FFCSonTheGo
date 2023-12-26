@@ -160,9 +160,6 @@
 li.sortable-chosen {
     background-color: rgb(217, 234, 255) !important;
 }
-tr.sortable-chosen {
-    background-color: rgb(53, 132, 229) !important;
-}
 
 .dropdown ul li {
     display: flex;
@@ -177,6 +174,14 @@ input[type='radio'] {
 }
 /* END: only for safari */
 
-.clash {
+/* .clash {
     text-decoration: line-through;
+} */
+.clashLi {
+    opacity: 0.385 !important;
+}
+
+#attack-toggle:checked {
+    background-color: red !important;
+    border-color: red !important;
 }

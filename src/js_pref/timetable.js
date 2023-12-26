@@ -1,3 +1,73 @@
+var attackMode = false;
+var attackData = [];
+var ttDataStructureInLFormat = {
+    L1: 'A1',
+    L2: 'F1',
+    L3: 'D1',
+    L4: 'TB1',
+    L5: 'TG1',
+    L6: 'L6',
+    L31: 'A2',
+    L32: 'F2',
+    L33: 'D2',
+    L34: 'TB2',
+    L35: 'TG2',
+    L36: 'L36',
+    V3: 'V3',
+    L7: 'B1',
+    L8: 'G1',
+    L9: 'E1',
+    L10: 'TC1',
+    L11: 'TAA1',
+    L12: 'L12',
+    L37: 'B2',
+    L38: 'G2',
+    L39: 'E2',
+    L40: 'TC2',
+    L41: 'TAA2',
+    L42: 'L42',
+    V4: 'V4',
+    L13: 'C1',
+    L14: 'A1',
+    L15: 'F1',
+    L16: 'V1',
+    L17: 'V2',
+    L18: 'L18',
+    L43: 'C2',
+    L44: 'A2',
+    L45: 'F2',
+    L46: 'TD2',
+    L47: 'TBB2',
+    L48: 'L48',
+    V5: 'V5',
+    L19: 'D1',
+    L20: 'B1',
+    L21: 'G1',
+    L22: 'TE1',
+    L23: 'TCC1',
+    L24: 'L24',
+    L49: 'D2',
+    L50: 'B2',
+    L51: 'G2',
+    L52: 'TE2',
+    L53: 'TCC2',
+    L54: 'L54',
+    V6: 'V6',
+    L25: 'E1',
+    L26: 'C1',
+    L27: 'TA1',
+    L28: 'TF1',
+    L29: 'TD1',
+    L30: 'L30',
+    L55: 'E2',
+    L56: 'C2',
+    L57: 'TA2',
+    L58: 'TF2',
+    L59: 'TDD2',
+    L60: 'L60',
+    V7: 'V7',
+};
+
 // make the list of all slots in the activeTabe.data
 function getSlots() {
     var slots = [];
@@ -6,7 +76,55 @@ function getSlots() {
             slots.push(slot);
         });
     });
+    slots = updateSlots(slots);
     return slots;
+}
+
+// function to update the array of slots if slot is in key of getCourseTTDataObject it will be replaced with its value
+function updateSlots(slots) {
+    var newSlots = [];
+    slots.forEach((slot) => {
+        if (slot in ttDataStructureInLFormat) {
+            newSlots.push(ttDataStructureInLFormat[slot]);
+        } else {
+            newSlots.push(slot);
+        }
+    });
+    return newSlots;
+}
+
+function getCourseTTDataObject() {
+    const timetableTable = document.querySelector('.table-bordered');
+    const rows = timetableTable.querySelectorAll('tr');
+
+    const timetable = {};
+
+    rows.forEach((row) => {
+        const cells = row.querySelectorAll('td.period'); // Only select cells with class 'period'
+
+        if (cells.length > 0) {
+            // Check if cells array is not empty
+            const day = cells[0].textContent.trim();
+
+            for (let i = 0; i < cells.length; i++) {
+                // Start from 0 to include all periods
+                const period = cells[i].textContent.trim();
+                if (period) {
+                    const [course, lab] = period.split('/');
+                    const courseTrimmed = course ? course.trim() : '';
+                    const labTrimmed = lab ? lab.trim() : '';
+
+                    if (labTrimmed) {
+                        timetable[labTrimmed] = courseTrimmed;
+                    } else {
+                        timetable[courseTrimmed] = courseTrimmed;
+                    }
+                }
+            }
+        }
+    });
+
+    return timetable;
 }
 
 // get the slots of the course in activeTable.data with Course Name
@@ -24,6 +142,7 @@ function getSlotsOfCourse(courseName) {
             });
         }
     });
+    slots = updateSlots(slots);
     return slots;
 }
 
@@ -77,7 +196,7 @@ function getCourseListFromSubjectArea() {
     return courseList;
 }
 
-function getSubjectDivInSubjectArea(courseName) {
+function getUlInSubjectArea(courseName) {
     var subjectArea = document.getElementById('subjectArea');
     var allSpan = subjectArea.querySelectorAll('.cname');
     for (const span of allSpan) {
@@ -160,6 +279,8 @@ $(() => {
         var facultuName = allTd[3].innerText;
         var teacherLi = getTeacherLiInSubjectArea(courseName, facultuName);
         teacherLi.querySelector('input[type="radio"]').checked = false;
+        revertRerrange();
+        rearrangeTeacherRefresh();
         removeCourseFromCourseList(course);
         removeCourseFromTimetable(course);
         var courseId = Number(course.split(/(\d+)/)[1]);
@@ -663,8 +784,9 @@ function switchTable(tableId) {
  */
 function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
-    fillPage1();
     fillPage();
+    fillPage1();
+
     closeEditPref();
 }
 
@@ -1368,10 +1490,43 @@ function closeEditPref() {
     showAddTeacherDiv();
     createSubjectJsonFromHtml();
     addEventListeners();
+    revertRerrange();
+    rearrangeTeacherRefresh();
 }
 document
     .getElementById('tt-subject-done')
     .addEventListener('click', closeEditPref);
+
+function createTeacherLI(teacherData) {
+    const li = document.createElement('li');
+    li.style.backgroundColor = teacherData.color;
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = teacherData.courseName;
+    input.value = teacherData.teacherName;
+
+    const teacherNameDiv = document.createElement('div');
+    teacherNameDiv.style.paddingLeft = '4%';
+    teacherNameDiv.style.width = '47%';
+    teacherNameDiv.innerText = teacherData.teacherName;
+
+    const slotsDiv = document.createElement('div');
+    slotsDiv.style.width = '38%';
+    slotsDiv.style.opacity = '70%';
+    slotsDiv.innerText = teacherData.slots;
+
+    const venueDiv = document.createElement('div');
+    venueDiv.style.width = '15%';
+    venueDiv.style.opacity = '70%';
+    venueDiv.innerText = teacherData.venue;
+
+    li.appendChild(input);
+    li.appendChild(teacherNameDiv);
+    li.appendChild(slotsDiv);
+    li.appendChild(venueDiv);
+    return li;
+}
 
 // Save teacher
 document
@@ -1464,37 +1619,16 @@ document
                     spanMsgColor = 'green';
                     document.getElementById('slot-input').value = '';
                     document.getElementById('teacher-input_remove').value = '';
-                    const li = document.createElement('li');
-                    li.style.backgroundColor = colorInput;
-
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = courseName;
-                    input.value = teacherName;
-
-                    const teacherNameDiv = document.createElement('div');
-                    teacherNameDiv.style.paddingLeft = '4%';
-                    teacherNameDiv.style.width = '47%';
-                    teacherNameDiv.innerText = teacherName;
-
-                    const slotsDiv = document.createElement('div');
-                    slotsDiv.style.width = '38%';
-                    slotsDiv.style.opacity = '70%';
-                    slotsDiv.innerText = slotsInput;
-
-                    const venueDiv = document.createElement('div');
-                    venueDiv.style.width = '15%';
-                    venueDiv.style.opacity = '70%';
-                    venueDiv.innerText = venueInput;
-
-                    li.appendChild(input);
-                    li.appendChild(teacherNameDiv);
-                    li.appendChild(slotsDiv);
-                    li.appendChild(venueDiv);
-
+                    var teacherData = {
+                        courseName: courseName,
+                        slots: slotsInput,
+                        venue: venueInput,
+                        color: colorInput,
+                        teacherName: teacherName,
+                    };
+                    const li = createTeacherLI(teacherData);
                     li.addEventListener('click', liClick);
                     const dropdownDivs = document.querySelectorAll('.dropdown');
-                    console.log('test 1 pass');
                     for (let dropdownDiv of dropdownDivs) {
                         const cname = dropdownDiv.querySelector('.cname');
                         if (cname && cname.textContent === courseName) {
@@ -1539,9 +1673,9 @@ function editPref() {
     document.getElementById('tt-subject-done').style.display = 'block';
     document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
     document.getElementById('edit_msg_').style.display = 'block';
-    activateSortableLi();
     openAllDropdowns();
     removeEventListeners();
+    revertRerrange();
     removeInputFieldsInSection('subjectArea');
     // Add event listeners to .h2s div elements
     document.querySelectorAll('.h2s').forEach((div) => {
@@ -1627,6 +1761,7 @@ function liClick() {
             radioButton.checked = false;
             removeRadioFalse(radioButton);
             updateDataJsonFromCourseList();
+            revertRerrange();
             rearrangeTeacherRefresh();
         } catch (error) {
             console.log('error');
@@ -1637,6 +1772,7 @@ function liClick() {
         addOnRadioTrue(radioButton);
         console.log(true, activeTable.data);
         updateDataJsonFromCourseList();
+        revertRerrange();
         rearrangeTeacherRefresh();
         console.log('after update', activeTable.data);
     }
@@ -1766,11 +1902,33 @@ function addOnRadioTrue(radioButton) {
     updateLocalForage();
 }
 
+function constructTeacherLi(courseName, subject) {
+    var result = [];
+    for (const teacherName in subject.teacher) {
+        var slotsInput = subject.teacher[teacherName].slots;
+        var venueInput = subject.teacher[teacherName].venue;
+        const colorInput = subject.teacher[teacherName].color;
+        if (slotsInput === '') {
+            slotsInput = 'SLOTS';
+        }
+        if (venueInput === '') {
+            venueInput = 'VENUE';
+        }
+        const teacherData = {
+            courseName: courseName,
+            slots: slotsInput,
+            venue: venueInput,
+            color: colorInput,
+            teacherName: teacherName,
+        };
+        const li = createTeacherLI(teacherData);
+        result.push(li);
+    }
+    return result;
+}
+
 // Function to create the HTML for subject dropdown
 function createSubjectDropdown(courseName, subject) {
-    console.log(subject);
-    var sub = Object.keys(subject)[0];
-
     const dropdown = document.createElement('div');
     dropdown.classList.add('dropdown');
     dropdown.classList.add('dropdown-teacher');
@@ -1805,40 +1963,10 @@ function createSubjectDropdown(courseName, subject) {
     const dropdownList = document.createElement('ul');
     dropdownList.classList.add('dropdown-list');
 
-    for (const teacherName in subject.teacher) {
-        const teacher = subject.teacher[teacherName];
-
-        const li = document.createElement('li');
-        li.style.backgroundColor = teacher.color;
-
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = courseName;
-        input.value = teacherName;
-
-        const teacherNameDiv = document.createElement('div');
-        teacherNameDiv.style.paddingLeft = '4%';
-        teacherNameDiv.style.width = '47%';
-        teacherNameDiv.innerText = teacherName;
-
-        const slotsDiv = document.createElement('div');
-        slotsDiv.style.width = '38%';
-        slotsDiv.style.opacity = '70%';
-        slotsDiv.innerText = teacher.slots;
-
-        const venueDiv = document.createElement('div');
-        venueDiv.style.width = '15%';
-        venueDiv.style.opacity = '70%';
-        venueDiv.innerText = teacher.venue;
-
-        li.appendChild(input);
-        li.appendChild(teacherNameDiv);
-        li.appendChild(slotsDiv);
-        li.appendChild(venueDiv);
-
+    const allTeacherLi = constructTeacherLi(courseName, subject);
+    allTeacherLi.forEach((li) => {
         dropdownList.appendChild(li);
-    }
-
+    });
     dropdown.appendChild(dropdownHeading);
     dropdown.appendChild(dropdownList);
 
@@ -1863,19 +1991,16 @@ function fillPage1() {
         const leftBox = document.getElementById('subjectArea');
         leftBox.innerHTML = '';
     }
-    addEventListeners();
-    makeRadioTrueOnPageLoad();
+    rearrangeTeacherRefresh();
 }
 
 // Function to be executed on page load'
 // Load the subjectArea show all info
 document.addEventListener('DOMContentLoaded', onPageLoad);
 function onPageLoad() {
-    fillPage1();
     fillPage();
-
+    fillPage1();
     activateSortableForCourseList();
-    console.log(timetableStoragePref);
 }
 // Add event listener for DOMContentLoaded event
 
@@ -2365,6 +2490,19 @@ function makeRadioTrueOnPageLoad() {
         teacherLi.querySelector('input[type="radio"]').checked = true;
     });
 }
+function makeRadioFalseOnNeed() {
+    activeTable.data.forEach((courseData) => {
+        if (courseData.courseCode === '') {
+            var courseName = courseData.courseTitle;
+        } else {
+            var courseName =
+                courseData.courseCode + '-' + courseData.courseTitle;
+        }
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = false;
+    });
+}
 
 // Delete for Subject Edit
 document
@@ -2405,15 +2543,16 @@ document
         }
     });
 
-//reaarange the teacherli within the subjectArea if slots are clashing
+//rearrange the teacherli within the subjectArea if slots are clashing
 function rearrangeTeacherRefresh() {
     const courseList = getCourseListFromSubjectArea();
     courseList.forEach((courseName) => {
         rearrangeTeacherLiInSubjectArea(courseName);
     });
+    addEventListeners();
 }
 function rearrangeTeacherLiInSubjectArea(courseName) {
-    var ul = getSubjectDivInSubjectArea(courseName);
+    var ul = getUlInSubjectArea(courseName);
     var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
     var slotsOfCourse = getSlotsOfCourse(courseName);
     var activeSlots = getSlots();
@@ -2421,14 +2560,18 @@ function rearrangeTeacherLiInSubjectArea(courseName) {
     var nonActiveTeacherLi = [];
     var activeTeacherLi = [];
     allTeacherLi.forEach((teacherLi) => {
-        const teacherSlot = slotsProcessingForCourseList(
-            teacherLi.querySelectorAll('div')[1].innerText,
+        const teacherSlot = updateSlots(
+            slotsProcessingForCourseList(
+                teacherLi.querySelectorAll('div')[1].innerText,
+            ),
         );
         if (isCommonSlot(teacherSlot, consideredSlots)) {
+            teacherLi.classList.add('clashLi');
             teacherLi.querySelector('div').classList.add('clash');
             nonActiveTeacherLi.push(teacherLi);
         } else {
             try {
+                teacherLi.classList.remove('clashLi');
                 teacherLi.querySelector('div').classList.remove('clash');
             } catch (error) {}
             activeTeacherLi.push(teacherLi);
@@ -2443,3 +2586,363 @@ function rearrangeTeacherLiInSubjectArea(courseName) {
         ul.appendChild(teacherLi);
     });
 }
+
+function rearrangeTeacherRefreshAttack() {
+    const courseList = getCourseListFromSubjectArea();
+    courseList.forEach((courseName) => {
+        rearrangeTeacherLiInSubjectAreaAttack(courseName);
+    });
+}
+
+function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
+    var ul = getUlInSubjectArea(courseName);
+    var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
+    var slotsOfCourse = getcourseSlotsAttack(courseName);
+    var activeSlots = slotsForAttack();
+    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
+    var nonActiveTeacherLi = [];
+    var activeTeacherLi = [];
+    allTeacherLi.forEach((teacherLi) => {
+        const teacherSlot = updateSlots(
+            slotsProcessingForCourseList(
+                teacherLi.querySelectorAll('div')[1].innerText,
+            ),
+        );
+        if (isCommonSlot(teacherSlot, consideredSlots)) {
+            teacherLi.classList.add('clashLi');
+            teacherLi.removeEventListener('click', attackLiClick);
+            teacherLi.querySelector('div').classList.add('clash');
+            nonActiveTeacherLi.push(teacherLi);
+        } else {
+            teacherLi.addEventListener('click', attackLiClick);
+            try {
+                teacherLi.classList.remove('clashLi');
+                teacherLi.querySelector('div').classList.remove('clash');
+            } catch (error) {}
+            activeTeacherLi.push(teacherLi);
+        }
+    });
+    // get the ul under that course name in subject area
+    ul.innerHTML = '';
+    activeTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+    nonActiveTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+}
+
+function revertRerrange() {
+    var allSubject = activeTable.subject;
+    Object.keys(allSubject).forEach((subjectName) => {
+        const subjectNameStr = subjectName.toString();
+        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
+        const TeacherLi = constructTeacherLi(
+            subjectNameStr,
+            allSubject[subjectNameStr],
+        );
+        ulToUpdate.innerHTML = '';
+        TeacherLi.forEach((li) => {
+            ulToUpdate.appendChild(li);
+        });
+        makeRadioTrueOnPageLoad();
+    });
+}
+
+// Make input radio true on the basis of attackData values
+function makeRadioTrueAttack() {
+    attackData.forEach((courseData) => {
+        if (courseData.courseCode === '') {
+            var courseName = courseData.courseTitle;
+        } else {
+            var courseName =
+                courseData.courseCode + '-' + courseData.courseTitle;
+        }
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = true;
+    });
+}
+function revertRerrangeAttack() {
+    var allSubject = activeTable.subject;
+    Object.keys(allSubject).forEach((subjectName) => {
+        const subjectNameStr = subjectName.toString();
+        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
+        const TeacherLi = constructTeacherLi(
+            subjectNameStr,
+            allSubject[subjectNameStr],
+        );
+        ulToUpdate.innerHTML = '';
+        TeacherLi.forEach((li) => {
+            ulToUpdate.appendChild(li);
+        });
+        makeRadioTrueAttack();
+    });
+}
+
+function addEventListenersAttack() {
+    var listItems = document.querySelectorAll('.dropdown li');
+    for (var i = 0; i < listItems.length; i++) {
+        listItems[i].addEventListener('click', attackLiClick);
+    }
+}
+function removeEventListenersAttack() {
+    var listItems = document.querySelectorAll('.dropdown li');
+    for (var i = 0; i < listItems.length; i++) {
+        listItems[i].removeEventListener('click', attackLiClick);
+    }
+}
+
+function slotsForAttack() {
+    var slots = [];
+    for (var i = 0; i < attackData.length; i++) {
+        slots = slots.concat(attackData[i].slots);
+    }
+    slots = updateSlots(slots);
+    return slots;
+}
+function getcourseSlotsAttack(courseName) {
+    var slots = [];
+    attackData.forEach((el) => {
+        const CourseNameData = getCourseNameFromCourseData(el);
+        if (
+            CourseNameData.toLocaleLowerCase() == courseName.toLocaleLowerCase()
+        ) {
+            el.slots.forEach((slot) => {
+                if (!slots.includes(slot)) {
+                    slots.push(slot);
+                }
+            });
+        }
+    });
+    slots = updateSlots(slots);
+    return slots;
+}
+
+function removeRadioFalseAttack(radioButton) {
+    var courseToRemove =
+        radioButton.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    for (var i = 0; i < attackData.length; ++i) {
+        var attackCourse = getCourseNameFromCourseData(attackData[i]);
+        if (
+            attackCourse.toLocaleLowerCase() ===
+            courseToRemove.toLocaleLowerCase()
+        ) {
+            attackData.splice(i, 1);
+            break;
+        }
+    }
+}
+
+function addOnRadioAttack(radioButton) {
+    var current = radioButton; // This radio button is now the currently selected one
+    var courseToRemove =
+        current.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+
+    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
+    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
+    var dropdownUlRemoveShow = current.parentElement.parentElement;
+    console.log(dropdownUlRemoveShow);
+    var dropdownDivRemoveOpen = dropdownUlRemoveShow.previousElementSibling;
+    console.log(dropdownDivRemoveOpen);
+    try {
+        var dropdownDivAddOpen =
+            dropdownDivRemoveOpen.parentElement.nextElementSibling;
+        var dropdownUlAddShow = dropdownDivAddOpen.querySelector('ul');
+        var dropdownDivAddOpen =
+            dropdownDivRemoveOpen.parentElement.nextElementSibling;
+        var dropdownUlAddShow = dropdownDivAddOpen.querySelector('ul');
+        dropdownUlRemoveShow.classList.remove('show');
+        dropdownDivRemoveOpen.classList.remove('open');
+        dropdownDivAddOpen.classList.add('open');
+        dropdownUlAddShow.classList.add('show');
+    } catch (error) {}
+
+    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
+    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
+    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
+    var credits = getCreditsFromCourseName(courseToRemove);
+
+    var isProject = false;
+
+    var slots = slotsProcessingForCourseList(slotString);
+    var courseId = 0;
+    if (attackData.length != 0) {
+        var lastAddedCourse = attackData[attackData.length - 1];
+        courseId = lastAddedCourse.courseId + 1;
+    }
+    var courseData = {
+        courseId: courseId,
+        courseTitle: courseTitle,
+        faculty: faculty,
+        slots: slots,
+        venue: venue,
+        credits: credits,
+        isProject: isProject,
+        courseCode: courseCode,
+    };
+    attackData.push(courseData);
+}
+
+function attackLiClick() {
+    // Get the radio button inside this list item
+    var radioButton = this.querySelector('input[type="radio"]');
+    if (radioButton.checked) {
+        try {
+            radioButton.checked = false;
+            removeRadioFalseAttack(radioButton);
+            console.log(false, attackData);
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+        } catch (error) {
+            console.log('error');
+        }
+    } else {
+        radioButton.checked = true; // This radio button is now the currently selected one
+        removeRadioFalseAttack(radioButton);
+        addOnRadioAttack(radioButton);
+
+        revertRerrangeAttack();
+        rearrangeTeacherRefreshAttack();
+    }
+}
+
+// Add event listener to the toggle checkbox
+document
+    .querySelector('#attack-toggle')
+    .addEventListener('change', function () {
+        // Update the value of editSub based on the checkbox state
+        attackMode = this.checked;
+        if (this.checked) {
+            closeEditPref();
+            activateSortable();
+            closeEditPref1();
+            document.getElementById('div-for-edit-teacher').style.display =
+                'none';
+            document.getElementById('edit_msg_').style.display = 'block';
+            document.getElementById('edit_msg_').innerText =
+                'Attack Mode Enabled.';
+            document.getElementById('tt-subject-edit').style.display = 'none';
+            document.getElementById('tt-subject-add').style.display = 'none';
+            document.getElementById('tt-teacher-add').style.display = 'none';
+            document.getElementById('tt-subject-collapse').style.display =
+                'none';
+            document.getElementById('tt-subject-done').style.display = 'none';
+            document.getElementById('div-for-add-teacher').style.display =
+                'none';
+            document.getElementById('tt-sub-edit-switch-div').style.display =
+                'none';
+            document.getElementById('tt-sub-edit-switch').checked = false;
+            document.getElementById('div-for-edit-course').style.display =
+                'none';
+            document.getElementById('div-for-edit-teacher').style.display =
+                'none';
+            closeAllDropdowns();
+            document.querySelector('.dropdown-list').classList.add('show');
+            document
+                .querySelector('.dropdown-list')
+                .previousElementSibling.classList.add('open');
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+            removeEventListeners();
+            makeRadioFalseOnNeed();
+            attackData = [];
+        } else {
+            document.getElementById('edit_msg_').innerText =
+                'Click on the Teacher to edit it.';
+            document.getElementById('edit_msg_').style.display = 'none';
+            removeEventListenersAttack();
+            closeEditPref();
+            activateSortable();
+            closeEditPref1();
+        }
+    });
+
+document
+    .getElementById('save-panel-button')
+    .addEventListener('click', function () {
+        // Convert the activeTable to a JSON string
+        var jsonStr = JSON.stringify(activeTable);
+
+        // Encode the JSON string in base64
+        var dataStr = 'data:text/plain;base64,' + btoa(jsonStr);
+
+        // Create a new 'a' element
+        var dlAnchorElem = document.createElement('a');
+
+        // Set its attributes
+        dlAnchorElem.setAttribute('href', dataStr);
+        dlAnchorElem.setAttribute(
+            'download',
+            activeTable.name + '.ffcsOnTheGo',
+        );
+
+        // Append it to the body (this is necessary for Firefox)
+        document.body.appendChild(dlAnchorElem);
+
+        // Simulate a click on the element
+        dlAnchorElem.click();
+
+        // Remove the element from the body after the download starts
+        document.body.removeChild(dlAnchorElem);
+    });
+
+function processFile(file) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        // Extract the base64 data from the Data URL
+        var base64Data = event.target.result.split(',')[1];
+
+        // Decode the base64 string back into a JSON string
+        var jsonStr = atob(base64Data);
+        // Parse the JSON string back into an object
+        var activeTableUpdate = JSON.parse(jsonStr);
+        activeTableUpdate.id = activeTable.id;
+        activeTableUpdate.name = activeTable.name;
+        timetableStoragePref[activeTable.id] = activeTableUpdate;
+        updateLocalForage();
+        switchTable(activeTable.id);
+        updateDataJsonFromCourseList();
+        updateCredits();
+
+        // Update the UI to reflect the new activeTable
+        // ...
+    };
+    reader.readAsDataURL(file);
+}
+
+// on click on the load data and on upload of json file the data should be loaded to the activeTable
+// and the page should be refreshed the data should be loaded to the activeTable and check the structure is matching or not
+// id of the upload button is 'load-panel-button'
+document
+    .getElementById('load-panel-button')
+    .addEventListener('click', function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.ffcsonthego';
+        input.onchange = function (event) {
+            processFile(event.target.files[0]);
+        };
+        input.click();
+    });
+
+// onclick clear with id 'clear-course-button' the courselist should get cleared
+// and all radio button should turned into false
+document
+    .getElementById('clear-course-button')
+    .addEventListener('click', function () {
+        // Ask for confirmation
+        if (!confirm('Are you sure you want to clear the course list?')) {
+            return;
+        }
+
+        getCourseListFromSubjectArea().forEach((courseName) => {
+            courseRemove(courseName);
+        });
+        revertRerrange();
+        rearrangeTeacherRefresh();
+    });

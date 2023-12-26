@@ -215,6 +215,7 @@ window.getCourses = () => {
         courses_data.all_data = require('../data/all_data_vellore.json');
         courses_data.courses = require('../data/courses_vellore.json');
     }
+    //const ttDataStructureInLFormat = readJsonFile('../data/ttDataStructureInLFormat.json');
 
     initializeAutocomplete();
 };

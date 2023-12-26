@@ -71,16 +71,14 @@ function openAllDropdowns() {
     });
 }
 
-// Keep references to the Sortable instances
-function activateSortableH2s() {
+function activateSortable(params) {
     var leftBox = document.querySelector('.left-box');
     Sortable.create(leftBox, {
         animation: 150,
         delay: 5,
         chosenClass: 'sortable-chosen',
     });
-}
-function activateSortableLi() {
+
     var dropdownLists = document.querySelectorAll('.dropdown-list');
     dropdownLists.forEach((dropdownList) => {
         Sortable.create(dropdownList, {
@@ -92,36 +90,24 @@ function activateSortableLi() {
 }
 
 function deactivateSortable() {
-    try {
-        var leftBox = document.querySelector('.left-box');
-        Sortable.get(leftBox).destroy();
-    } catch (error) {
-        console.log(error);
-    }
-    try {
-        var dropdownLists = document.querySelectorAll('.dropdown-list');
-        dropdownLists.forEach((dropdownList) => {
-            Sortable.get(dropdownList).destroy();
-        });
-    } catch (error) {
-        console.log(error);
-    }
-}
+    var leftBox = document.querySelector('.left-box');
+    Sortable.get(leftBox).destroy();
 
-function courseEditSortable() {
-    deactivateSortable();
-    activateSortableH2s();
-}
-function teacherEditSortable() {
-    deactivateSortable();
-    activateSortableLi();
+    var dropdownLists = document.querySelectorAll('.dropdown-list');
+    dropdownLists.forEach((dropdownList) => {
+        Sortable.get(dropdownList).destroy();
+    });
 }
 
 function closeEditPref1() {
     editTeacher = false;
     deactivateSortable();
-    addInputFieldsInSection('subjectArea');
     document.getElementById('edit_msg_').style.display = 'none';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
+}
+function editPrefAddOn() {
+    activateSortable();
+    document.getElementById('edit_msg_').style.display = 'block';
     document.getElementById('div-for-edit-teacher').style.display = 'none';
 }
 
@@ -133,15 +119,12 @@ document
         editSub = this.checked;
         if (this.checked) {
             closeAllDropdowns();
-            activateSortableH2s();
             document.getElementById('div-for-edit-teacher').style.display =
                 'none';
             document.getElementById('edit_msg_').style.display = 'block';
             document.getElementById('edit_msg_').innerText =
                 'Click on the Course to edit it.';
         } else {
-            deactivateSortable();
-            activateSortableLi();
             document.getElementById('div-for-edit-course').style.display =
                 'none';
             document.getElementById('div-for-edit-teacher').style.display =

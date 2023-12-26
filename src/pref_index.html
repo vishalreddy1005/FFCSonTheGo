@@ -315,6 +315,7 @@
                             id="tt-subject-edit"
                             class="btn btn-warning ms-1 me-1"
                             type="button"
+                            onclick="editPrefAddOn()"
                         >
                             <!-- onclick="editPref()" -->
                             <i class="fas fa-pencil"></i>
@@ -864,9 +865,25 @@
                     <div class="row align-items-center justify-content-between">
                         <div class="col-sm-auto my-1 text-center">
                             <span id="last-update_remove" class="fw-bold"
-                                >For all Semesters</span
-                            >
+                                ><div
+                                    class="form-check form-switch"
+                                    style="margin-top: 7px"
+                                >
+                                    &emsp14;
+                                    <label
+                                        class="form-check-label"
+                                        for="toggle-switch"
+                                    >
+                                        Attack Mode
+                                    </label>
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="attack-toggle"
+                                    /></div
+                            ></span>
                         </div>
+
                         <!-- _remove to remove the last updated text in the above span -->
                         <div class="col-sm-auto my-1 text-center">
                             <button
@@ -883,15 +900,9 @@
                             >
                                 Load Last Saved
                             </button>
+
                             <button
-                                id="clear-panel-button"
-                                type="button"
-                                class="btn btn-light me-1"
-                            >
-                                Reset
-                            </button>
-                            <button
-                                id="add-course-button"
+                                id="clear-course-button"
                                 type="button"
                                 class="btn btn-success"
                             >
