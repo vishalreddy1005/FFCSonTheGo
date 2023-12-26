@@ -7,7 +7,4 @@ module.exports = {
     cleanupOutdatedCaches: true,
     offlineGoogleAnalytics: true,
     sourcemap: true,
-    optimization: {
-        minimize: false,
-    },
 };
