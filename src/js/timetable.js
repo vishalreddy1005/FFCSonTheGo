@@ -1,5 +1,5 @@
 // Functions for rearrangements
-editSub = false;
+var editSub = false;
 var attackData = [];
 var ttDataStructureInLFormat = {
     L1: 'A1',
