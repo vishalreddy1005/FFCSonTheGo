@@ -49,13 +49,14 @@ function addInputFieldsInSection(sectionId) {
 function editPrefCollapse() {
     closeAllDropdowns();
 }
-
-function showAddCourseDiv() {
-    var addCourseDiv = document.getElementById('div-for-add-course');
-    var addTeacherDiv = document.getElementById('div-for-add-teacher');
-    addCourseDiv.style.display = 'block';
-    addTeacherDiv.style.display = 'none';
-}
+document
+    .getElementById('tt-subject-add')
+    .addEventListener('click', function () {
+        var addCourseDiv = document.getElementById('div-for-add-course');
+        var addTeacherDiv = document.getElementById('div-for-add-teacher');
+        addCourseDiv.style.display = 'block';
+        addTeacherDiv.style.display = 'none';
+    });
 
 function closeAllDropdowns() {
     document.querySelectorAll('.dropdown-list').forEach((dropdownList) => {
