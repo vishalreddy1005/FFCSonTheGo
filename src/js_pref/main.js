@@ -17,8 +17,9 @@ import localforage from 'localforage/dist/localforage';
 
 import './attacher';
 import './course-panel';
-import './timetable';
 import './add_on';
+import './timetable';
+
 import * as Utils from './utils';
 
 const lastUpdate = require('../../package.json')['lastUpdate'];
