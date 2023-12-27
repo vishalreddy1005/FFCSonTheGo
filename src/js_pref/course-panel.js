@@ -100,10 +100,10 @@ $(() => {
     /*
         Double click event to quickly add a course
      */
-    // $('#slot-buttons').on('dblclick', 'button', function () {
-    //     $('#add-course-button').trigger('click');
-    //     $(this).trigger('blur');
-    // });
+    $('#slot-buttons').on('dblclick', 'button', function () {
+        $('#add-course-button').trigger('click');
+        $(this).trigger('blur');
+    });
 
     /*
         Click event to toggle advanced options
@@ -184,13 +184,13 @@ $(() => {
 
         var courseData = {
             courseId: courseId,
+            courseCode: courseCode,
             courseTitle: courseTitle,
             faculty: faculty,
             slots: slots,
             venue: venue,
             credits: credits,
             isProject: isProject,
-            courseCode: courseCode,
         };
 
         activeTable.data.push(courseData);
@@ -215,7 +215,6 @@ window.getCourses = () => {
         courses_data.all_data = require('../data/all_data_vellore.json');
         courses_data.courses = require('../data/courses_vellore.json');
     }
-    //const ttDataStructureInLFormat = readJsonFile('../data/ttDataStructureInLFormat.json');
 
     initializeAutocomplete();
 };

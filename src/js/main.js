@@ -11,13 +11,15 @@ import '../scss/main.scss';
 import '../scss/course-panel.scss';
 import '../scss/timetable.scss';
 import '../scss/course-list.scss';
+import '../css/add-on.css';
 
 import localforage from 'localforage/dist/localforage';
 
 import './attacher';
 import './course-panel';
+import './add_on';
 import './timetable';
-import './course-list';
+
 import * as Utils from './utils';
 
 const lastUpdate = require('../../package.json')['lastUpdate'];
