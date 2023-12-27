@@ -892,7 +892,7 @@ function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
     fillPage();
     fillPage1();
-
+    editPref();
     closeEditPref();
 }
 
