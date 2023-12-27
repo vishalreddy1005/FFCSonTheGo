@@ -87,16 +87,22 @@
 
 .dropdown .h2s h2 {
     width: 90%;
+    font-size: larger;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    height: auto;
+    margin-bottom: 0.1rem;
 }
 .dropdown .h2s h4 {
     width: 10%;
 }
-.dropdown h4 {
+.dropdown span .cname {
     justify-content: center;
     justify-self: center;
     align-self: center;
     align-items: center;
-    background-color: rgba(252, 252, 252, 0);
+    font-size: medium;
 }
 
 .dropdown ul {
