@@ -47,16 +47,16 @@ function addInputFieldsInSection(sectionId) {
 
 // Rest of the code...
 
-function editPrefCollapse() {
-    closeAllDropdowns();
-}
-
 function showAddCourseDiv() {
     var addCourseDiv = document.getElementById('div-for-add-course');
     var addTeacherDiv = document.getElementById('div-for-add-teacher');
     addCourseDiv.style.display = 'block';
     addTeacherDiv.style.display = 'none';
 }
+//event.preventDefault(); showAddCourseDiv(); for 'course_link' on click
+document.getElementById('course_link').addEventListener('click', () => {
+    showAddCourseDiv();
+});
 
 document.getElementById('tt-subject-collapse').addEventListener('click', () => {
     closeAllDropdowns();
@@ -1463,6 +1463,12 @@ function generateCourseName(courseInput) {
     return courseName;
 }
 // save added course
+
+// toggle dropdown on click on dropdown-heading
+document
+    .getElementsByClassName('dropdown-heading')
+    .eventListener('click', toggleDropdown(this));
+
 document
     .getElementById('saveSubjectModal')
     .addEventListener('click', function () {
