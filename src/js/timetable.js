@@ -1717,6 +1717,7 @@ document
                     spanMsgColor = 'green';
                     // document.getElementById('slot-input').value = '';
                     document.getElementById('teacher-input_remove').value = '';
+                    document.getElementById('venue-input').value = '';
                     var teacherData = {
                         courseName: courseName,
                         slots: slotsInput,
