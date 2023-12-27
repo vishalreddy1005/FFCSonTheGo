@@ -13,7 +13,7 @@
         "start": "yarn convert && yarn start:noconvert",
         "start:noconvert": "parcel src/index.html",
         "build:sw": "workbox generateSW ./src/workbox-config.js",
-        "build": "yarn convert && parcel build src/index.html --no-minify && yarn build:sw",
+        "build": "yarn convert && parcel build src/index.html && yarn build:sw",
         "convert": "node util/convert_xlsx_to_json.js && node util/convert_json_to_data.js",
         "test": "jest tests",
         "prepare": "husky install"
@@ -25,7 +25,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.4.2",
         "@parcel/core": "^2.10.1",
-        "@parcel/packager-raw-url": "2.10.1",
+        "@parcel/packager-raw-url": "2.10.3",
         "@parcel/transformer-sass": "2.10.3",
         "@parcel/transformer-webmanifest": "2.10.3",
         "@popperjs/core": "^2.11.8",
