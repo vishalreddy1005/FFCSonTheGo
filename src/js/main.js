@@ -61,14 +61,6 @@ $(function () {
 //     }
 // }
 
-window.toggleDropdown = (dropdownHeading) => {
-    if (window.editSub === false) {
-        const dropdownList = dropdownHeading.nextElementSibling;
-        dropdownList.classList.toggle('show');
-        dropdownHeading.classList.toggle('open');
-    }
-};
-
 window.switchCampus = () => {
     if (window.location.hash.toLowerCase() === '#chennai') {
         $('#campus').text('Chennai Campus');
