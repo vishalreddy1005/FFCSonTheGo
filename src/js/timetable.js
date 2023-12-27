@@ -1715,7 +1715,7 @@ document
                     ].teacher[teacherName]['color'] = colorInput;
                     spanMsg = 'Teacher Added Successfully';
                     spanMsgColor = 'green';
-                    document.getElementById('slot-input').value = '';
+                    // document.getElementById('slot-input').value = '';
                     document.getElementById('teacher-input_remove').value = '';
                     var teacherData = {
                         courseName: courseName,
