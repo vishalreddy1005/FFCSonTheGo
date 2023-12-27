@@ -152,3 +152,10 @@ document
                 'Click on the Teacher to edit it.';
         }
     });
+
+// all the form elements under section with class right-box should not do anything means no request on submit
+document.querySelectorAll('.right-box form').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+    });
+});
