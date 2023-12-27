@@ -893,7 +893,9 @@ function updatePickerLabel(tableName) {
     fillPage();
     fillPage1();
     editPref();
+    editPrefAddOn();
     closeEditPref();
+    closeEditPref1();
 }
 
 /*
