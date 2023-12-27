@@ -1530,6 +1530,7 @@ function showAddTeacherDiv() {
     addCourseDiv.style.display = 'none';
     addTeacherDiv.style.display = 'block';
     const courseSelect = document.getElementById('course-select-add-teacher');
+    document.getElementById('slot-input').value = '';
     courseSelect.innerHTML = '';
     if (
         !timetableStoragePref[window.activeTable.id].hasOwnProperty('subject')
