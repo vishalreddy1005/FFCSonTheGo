@@ -1586,11 +1586,11 @@ function closeEditPref() {
     document.getElementById('div-for-edit-course').style.display = 'none';
     document.getElementById('div-for-edit-teacher').style.display = 'none';
     editSub = false;
-    showAddTeacherDiv();
     createSubjectJsonFromHtml();
     addEventListeners();
     revertRerrange();
     rearrangeTeacherRefresh();
+    showAddTeacherDiv();
 }
 document
     .getElementById('tt-subject-done')
