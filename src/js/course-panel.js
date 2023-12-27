@@ -235,16 +235,36 @@ function initializeAutocomplete() {
             },
             maxNumberOfElements: 10,
             onSelectItemEvent: function () {
-                var title = $('#course-input').getSelectedItemData().TITLE;
-                var code = $('#course-input').getSelectedItemData().CODE;
+                var title = $('#course-input_remove').getSelectedItemData()
+                    .TITLE;
+                var code = $('#course-input_remove').getSelectedItemData().CODE;
 
-                $('#course-input').val(code + ' - ' + title);
+                $('#course-input_remove').val(code + ' - ' + title);
                 addSlotButtons(code);
             },
         },
     };
+    const courseOptionsForEdit = {
+        data: courses_data.courses,
+        getValue: function (el) {
+            return el.CODE + ' - ' + el.TITLE;
+        },
+        list: {
+            match: {
+                enabled: true,
+            },
+            maxNumberOfElements: 10,
+            onSelectItemEvent: function () {
+                var title = $('#course-input_edit').getSelectedItemData().TITLE;
+                var code = $('#course-input_edit').getSelectedItemData().CODE;
 
-    $('#course-input').easyAutocomplete(courseOptions);
+                $('#course-input_edit').val(code + ' - ' + title);
+                addSlotButtons(code);
+            },
+        },
+    };
+    $('#course-input_remove').easyAutocomplete(courseOptions);
+    $('#course-input_edit').easyAutocomplete(courseOptionsForEdit);
     $('div .easy-autocomplete').removeAttr('style');
 }
 
