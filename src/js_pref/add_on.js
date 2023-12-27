@@ -8,6 +8,13 @@ function toggleDropdown(dropdownHeading) {
     }
 }
 
+function showAddCourseDiv() {
+    var addCourseDiv = document.getElementById('div-for-add-course');
+    var addTeacherDiv = document.getElementById('div-for-add-teacher');
+    addCourseDiv.style.display = 'block';
+    addTeacherDiv.style.display = 'none';
+}
+
 document.getElementById('hide_br').style.display = 'inline';
 
 // Function to remove the click event listener from each list item
@@ -58,6 +65,16 @@ document
         addTeacherDiv.style.display = 'none';
     });
 
+document
+    .getElementById('course_link')
+    .addEventListener('click', function (event) {
+        event.preventDefault();
+        var addCourseDiv = document.getElementById('div-for-add-course');
+        var addTeacherDiv = document.getElementById('div-for-add-teacher');
+        addCourseDiv.style.display = 'block';
+        addTeacherDiv.style.display = 'none';
+    });
+
 function closeAllDropdowns() {
     document.querySelectorAll('.dropdown-list').forEach((dropdownList) => {
         dropdownList.classList.remove('show');
@@ -72,7 +89,7 @@ function openAllDropdowns() {
     });
 }
 
-function activateSortable(params) {
+function activateSortable() {
     var leftBox = document.querySelector('.left-box');
     Sortable.create(leftBox, {
         animation: 150,
