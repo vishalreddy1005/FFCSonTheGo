@@ -2981,8 +2981,12 @@ function processFile(file) {
         // Extract the base64 data from the Data URL
         var base64Data = event.target.result.split(',')[1];
 
-        // Decode the base64 string back into a JSON string
-        var jsonStr = atob(base64Data);
+        // Decode the base64 string back into a URI-encoded string
+        var uriEncodedData = atob(base64Data);
+
+        // Decode the URI-encoded string back into a JSON string
+        var jsonStr = decodeURIComponent(uriEncodedData);
+
         // Parse the JSON string back into an object
         var activeTableUpdate = JSON.parse(jsonStr);
         activeTableUpdate.id = activeTable.id;
@@ -2998,7 +3002,6 @@ function processFile(file) {
     };
     reader.readAsDataURL(file);
 }
-
 // on click on the load data and on upload of json file the data should be loaded to the activeTable
 // and the page should be refreshed the data should be loaded to the activeTable and check the structure is matching or not
 // id of the upload button is 'load-panel-button'
