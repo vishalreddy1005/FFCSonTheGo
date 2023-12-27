@@ -2952,9 +2952,8 @@ document
     .addEventListener('click', function () {
         // Convert the activeTable to a JSON string
         var jsonStr = JSON.stringify(activeTable);
-
-        // Encode the JSON string in base64
-        var dataStr = 'data:text/plain;base64,' + btoa(jsonStr);
+        var utf8Str = btoa(encodeURIComponent(jsonStr));
+        var dataStr = 'data:text/plain;base64,' + utf8Str;
 
         // Create a new 'a' element
         var dlAnchorElem = document.createElement('a');
