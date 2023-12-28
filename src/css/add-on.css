@@ -201,3 +201,7 @@ input[type='radio'] {
     margin-top: 7px;
     margin-left: 12px;
 }
+
+.c_pref:hover {
+    cursor: pointer;
+}

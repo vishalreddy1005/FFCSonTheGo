@@ -899,6 +899,7 @@ function updatePickerLabel(tableName) {
     fillPage1();
     editPref();
     editPrefAddOn();
+    closeAllDropdowns();
     closeEditPref();
     closeEditPref1();
 }
@@ -3051,5 +3052,12 @@ document.addEventListener('DOMContentLoaded', () => {
     switchButton.addEventListener('click', () => {
         // Open pref_index.html in a new window
         window.open('./pref_index.html', '_blank');
+    });
+});
+
+// on click on div with class 'c_pref' run function closealldropdown
+document.querySelectorAll('.c_pref').forEach((div) => {
+    div.addEventListener('click', function () {
+        closeAllDropdowns();
     });
 });
