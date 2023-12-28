@@ -1,6 +1,8 @@
 // Functions for rearrangements
 var editSub = false;
 var editTeacher = false;
+var sortableIsActive = false;
+
 var attackData = [];
 var ttDataStructureInLFormat = {
     L1: 'A1',
@@ -129,35 +131,41 @@ window.removeInputFieldsInSection = removeInputFieldsInSection;
 
 function activateSortable() {
     // Detect whether the user is on a mobile device
-    var isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
-        );
+    if (sortableIsActive === false) {
+        sortableIsActive = true;
+        var isMobile =
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent,
+            );
 
-    var leftBox = document.querySelector('.left-box');
-    Sortable.create(leftBox, {
-        animation: 150,
-        delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
-        chosenClass: 'sortable-chosen',
-    });
-
-    var dropdownLists = document.querySelectorAll('.dropdown-list');
-    dropdownLists.forEach((dropdownList) => {
-        Sortable.create(dropdownList, {
-            animation: 70,
+        var leftBox = document.querySelector('.left-box');
+        Sortable.create(leftBox, {
+            animation: 150,
             delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
             chosenClass: 'sortable-chosen',
         });
-    });
+
+        var dropdownLists = document.querySelectorAll('.dropdown-list');
+        dropdownLists.forEach((dropdownList) => {
+            Sortable.create(dropdownList, {
+                animation: 70,
+                delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
+                chosenClass: 'sortable-chosen',
+            });
+        });
+    }
 }
 function deactivateSortable() {
-    var leftBox = document.querySelector('.left-box');
-    Sortable.get(leftBox).destroy();
+    if (sortableIsActive === true) {
+        sortableIsActive = false;
+        var leftBox = document.querySelector('.left-box');
+        Sortable.get(leftBox).destroy();
 
-    var dropdownLists = document.querySelectorAll('.dropdown-list');
-    dropdownLists.forEach((dropdownList) => {
-        Sortable.get(dropdownList).destroy();
-    });
+        var dropdownLists = document.querySelectorAll('.dropdown-list');
+        dropdownLists.forEach((dropdownList) => {
+            Sortable.get(dropdownList).destroy();
+        });
+    }
 }
 function closeEditPref1() {
     editTeacher = false;
@@ -2915,8 +2923,9 @@ document
     .addEventListener('change', function () {
         // Update the value of editSub based on the checkbox state
         if (this.checked) {
-            closeEditPref();
             activateSortable();
+            closeEditPref();
+
             closeEditPref1();
             document.getElementById('div-for-edit-teacher').style.display =
                 'none';
