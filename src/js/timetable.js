@@ -128,25 +128,28 @@ window.openAllDropdowns = openAllDropdowns;
 window.removeInputFieldsInSection = removeInputFieldsInSection;
 
 function activateSortable() {
+    // Detect whether the user is on a mobile device
+    var isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+        );
+
     var leftBox = document.querySelector('.left-box');
     Sortable.create(leftBox, {
         animation: 150,
-        delay: 5,
-        delayOnTouchOnly: true, // for touch screen
+        delay: isMobile ? 80 : 5, // Different delay for mobile and desktop
         chosenClass: 'sortable-chosen',
     });
 
     var dropdownLists = document.querySelectorAll('.dropdown-list');
     dropdownLists.forEach((dropdownList) => {
         Sortable.create(dropdownList, {
-            animation: 150,
-            delay: 5,
-            delayOnTouchOnly: true, // for touch screen
+            animation: 70,
+            delay: isMobile ? 80 : 5, // Different delay for mobile and desktop
             chosenClass: 'sortable-chosen',
         });
     });
 }
-
 function deactivateSortable() {
     var leftBox = document.querySelector('.left-box');
     Sortable.get(leftBox).destroy();
