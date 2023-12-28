@@ -905,7 +905,6 @@ function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
     fillPage();
     fillPage1();
-    closeAllDropdowns();
     closeEditPref();
     closeEditPref1();
 }
