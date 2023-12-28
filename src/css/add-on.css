@@ -81,7 +81,6 @@
     padding-left: 3%;
     border-top: 0.5px solid rgba(0, 0, 0, 0.2);
     background-color: rgb(252, 252, 252);
-    border-radius: 3px;
     margin: 0;
 }
 
@@ -197,11 +196,15 @@ input[type='radio'] {
 }
 
 .attack-toggle {
-    display: inline block;
+    display: inline-block;
     margin-top: 7px;
     margin-left: 12px;
 }
 
 .c_pref:hover {
     cursor: pointer;
+}
+
+.dropdown h4 {
+    text-align: center;
 }

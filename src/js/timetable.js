@@ -1457,8 +1457,10 @@ document
             const spanCname = document.createElement('span');
             spanCname.classList.add('cname');
             spanCname.textContent = subjectName;
+
             const pArrow = document.createElement('p');
             pArrow.classList.add('arrow');
+
             const h4 = document.createElement('h4');
             h4.textContent = `[${credits}]`;
             divH2s.appendChild(h2);
