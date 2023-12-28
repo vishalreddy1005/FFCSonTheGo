@@ -132,6 +132,7 @@ function activateSortable() {
     Sortable.create(leftBox, {
         animation: 150,
         delay: 5,
+        delayOnTouchOnly: true, // for touch screen
         chosenClass: 'sortable-chosen',
     });
 
@@ -140,6 +141,7 @@ function activateSortable() {
         Sortable.create(dropdownList, {
             animation: 150,
             delay: 5,
+            delayOnTouchOnly: true, // for touch screen
             chosenClass: 'sortable-chosen',
         });
     });
