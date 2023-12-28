@@ -191,3 +191,13 @@ input[type='radio'] {
     background-color: red !important;
     border-color: red !important;
 }
+
+#attack-toggle {
+    text-align: left !important;
+}
+
+.attack-toggle {
+    display: inline block;
+    margin-top: 7px;
+    margin-left: 12px;
+}
