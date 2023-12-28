@@ -3086,7 +3086,7 @@ document.querySelectorAll('.c_pref').forEach((div) => {
 
 window.addEventListener('resize', function () {
     // if mobile phone in portrait mode show div with id 'mobile_message'
-    if (window.innerWidth < 660) {
+    if (window.innerWidth < 631) {
         document.getElementById('mobile_message').style.display = 'block';
     }
     // if mobile phone in landscape mode hide div with id 'mobile_message'
