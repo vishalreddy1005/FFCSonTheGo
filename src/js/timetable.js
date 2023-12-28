@@ -508,6 +508,17 @@ window.addCourseToCourseList = (courseData) => {
     } else {
         nextRow.before($courseListItem);
     }
+    var courseList = document.querySelector('#course-list tbody');
+
+    // Process each 'tr' before activating the Sortable
+    [].forEach.call(courseList.getElementsByTagName('tr'), function (tr) {
+        [].forEach.call(tr.getElementsByTagName('td'), function (td) {
+            // Store the original width
+            td.dataset.originalWidth = getComputedStyle(td).width;
+            // Set the width to the original width
+            td.style.width = td.dataset.originalWidth;
+        });
+    });
 
     updateCredits();
 };
@@ -2566,11 +2577,13 @@ function activateSortableForCourseList() {
         );
 
     var courseList = document.querySelector('#course-list tbody');
+
     Sortable.create(courseList, {
         animation: 150,
-        delay: isMobile ? 170 : 10, // Different delay for mobile and desktop
-        chosenClass: 'sortable-chosen',
-        onEnd: function (evt) {
+        delay: isMobile ? 170 : 5, // Different delay for mobile and desktop
+        chosenClass: 'sortable-chosen1',
+
+        onEnd: function () {
             updateDataJsonFromCourseList();
         },
     });

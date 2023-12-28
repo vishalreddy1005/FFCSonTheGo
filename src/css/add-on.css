@@ -206,11 +206,13 @@ input[type='radio'] {
 }
 
 .dropdown h4 {
+    display: flex !important;
     text-align: center;
+    justify-content: center;
 }
 
 /* at screen size 900px  and smaller*/
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 770px) {
     .cname {
         font-size: small;
     }
@@ -219,5 +221,14 @@ input[type='radio'] {
     }
     .dropdown li {
         font-size: x-small;
+    }
+}
+@media screen and (max-width: 800px) {
+    .card-header button {
+        font-size: small;
+        padding: 0.1rem;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        padding: 4px 5px 4px 5px;
     }
 }
