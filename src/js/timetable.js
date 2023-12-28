@@ -1455,7 +1455,8 @@ document
             divH2s.style.flexDirection = 'row';
             const h2 = document.createElement('h2');
             const spanCname = document.createElement('span');
-            spanCname.classList.add('cname');
+            spanCname.c;
+            lassList.add('cname');
             spanCname.textContent = subjectName;
 
             const pArrow = document.createElement('p');

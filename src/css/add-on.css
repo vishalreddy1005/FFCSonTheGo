@@ -208,3 +208,16 @@ input[type='radio'] {
 .dropdown h4 {
     text-align: center;
 }
+
+/* at screen size 900px  and smaller*/
+@media screen and (max-width: 900px) {
+    .cname {
+        font-size: small;
+    }
+    .dropdown h4 {
+        font-size: small;
+    }
+    .dropdown li {
+        font-size: x-small;
+    }
+}
