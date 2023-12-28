@@ -2970,20 +2970,24 @@ document
             closeEditPref1();
         }
     });
-
 document
     .getElementById('save-panel-button')
     .addEventListener('click', function () {
         // Convert the activeTable to a JSON string
         var jsonStr = JSON.stringify(activeTable);
         var utf8Str = btoa(encodeURIComponent(jsonStr));
-        var dataStr = 'data:text/plain;base64,' + utf8Str;
+
+        // Create a new Blob object
+        var blob = new Blob([utf8Str], { type: 'text/plain' });
+
+        // Create a URL for the Blob object
+        var url = URL.createObjectURL(blob);
 
         // Create a new 'a' element
         var dlAnchorElem = document.createElement('a');
 
         // Set its attributes
-        dlAnchorElem.setAttribute('href', dataStr);
+        dlAnchorElem.setAttribute('href', url);
         dlAnchorElem.setAttribute(
             'download',
             activeTable.name + '.ffcsOnTheGo',
@@ -2997,13 +3001,16 @@ document
 
         // Remove the element from the body after the download starts
         document.body.removeChild(dlAnchorElem);
+
+        // Release the created URL
+        URL.revokeObjectURL(url);
     });
 
 function processFile(file) {
     var reader = new FileReader();
     reader.onload = function (event) {
-        // Extract the base64 data from the Data URL
-        var base64Data = event.target.result.split(',')[1];
+        // Extract the data from the Data URL
+        var base64Data = event.target.result;
 
         // Decode the base64 string back into a URI-encoded string
         var uriEncodedData = atob(base64Data);
@@ -3024,7 +3031,7 @@ function processFile(file) {
         // Update the UI to reflect the new activeTable
         // ...
     };
-    reader.readAsDataURL(file);
+    reader.readAsText(file);
 }
 // on click on the load data and on upload of json file the data should be loaded to the activeTable
 // and the page should be refreshed the data should be loaded to the activeTable and check the structure is matching or not
