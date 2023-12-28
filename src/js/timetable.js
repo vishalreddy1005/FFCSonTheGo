@@ -137,7 +137,7 @@ function activateSortable() {
     var leftBox = document.querySelector('.left-box');
     Sortable.create(leftBox, {
         animation: 150,
-        delay: isMobile ? 80 : 5, // Different delay for mobile and desktop
+        delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
         chosenClass: 'sortable-chosen',
     });
 
@@ -145,7 +145,7 @@ function activateSortable() {
     dropdownLists.forEach((dropdownList) => {
         Sortable.create(dropdownList, {
             animation: 70,
-            delay: isMobile ? 80 : 5, // Different delay for mobile and desktop
+            delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
             chosenClass: 'sortable-chosen',
         });
     });
@@ -1599,6 +1599,8 @@ function closeEditPref() {
     revertRerrange();
     rearrangeTeacherRefresh();
     showAddTeacherDiv();
+    document.getElementById('edit_msg_').innerText =
+        'Click on the Teacher to edit it.';
 }
 document
     .getElementById('tt-subject-done')
