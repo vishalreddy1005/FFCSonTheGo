@@ -141,7 +141,7 @@ function activateSortable() {
         var leftBox = document.querySelector('.left-box');
         Sortable.create(leftBox, {
             animation: 150,
-            delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
+            delay: isMobile ? 170 : 5, // Different delay for mobile and desktop
             chosenClass: 'sortable-chosen',
         });
 
@@ -149,7 +149,7 @@ function activateSortable() {
         dropdownLists.forEach((dropdownList) => {
             Sortable.create(dropdownList, {
                 animation: 70,
-                delay: isMobile ? 200 : 5, // Different delay for mobile and desktop
+                delay: isMobile ? 170 : 5, // Different delay for mobile and desktop
                 chosenClass: 'sortable-chosen',
             });
         });
@@ -2560,9 +2560,15 @@ function updateDataJsonFromCourseList() {
 
 // Sortable for course list after dropping should do something
 function activateSortableForCourseList() {
+    var isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+        );
+
     var courseList = document.querySelector('#course-list tbody');
     Sortable.create(courseList, {
         animation: 150,
+        delay: isMobile ? 170 : 10, // Different delay for mobile and desktop
         chosenClass: 'sortable-chosen',
         onEnd: function (evt) {
             updateDataJsonFromCourseList();
