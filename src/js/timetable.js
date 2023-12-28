@@ -2580,7 +2580,7 @@ function activateSortableForCourseList() {
 
     Sortable.create(courseList, {
         animation: 150,
-        delay: isMobile ? 170 : 5, // Different delay for mobile and desktop
+        delay: isMobile ? 170 : 6, // Different delay for mobile and desktop
         chosenClass: 'sortable-chosen1',
 
         onEnd: function () {
