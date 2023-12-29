@@ -3205,6 +3205,7 @@ function doubleClickOnTrOfCourseList() {
 function addEventListnerToCourseList() {
     var lastTouchTime = 0;
     var timeout;
+    var eventTr;
     // try to remove all eventlistner from course list first
     document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
         tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
@@ -3215,14 +3216,16 @@ function addEventListnerToCourseList() {
         var currentTime = new Date().getTime();
         var tapLength = currentTime - lastTouchTime;
         clearTimeout(timeout);
-        if (tapLength < 130 && tapLength > 0) {
+        if (tapLength < 80 && tapLength > 0) {
             // Double tap action
-            doubleClickOnTrOfCourseList.call(event.target.parentElement);
+            if (event.target.parentElement===eventTr){
+            doubleClickOnTrOfCourseList.call(event.target.parentElement);}
         } else {
             // Single tap action
             timeout = setTimeout(function () {
                 clearTimeout(timeout);
-            }, 130);
+            }, 80);
+            eventTr = event.target.parentElement;
         }
         lastTouchTime = currentTime;
     }
