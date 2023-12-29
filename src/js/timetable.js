@@ -3202,39 +3202,85 @@ function doubleClickOnTrOfCourseList() {
     window.scrollTo(0, 0);
 }
 
+// function addEventListnerToCourseList() {
+//     console.log(11)
+
+//     // try to remove all eventlistner from course list first
+//     document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+//         tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
+//         tr.removeEventListener('click', handleClick);
+//     });
+
+//     function handleClick(event) {
+
+//         // Prevent the event listener from running if eventTr is already defined
+//         var currentTime = new Date().getTime();
+//         var tapLength = currentTime - lastTouchTime;
+
+//         clearTimeout(timeout);
+//         if (tapLength < 230 && tapLength > 0) {
+//             // Double tap action
+//             console.log(eventTr === event.target.parentElement);
+//             if (eventTr === event.target.parentElement) {
+//                 doubleClickOnTrOfCourseList.call(eventTr);
+//             }
+//         } else {
+//             // Single tap action
+
+//             timeout = setTimeout(function () {
+//                 clearTimeout(timeout);
+//             }, 230);
+//         }
+//         eventTr = event.target.parentElement;
+//         lastTouchTime = currentTime;
+//     }
+
+//     // on double click or double tap on tr element do something
+//     document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+//         tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
+//         tr.addEventListener('click', handleClick);
+//     });
+// }
+
+// jquery for double click on tr element of course list
+// $(document).on('dblclick', '#course-list tbody tr', function () {
+//     doubleClickOnTrOfCourseList.call(this);
+// });
+
 function addEventListnerToCourseList() {
     var lastTouchTime = 0;
     var timeout;
-    var enentTr;
+    var eventTr;
+
     // try to remove all eventlistner from course list first
-    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
-        tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
-        tr.removeEventListener('touchstart', handleTouchStart);
+    document.querySelectorAll('#course-list tbody td').forEach((td) => {
+        td.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
+        td.removeEventListener('click', handleClick);
     });
 
-    function handleTouchStart(event) {
+    function handleClick(event) {
         var currentTime = new Date().getTime();
         var tapLength = currentTime - lastTouchTime;
 
         clearTimeout(timeout);
-        if (tapLength < 230 && tapLength > 0) {
+        if (tapLength < 215 && tapLength > 0) {
             // Double tap action
-            if (enentTr === event.target.parentElement) {
-                doubleClickOnTrOfCourseList.call(enentTr);
+            if (eventTr === event.target.parentElement) {
+                doubleClickOnTrOfCourseList.call(eventTr);
             }
         } else {
             // Single tap action
             timeout = setTimeout(function () {
                 clearTimeout(timeout);
-            }, 230);
+            }, 215);
         }
-        enentTr = event.target.parentElement;
+        eventTr = event.target.parentElement;
         lastTouchTime = currentTime;
     }
 
-    // on double click or double tap on tr element do something
-    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
-        tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
-        tr.addEventListener('touchstart', handleTouchStart);
+    // on double click or double tap on td element do something
+    document.querySelectorAll('#course-list tbody td').forEach((td) => {
+        td.addEventListener('dblclick', doubleClickOnTrOfCourseList);
+        td.addEventListener('click', handleClick);
     });
 }

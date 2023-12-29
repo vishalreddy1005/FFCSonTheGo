@@ -245,3 +245,7 @@ input[type='radio'] {
         padding: 4px 5px 4px 5px;
     }
 }
+
+tr.sortable-chosen1 td {
+    background-color: rgb(217, 234, 255);
+}
