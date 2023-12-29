@@ -409,6 +409,8 @@ $(() => {
         }
         revertRerrange();
         rearrangeTeacherRefresh();
+        closeEditPref();
+        closeEditPref1();
     });
 });
 
@@ -519,7 +521,7 @@ window.addCourseToCourseList = (courseData) => {
             td.style.width = td.dataset.originalWidth;
         });
     });
-
+    addEventListnerToCourseList();
     updateCredits();
 };
 
@@ -2122,6 +2124,7 @@ function onPageLoad() {
     fillPage();
     fillPage1();
     activateSortableForCourseList();
+    addEventListnerToCourseList();
 }
 // Add event listener for DOMContentLoaded event
 
@@ -3106,4 +3109,44 @@ window.addEventListener('resize', function () {
     else {
         document.getElementById('mobile_message').style.display = 'none';
     }
+    // Process each 'tr' before activating the Sortable
+    [].forEach.call(courseList.getElementsByTagName('tr'), function (tr) {
+        [].forEach.call(tr.getElementsByTagName('td'), function (td) {
+            // Store the original width
+            td.dataset.originalWidth = getComputedStyle(td).width;
+            // Set the width to the original width
+            td.style.width = td.dataset.originalWidth;
+        });
+    });
 });
+
+function doubleClickOnTrOfCourseList() {
+    // Get the course name and faculty from the tr element
+
+    editPref();
+    editPrefAddOn();
+    var courseName_Faculty = getCourseNameAndFacultyFromTr(this);
+    var courseName = courseName_Faculty[0];
+    var faculty = courseName_Faculty[1];
+
+    // Get the li element corresponding to the course name and faculty
+    var li = getTeacherLiInSubjectArea(courseName, faculty);
+    closeAllDropdowns();
+    li.parentElement.previousElementSibling.click();
+    li.click();
+    li.focus();
+    // scroll to the top
+    window.scrollTo(0, 0);
+}
+
+function addEventListnerToCourseList() {
+    // try to remove all eventlistner from course list first
+    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+        tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
+    });
+    // on double click on tr element do something
+
+    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+        tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
+    });
+}

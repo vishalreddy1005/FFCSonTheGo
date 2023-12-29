@@ -33,6 +33,7 @@ If you're interested in contributing to our code, refer the [contributing guidli
 ## Contributors
 
 -   **Sujit Kumar** (Active maintainer) - [@therealsujitk](https://github.com/therealsujitk)
+-   **Sarvesh Dakhore** - [@sarveshdakhore](https://github.com/sarveshdakhore)
 -   **Sanket Mohapatra** - [@sanket9918](https://github.com/sanket9918)
 
 See also the list of [contributors](https://github.com/vatz88/FFCSonTheGo/contributors) who participated in this project.
