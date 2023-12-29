@@ -3215,14 +3215,14 @@ function addEventListnerToCourseList() {
         var currentTime = new Date().getTime();
         var tapLength = currentTime - lastTouchTime;
         clearTimeout(timeout);
-        if (tapLength < 500 && tapLength > 0) {
+        if (tapLength < 130 && tapLength > 0) {
             // Double tap action
             doubleClickOnTrOfCourseList.call(event.target.parentElement);
         } else {
             // Single tap action
             timeout = setTimeout(function () {
                 clearTimeout(timeout);
-            }, 500);
+            }, 130);
         }
         lastTouchTime = currentTime;
     }
