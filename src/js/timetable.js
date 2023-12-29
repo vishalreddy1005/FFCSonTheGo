@@ -3181,11 +3181,23 @@ function doubleClickOnTrOfCourseList() {
     var faculty = courseName_Faculty[1];
 
     // Get the li element corresponding to the course name and faculty
-    var li = getTeacherLiInSubjectArea(courseName, faculty);
-    closeAllDropdowns();
-    li.parentElement.previousElementSibling.click();
-    li.click();
-    li.focus();
+    if (editSub === true) {
+        closeAllDropdowns();
+        document.getElementById('div-for-edit-teacher').style.display = 'none';
+        document.getElementById('edit_msg_').style.display = 'block';
+        document.getElementById('edit_msg_').innerText =
+            'Click on the Course to edit it.';
+        var div = getCourseDivInSubjectArea(courseName);
+        div.click();
+        div.focus();
+    } else {
+        var li = getTeacherLiInSubjectArea(courseName, faculty);
+        closeAllDropdowns();
+        li.parentElement.previousElementSibling.click();
+        li.click();
+        li.focus();
+    }
+
     // scroll to the top
     window.scrollTo(0, 0);
 }
