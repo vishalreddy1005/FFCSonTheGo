@@ -170,8 +170,10 @@ function deactivateSortable() {
 function closeEditPref1() {
     editTeacher = false;
     deactivateSortable();
+
     document.getElementById('edit_msg_').style.display = 'none';
     document.getElementById('div-for-edit-teacher').style.display = 'none';
+    selectBackgroundRemovalOfPreviousH2s();
 }
 function editPrefAddOn() {
     activateSortable();
@@ -331,6 +333,8 @@ document
             document.getElementById('edit_msg_').style.display = 'block';
             document.getElementById('edit_msg_').innerText =
                 'Click on the Teacher to edit it.';
+            selectBackgroundRemovalOfPreviousH2s();
+            selectBackgroundRemovalOfPreviousLi();
         }
     });
 
@@ -548,6 +552,7 @@ import localforage from 'localforage/dist/localforage';
 import html2canvas from 'html2canvas/dist/html2canvas';
 import { parse, isValid, add } from 'date-fns';
 import { fi, te } from 'date-fns/locale';
+import { get } from 'jquery';
 
 var timetableStoragePref = [
     {
@@ -1788,6 +1793,34 @@ document
         addEventListeners();
     });
 
+// Removal of selection background
+
+function selectBackgroundRemovalOfPreviousH2s() {
+    let courseDiv = document.getElementById('div-for-edit-course');
+    var courseNameToRemoveBlueFrom = courseDiv.querySelector(
+        '#course-input-edit-pre',
+    ).innerText;
+    var courseDivPre = getCourseDivInSubjectArea(courseNameToRemoveBlueFrom);
+    if (courseDivPre) {
+        courseDivPre.classList.remove('select_background');
+    }
+}
+function selectBackgroundRemovalOfPreviousLi() {
+    let teacherDiv = document.getElementById('div-for-edit-teacher');
+    var teacherNameToRemoveSelectFrom = teacherDiv.querySelector(
+        '#teacher-input_remove-edit-pre',
+    ).value;
+    let courseNameOfRemovalTeacher = document.getElementById(
+        'teacher-edit-course',
+    ).value;
+    var teacherDivPre = getTeacherLiInSubjectArea(
+        courseNameOfRemovalTeacher,
+        teacherNameToRemoveSelectFrom,
+    );
+    if (teacherDivPre) {
+        teacherDivPre.classList.remove('select_background');
+    }
+}
 // On click of edit button
 document.getElementById('tt-subject-edit').addEventListener('click', editPref);
 function editPref() {
@@ -1816,6 +1849,10 @@ function editPref() {
                     .replace(']', '');
                 credit = parseInt(credit);
                 let courseDiv = document.getElementById('div-for-edit-course');
+                selectBackgroundRemovalOfPreviousH2s();
+                // add class to this
+                this.classList.add('select_background');
+
                 courseDiv.style.display = 'block';
                 courseDiv.querySelector('#course-input_edit').value =
                     subjectName;
@@ -1850,6 +1887,9 @@ function editPref() {
                 if (venue === 'VENUE') {
                     venue = '';
                 }
+
+                selectBackgroundRemovalOfPreviousLi();
+                this.classList.add('select_background');
                 document.getElementById('teacher-input_remove-edit').value =
                     teacherName;
                 document.getElementById('slot-input-edit').value = slot;
@@ -2521,7 +2561,15 @@ function getTeacherLiInSubjectArea(courseName, teacherName) {
         }
     }
 }
-
+function getCourseDivInSubjectArea(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            return span.parentElement.parentElement;
+        }
+    }
+}
 // Function to find/get tr element of the course
 function getCourseTrInCourseList(courseName, teacherName) {
     var courseList = document.getElementById('courseList-tbody');
@@ -2947,7 +2995,6 @@ document
         if (this.checked) {
             activateSortable();
             closeEditPref();
-
             closeEditPref1();
             document.getElementById('div-for-edit-teacher').style.display =
                 'none';
@@ -3102,6 +3149,18 @@ document.querySelectorAll('.c_pref').forEach((div) => {
 
 window.addEventListener('resize', function () {
     // if mobile phone in portrait mode show div with id 'mobile_message'
+    // Process each 'tr' before activating the Sortable
+    var courseList = document.querySelector('#course-list tbody');
+
+    [].forEach.call(courseList.getElementsByTagName('tr'), function (tr) {
+        [].forEach.call(tr.getElementsByTagName('td'), function (td) {
+            // Store the original width
+
+            td.dataset.originalWidth = getComputedStyle(td).width;
+            // Set the width to the original width
+            td.style.width = td.dataset.originalWidth;
+        });
+    });
     if (window.innerWidth < 631) {
         document.getElementById('mobile_message').style.display = 'block';
     }
@@ -3109,19 +3168,11 @@ window.addEventListener('resize', function () {
     else {
         document.getElementById('mobile_message').style.display = 'none';
     }
-    // Process each 'tr' before activating the Sortable
-    [].forEach.call(courseList.getElementsByTagName('tr'), function (tr) {
-        [].forEach.call(tr.getElementsByTagName('td'), function (td) {
-            // Store the original width
-            td.dataset.originalWidth = getComputedStyle(td).width;
-            // Set the width to the original width
-            td.style.width = td.dataset.originalWidth;
-        });
-    });
 });
 
 function doubleClickOnTrOfCourseList() {
     // Get the course name and faculty from the tr element
+    var courseList = document.querySelector('#course-list tbody');
 
     editPref();
     editPrefAddOn();
@@ -3140,13 +3191,33 @@ function doubleClickOnTrOfCourseList() {
 }
 
 function addEventListnerToCourseList() {
+    var lastTouchTime = 0;
+    var timeout;
     // try to remove all eventlistner from course list first
     document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
         tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
+        tr.removeEventListener('touchstart', handleTouchStart);
     });
-    // on double click on tr element do something
 
+    function handleTouchStart(event) {
+        var currentTime = new Date().getTime();
+        var tapLength = currentTime - lastTouchTime;
+        clearTimeout(timeout);
+        if (tapLength < 500 && tapLength > 0) {
+            // Double tap action
+            doubleClickOnTrOfCourseList.call(event.target.parentElement);
+        } else {
+            // Single tap action
+            timeout = setTimeout(function () {
+                clearTimeout(timeout);
+            }, 500);
+        }
+        lastTouchTime = currentTime;
+    }
+
+    // on double click or double tap on tr element do something
     document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
         tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
+        tr.addEventListener('touchstart', handleTouchStart);
     });
 }

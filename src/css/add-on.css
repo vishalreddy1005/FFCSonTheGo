@@ -231,3 +231,7 @@ input[type='radio'] {
         padding: 4px 5px 4px 5px;
     }
 }
+
+.select_background {
+    background-color: rgb(244, 173, 246) !important;
+}
