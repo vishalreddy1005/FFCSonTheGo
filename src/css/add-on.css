@@ -158,9 +158,6 @@
     }
 }
 
-.sortable-chosen .h2s {
-    background-color: rgb(217, 234, 255);
-}
 li.sortable-chosen {
     background-color: rgb(217, 234, 255) !important;
 }
@@ -253,4 +250,7 @@ tr.sortable-chosen1 td {
 #subjectArea input[type='radio'] {
     /* disable this input */
     pointer-events: none !important;
+}
+.sortable-chosen .h2s {
+    background-color: rgb(217, 234, 255) !important;
 }
