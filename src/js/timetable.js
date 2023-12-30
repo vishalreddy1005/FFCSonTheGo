@@ -2165,6 +2165,10 @@ function onPageLoad() {
     fillPage1();
     activateSortableForCourseList();
     addEventListnerToCourseList();
+    // if window size is less then 630 show mobile_message
+    if (window.innerWidth < 631) {
+        document.getElementById('mobile_message').style.display = 'block';
+    }
 }
 // Add event listener for DOMContentLoaded event
 
