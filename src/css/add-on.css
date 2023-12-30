@@ -249,3 +249,8 @@ input[type='radio'] {
 tr.sortable-chosen1 td {
     background-color: rgb(217, 234, 255);
 }
+
+#subjectArea input[type='radio'] {
+    /* disable this input */
+    pointer-events: none !important;
+}
