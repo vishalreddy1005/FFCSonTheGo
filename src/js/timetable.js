@@ -2300,6 +2300,11 @@ document
                     } else if (tempSwitchToPassUpdates === 1) {
                         span.innerText = courseName;
                         courseNamePreDiv.innerText = span.innerText;
+                        courseDiv.querySelector(
+                            '#credit-input-edit-pre',
+                        ).innerText = courseDiv
+                            .querySelector('#credits-input-edit')
+                            .value.trim();
                         span.parentElement.parentElement.querySelector(
                             'h4',
                         ).innerText =
