@@ -3151,29 +3151,6 @@ document.querySelectorAll('.c_pref').forEach((div) => {
     });
 });
 
-window.addEventListener('resize', function () {
-    // if mobile phone in portrait mode show div with id 'mobile_message'
-    // Process each 'tr' before activating the Sortable
-    var courseList = document.querySelector('#course-list tbody');
-
-    [].forEach.call(courseList.getElementsByTagName('tr'), function (tr) {
-        [].forEach.call(tr.getElementsByTagName('td'), function (td) {
-            // Store the original width
-
-            td.dataset.originalWidth = getComputedStyle(td).width;
-            // Set the width to the original width
-            td.style.width = td.dataset.originalWidth;
-        });
-    });
-    if (window.innerWidth < 631) {
-        document.getElementById('mobile_message').style.display = 'block';
-    }
-    // if mobile phone in landscape mode hide div with id 'mobile_message'
-    else {
-        document.getElementById('mobile_message').style.display = 'none';
-    }
-});
-
 function doubleClickOnTrOfCourseList() {
     // Get the course name and faculty from the tr element
     var courseList = document.querySelector('#course-list tbody');
