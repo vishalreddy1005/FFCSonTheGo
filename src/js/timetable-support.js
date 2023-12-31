@@ -75,7 +75,9 @@ var ttDataStructureInLFormat = {
     L60: 'L60',
     V7: 'V7',
 };
-
+var slotsExistInNonLectureFormat = new Set(
+    Object.values(ttDataStructureInLFormat),
+);
 // ##################### Exporting Global Variables #####################
 export var globalVars = {
     editSub: editSub,
@@ -83,6 +85,7 @@ export var globalVars = {
     sortableIsActive: sortableIsActive,
     attackData: [],
     ttDataStructureInLFormat: ttDataStructureInLFormat,
+    slotsExistInNonLectureFormat: slotsExistInNonLectureFormat,
 };
 
 // Tried to do so and failed

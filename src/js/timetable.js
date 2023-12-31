@@ -6,6 +6,7 @@ let {
     sortableIsActive,
     attackData,
     ttDataStructureInLFormat,
+    slotsExistInNonLectureFormat,
 } = globalVars;
 
 // ********************* Global Functions *********************
@@ -326,23 +327,39 @@ function getCourseTTDataObject() {
     return timetable;
 }
 
+// check whether the slots exist in non lecture format
+// if exist return true else false
+function isSlotExist(slotsArray) {
+    // if slotsArray is string convert it to array
+    if (typeof slotsArray === 'string') {
+        slotsArray = slotsProcessingForCourseList(slotsArray);
+    }
+    slotsArray = updateSlots(slotsArray);
+    var result = true;
+    slotsArray.forEach((slot) => {
+        if (!slotsExistInNonLectureFormat.has(slot)) {
+            result = false;
+        }
+    });
+    return result;
+}
 // slots processing for course list
-// for example param 'L1+L2+L3' , return ['L1', 'L2', 'L3']
+// for example param 'L1+L2+L3+L1' , return ['L1', 'L2', 'L3']
 function slotsProcessingForCourseList(slotString) {
     var slots = (function () {
-        var arr = [];
+        var set = new Set();
 
         try {
             slotString.split(/\s*\+\s*/).forEach(function (el) {
                 if (el && $('.' + el)) {
-                    arr.push(el);
+                    set.add(el);
                 }
             });
         } catch (error) {
-            arr = [];
+            set.clear();
         }
 
-        return arr;
+        return Array.from(set);
     })();
     return slots;
 }
@@ -1431,6 +1448,12 @@ function onPageLoad() {
     }
 }
 
+// replace all dots with empty string in input field
+function removeDotsLive(inputElement) {
+    let inputValue = inputElement.value;
+    let cleanedValue = inputValue.replace(/\./g, '');
+    inputElement.value = cleanedValue;
+}
 // ------------------ Misslenious Ends Here ------------------
 
 window.editPrefCollapse = editPrefCollapse;
@@ -1438,7 +1461,7 @@ window.toggleDropdown = toggleDropdown;
 window.closeAllDropdowns = closeAllDropdowns;
 window.openAllDropdowns = openAllDropdowns;
 window.removeInputFieldsInSection = removeInputFieldsInSection;
-
+window.removeDotsLive = removeDotsLive;
 window.editPrefAddOn = editPrefAddOn;
 window.closeEditPref1 = closeEditPref1;
 
@@ -2736,7 +2759,12 @@ document
                 spanMsg = 'Course Does Not Exist';
                 spanMsgColor = 'red';
             } else {
-                if (
+                console.log(slotsInput);
+                console.log(isSlotExist(slotsInput));
+                if (isSlotExist(slotsInput) === false) {
+                    spanMsg = 'Slot Does Not Exist';
+                    spanMsgColor = 'red';
+                } else if (
                     !Object.keys(
                         timetableStoragePref[window.activeTable.id].subject[
                             courseName
@@ -3216,32 +3244,19 @@ document
         // Convert the activeTable to a JSON string
         var jsonStr = JSON.stringify(activeTable);
         var utf8Str = btoa(encodeURIComponent(jsonStr));
-
-        // Create a new Blob object
-        var blob = new Blob([utf8Str], { type: 'text/plain' });
-
-        // Create a URL for the Blob object
-        var url = URL.createObjectURL(blob);
-
-        // Create a new 'a' element
-        var dlAnchorElem = document.createElement('a');
-
+        var blob = new Blob([utf8Str], { type: 'text/plain' }); // Create a new Blob object
+        var url = URL.createObjectURL(blob); // Create a URL for the Blob object
+        var dlAnchorElem = document.createElement('a'); // Create a new 'a' element
         // Set its attributes
         dlAnchorElem.setAttribute('href', url);
         dlAnchorElem.setAttribute(
             'download',
             activeTable.name + '.ffcsOnTheGo',
         );
-
-        // Append it to the body (this is necessary for Firefox)
-        document.body.appendChild(dlAnchorElem);
-
-        // Simulate a click on the element
+        document.body.appendChild(dlAnchorElem); // Append it to the body (this is necessary for Firefox)
         dlAnchorElem.click();
-
         // Remove the element from the body after the download starts
         document.body.removeChild(dlAnchorElem);
-
         // Release the created URL
         URL.revokeObjectURL(url);
     });
@@ -3253,7 +3268,7 @@ document
     .addEventListener('click', function () {
         var input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.ffcsonthego';
+        input.accept = '.ffcsonthego, .txt';
         input.onchange = function (event) {
             processFile(event.target.files[0]);
         };
