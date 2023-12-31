@@ -9,6 +9,10 @@ let {
     slotsExistInNonLectureFormat,
 } = globalVars;
 
+// push '' and 'SLOTS' in slotsExistInNonLectureFormat
+slotsExistInNonLectureFormat.add('');
+slotsExistInNonLectureFormat.add('SLOTS');
+
 // ********************* Global Functions *********************
 // ================== Basic ==================
 
@@ -195,7 +199,9 @@ function getCourseNameAndFacultyFromTr(trElement) {
 // to process the raw course name from input field
 function processRawCourseName(courseInput) {
     try {
-        var courseListStr = courseInput.trim('-').split('-');
+        courseInput = courseInput.trim();
+        courseInput = trimSign(courseInput, '-');
+        var courseListStr = courseInput.split('-');
         let courseName = '';
         for (i = 0; i < courseListStr.length; i++) {
             if (courseListStr[i].trim() === '') {
@@ -793,7 +799,6 @@ function doubleClickOnTrOfCourseList() {
 
 // Add double click event listener to course list
 function addEventListnerToCourseList() {
-    console.log(11);
     var lastTouchTime = 0;
     var timeout;
     var eventTr;
@@ -811,7 +816,6 @@ function addEventListnerToCourseList() {
         clearTimeout(timeout);
         if (tapLength < 215 && tapLength > 0) {
             // Double tap action
-            console.log(eventTr === event.target.parentElement);
             if (eventTr === event.target.parentElement) {
                 doubleClickOnTrOfCourseList.call(eventTr);
             }
@@ -1452,10 +1456,78 @@ function onPageLoad() {
 function removeDotsLive(inputElement) {
     let inputValue = inputElement.value;
     let cleanedValue = inputValue.replace(/\./g, '');
+    cleanedValue = inputValue.replace(/\--/g, '-');
+    cleanedValue = cleanedValue.replace(/\  /g, ' ');
+    cleanedValue = cleanedValue.replace(/[^a-zA-Z0-9+ -]/g, '');
     inputElement.value = cleanedValue;
 }
+
+// replace all dots with empty string in input field
+function removeSlotSplCharLive(inputElement) {
+    let inputValue = inputElement.value;
+    let cleanedValue = inputValue.replace(/\./g, '');
+    cleanedValue = cleanedValue.replace(/[^a-zA-Z0-9+-]/g, '');
+    inputElement.value = cleanedValue;
+}
+
+function trimSign(slotString, sign) {
+    while (slotString.startsWith(sign)) {
+        slotString = slotString.slice(1);
+    }
+    while (slotString.endsWith(sign)) {
+        slotString = slotString.slice(0, -1);
+    }
+    return slotString;
+}
+
+function removeDuplicateSlots(slotString) {
+    // Split the string into an array
+    slotString = slotString.toUpperCase();
+    slotString = trimSign(slotString, '+');
+    slotString = cleanSlotString(slotString);
+    var slotsArray = slotString.split('+');
+
+    // Create a new array to store unique slots
+    var uniqueSlotsArray = [];
+
+    // Iterate over the original array
+    slotsArray.forEach(function (slot) {
+        // If the slot is not already in the uniqueSlotsArray, add it
+        if (!uniqueSlotsArray.includes(slot)) {
+            uniqueSlotsArray.push(slot);
+        }
+    });
+
+    // Join the array back into a string
+    var uniqueSlotString = uniqueSlotsArray.join('+');
+
+    return uniqueSlotString;
+}
+
+function cleanSlotString(slotString) {
+    // Remove consecutive plus signs
+    var cleanedSlotString = slotString.replace(/\++/g, '+');
+
+    // Remove spaces
+    cleanedSlotString = cleanedSlotString.replace(/\s/g, '');
+
+    return cleanedSlotString;
+}
+
+// document.getElementById('saveTeacherModal').addEventListener('click', function () {
+//     var inputElementSave = document.getElementById('slot-input');
+//     inputElementSave.value = cleanSlotString(inputElementSave.value);
+//     inputElementSave.value = removeDuplicateSlots(inputElementSave.value);
+// }, true);
+
+// document.getElementById('saveTeacherEdit').addEventListener('click', function () {
+//     var inputElement = document.getElementById('slot-input-edit');
+//     inputElement.value = cleanSlotString(inputElement.value);
+//     inputElement.value = removeDuplicateSlots(inputElement.value);
+// }, true);
 // ------------------ Misslenious Ends Here ------------------
 
+window.removeSlotSplCharLive = removeSlotSplCharLive;
 window.editPrefCollapse = editPrefCollapse;
 window.toggleDropdown = toggleDropdown;
 window.closeAllDropdowns = closeAllDropdowns;
@@ -2709,6 +2781,13 @@ document
 document
     .getElementById('saveTeacherModal')
     .addEventListener('click', function () {
+        var inputElementSave = document.getElementById('slot-input');
+        document.getElementById('slot-input').value = cleanSlotString(
+            inputElementSave.value,
+        );
+        document.getElementById('slot-input').value = removeDuplicateSlots(
+            document.getElementById('slot-input').value,
+        );
         const courseName = document.getElementById(
             'course-select-add-teacher',
         ).value;
@@ -2718,6 +2797,7 @@ document
         var slotsInput = document
             .getElementById('slot-input')
             .value.trim()
+            .trim('+')
             .toUpperCase();
         var venueInput = document
             .getElementById('venue-input')
@@ -2759,8 +2839,6 @@ document
                 spanMsg = 'Course Does Not Exist';
                 spanMsgColor = 'red';
             } else {
-                console.log(slotsInput);
-                console.log(isSlotExist(slotsInput));
                 if (isSlotExist(slotsInput) === false) {
                     spanMsg = 'Slot Does Not Exist';
                     spanMsgColor = 'red';
@@ -2965,6 +3043,9 @@ document
 document
     .getElementById('saveTeacherEdit')
     .addEventListener('click', function () {
+        var inputElementEdit = document.getElementById('slot-input-edit');
+        inputElementEdit.value = cleanSlotString(inputElementEdit.value);
+        inputElementEdit.value = removeDuplicateSlots(inputElementEdit.value);
         const courseName = document.getElementById('teacher-edit-course').value;
         const teacherNamePre = document.getElementById(
             'teacher-input_remove-edit-pre',
@@ -2979,6 +3060,7 @@ document
         var slotsInput = document
             .getElementById('slot-input-edit')
             .value.trim()
+            .trim('+')
             .toUpperCase();
         var venueInput = document
             .getElementById('venue-input-edit')
@@ -3010,31 +3092,36 @@ document
                         span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
                             'li',
                         );
-                    for (const li of allLi) {
-                        const allDiv = li.querySelectorAll('div');
-                        if (
-                            allDiv[0].innerText.toLowerCase() ===
-                            teacherNamePre.toLowerCase()
-                        ) {
-                            allDiv[0].innerText = teacherName;
-                            allDiv[1].innerText = slotsInput;
-                            allDiv[2].innerText = venueInput;
-                            li.style.backgroundColor = colorInput;
-                            document.getElementById(
-                                'teacher-input_remove-edit-pre',
-                            ).value = teacherName;
-                            spanMsg = 'Teacher updated successfully';
-                            createSubjectJsonFromHtml();
-                            spanMsgColor = 'green';
-                            if (trElementCourseList) {
-                                updateTeacherInCourseList(
-                                    trElementCourseList,
-                                    teacherName,
-                                    slotsInput,
-                                    venueInput,
-                                );
+                    if (isSlotExist(slotsInput) === false) {
+                        spanMsg = 'Slot Does Not Exist';
+                        spanMsgColor = 'red';
+                    } else {
+                        for (const li of allLi) {
+                            const allDiv = li.querySelectorAll('div');
+                            if (
+                                allDiv[0].innerText.toLowerCase() ===
+                                teacherNamePre.toLowerCase()
+                            ) {
+                                allDiv[0].innerText = teacherName;
+                                allDiv[1].innerText = slotsInput;
+                                allDiv[2].innerText = venueInput;
+                                li.style.backgroundColor = colorInput;
+                                document.getElementById(
+                                    'teacher-input_remove-edit-pre',
+                                ).value = teacherName;
+                                spanMsg = 'Teacher updated successfully';
+                                createSubjectJsonFromHtml();
+                                spanMsgColor = 'green';
+                                if (trElementCourseList) {
+                                    updateTeacherInCourseList(
+                                        trElementCourseList,
+                                        teacherName,
+                                        slotsInput,
+                                        venueInput,
+                                    );
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 } else {
@@ -3056,31 +3143,36 @@ document
                         }
                     }
                     if (editTeacherSwitch === 1) {
-                        for (const li of allLi) {
-                            const allDiv = li.querySelectorAll('div');
-                            if (
-                                allDiv[0].innerText.toLowerCase() ===
-                                teacherNamePre.toLowerCase()
-                            ) {
-                                allDiv[0].innerText = teacherName;
-                                allDiv[1].innerText = slotsInput;
-                                allDiv[2].innerText = venueInput;
-                                li.style.backgroundColor = colorInput;
-                                document.getElementById(
-                                    'teacher-input_remove-edit-pre',
-                                ).value = teacherName;
-                                spanMsg = 'Teacher updated successfully';
-                                spanMsgColor = 'green';
-                                if (trElementCourseList) {
-                                    updateTeacherInCourseList(
-                                        trElementCourseList,
-                                        teacherName,
-                                        slotsInput,
-                                        venueInput,
-                                    );
+                        if (isSlotExist(slotsInput) === false) {
+                            spanMsg = 'Slot Does Not Exist';
+                            spanMsgColor = 'red';
+                        } else {
+                            for (const li of allLi) {
+                                const allDiv = li.querySelectorAll('div');
+                                if (
+                                    allDiv[0].innerText.toLowerCase() ===
+                                    teacherNamePre.toLowerCase()
+                                ) {
+                                    allDiv[0].innerText = teacherName;
+                                    allDiv[1].innerText = slotsInput;
+                                    allDiv[2].innerText = venueInput;
+                                    li.style.backgroundColor = colorInput;
+                                    document.getElementById(
+                                        'teacher-input_remove-edit-pre',
+                                    ).value = teacherName;
+                                    spanMsg = 'Teacher updated successfully';
+                                    spanMsgColor = 'green';
+                                    if (trElementCourseList) {
+                                        updateTeacherInCourseList(
+                                            trElementCourseList,
+                                            teacherName,
+                                            slotsInput,
+                                            venueInput,
+                                        );
+                                    }
+                                    createSubjectJsonFromHtml();
+                                    break;
                                 }
-                                createSubjectJsonFromHtml();
-                                break;
                             }
                         }
 
@@ -3297,6 +3389,19 @@ document.querySelectorAll('.c_pref').forEach((div) => {
         closeAllDropdowns();
     });
 });
+
+// Slot input removal of duplicate slots
+document
+    .getElementById('slot-input-edit')
+    .addEventListener('input', function (event) {
+        event.target.value = cleanSlotString(event.target.value);
+    });
+
+document
+    .getElementById('slot-input')
+    .addEventListener('input', function (event) {
+        event.target.value = cleanSlotString(event.target.value);
+    });
 
 // Not for parcel bundler
 // if use other bundler which supports routing
