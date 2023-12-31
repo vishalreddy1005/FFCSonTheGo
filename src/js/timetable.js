@@ -427,6 +427,26 @@ function isCommonSlot(arr1, arr2) {
 
 // ================== Build / Update ==================
 
+function updateCourseList(courseTr, courseName, credits) {
+    var td = courseTr.querySelectorAll('td');
+    const courseTitle = getCourseCodeAndCourseTitle(courseName)[1];
+    const courseCode = getCourseCodeAndCourseTitle(courseName)[0];
+    td[1].innerText = courseCode;
+    td[2].innerText = courseTitle;
+    td[5].innerText = credits;
+    updateDataJsonFromCourseList();
+    var courseIdNum = courseTr.getAttribute('data-course');
+    removeCourseFromTimetable(courseIdNum);
+    courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
+    for (var i = 0; i < activeTable.data.length; ++i) {
+        if (activeTable.data[i].courseId == courseIdNum) {
+            addCourseToTimetable(activeTable.data[i]);
+            break;
+        }
+    }
+    updateCredits();
+}
+
 // Make input radio true on the bases of activeTable.data values
 function makeRadioTrueOnPageLoad() {
     activeTable.data.forEach((courseData) => {
@@ -2584,7 +2604,12 @@ document
         var spanMsg = '';
         var spanMsgColor = '';
 
-        if (courseName === '' || isNaN(credits)) {
+        if (
+            courseName === '' ||
+            isNaN(credits) ||
+            credits < 1 ||
+            credits > 30
+        ) {
             if (courseName === '' && isNaN(credits)) {
                 spanMsg = 'Course Name and Credits are empty';
                 spanMsgColor = 'red';
@@ -2593,6 +2618,9 @@ document
                 spanMsgColor = 'red';
             } else if (isNaN(credits)) {
                 spanMsg = 'Credits is empty';
+                spanMsgColor = 'red';
+            } else {
+                spanMsg = 'Credits should be between 1 and 30';
                 spanMsgColor = 'red';
             }
         } else {
@@ -2789,7 +2817,7 @@ document.getElementById('tt-subject-edit').addEventListener('click', editPref);
 // Load the subjectArea show all info
 document.addEventListener('DOMContentLoaded', onPageLoad);
 
-// Edit Subject Save button cliuck event
+// Edit course/Subject Save button cliuck event
 document
     .getElementById('saveSubjectEditModal')
     .addEventListener('click', function () {
@@ -2807,40 +2835,30 @@ document
             '#course-input-edit-pre',
         );
         const courseTr = getCourseTrInCourseList(courseNamePre);
-        function updateCourseList(courseTr, courseName, credits) {
-            var td = courseTr.querySelectorAll('td');
-            const courseTitle = getCourseCodeAndCourseTitle(courseName)[1];
-            const courseCode = getCourseCodeAndCourseTitle(courseName)[0];
-            td[1].innerText = courseCode;
-            td[2].innerText = courseTitle;
-            td[5].innerText = credits;
-            updateDataJsonFromCourseList();
-            var courseIdNum = courseTr.getAttribute('data-course');
-            removeCourseFromTimetable(courseIdNum);
-            courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
-            for (var i = 0; i < activeTable.data.length; ++i) {
-                if (activeTable.data[i].courseId == courseIdNum) {
-                    addCourseToTimetable(activeTable.data[i]);
-                    break;
-                }
-            }
-            updateCredits();
-        }
 
         let subjectArea = document.getElementById('subjectArea');
         let allSpan = subjectArea.querySelectorAll('.cname');
         var spanMsg = 'Course not updated';
         var spanMsgColor = 'red';
-        if (
-            courseDiv.querySelector('#credits-input-edit').value.trim() ===
-                '' ||
-            courseDiv.querySelector('#credits-input-edit').value < 0
-        ) {
-            spanMsg = 'Credits cannot be empty';
-            spanMsgColor = 'red';
-        } else if (courseName === '') {
+        var creditsInput = courseDiv.querySelector('#credits-input-edit').value;
+        if (courseName === '') {
             spanMsg = 'Course name cannot be empty';
             spanMsgColor = 'red';
+        } else if (
+            courseDiv.querySelector('#credits-input-edit').value.trim() ===
+                '' ||
+            creditsInput === '' ||
+            isNaN(creditsInput) ||
+            creditsInput < 1 ||
+            creditsInput > 30
+        ) {
+            if (creditsInput === '' || isNaN(creditsInput)) {
+                spanMsg = 'Credits cannot be empty';
+                spanMsgColor = 'red';
+            } else if (creditsInput < 1 || creditsInput > 30) {
+                spanMsg = 'Credits should be between 1 and 30';
+                spanMsgColor = 'red';
+            }
         } else {
             allSpan.forEach((span) => {
                 if (
