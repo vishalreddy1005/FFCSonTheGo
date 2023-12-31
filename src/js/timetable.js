@@ -1,92 +1,17 @@
-// Functions for rearrangements
-var editSub = false;
-var editTeacher = false;
-var sortableIsActive = false;
+import { globalVars } from './timetable-support.js';
+// Destructure the properties from the globalVars object
+let {
+    editSub,
+    editTeacher,
+    sortableIsActive,
+    attackData,
+    ttDataStructureInLFormat,
+} = globalVars;
 
-var attackData = [];
-var ttDataStructureInLFormat = {
-    L1: 'A1',
-    L2: 'F1',
-    L3: 'D1',
-    L4: 'TB1',
-    L5: 'TG1',
-    L6: 'L6',
-    L31: 'A2',
-    L32: 'F2',
-    L33: 'D2',
-    L34: 'TB2',
-    L35: 'TG2',
-    L36: 'L36',
-    V3: 'V3',
-    L7: 'B1',
-    L8: 'G1',
-    L9: 'E1',
-    L10: 'TC1',
-    L11: 'TAA1',
-    L12: 'L12',
-    L37: 'B2',
-    L38: 'G2',
-    L39: 'E2',
-    L40: 'TC2',
-    L41: 'TAA2',
-    L42: 'L42',
-    V4: 'V4',
-    L13: 'C1',
-    L14: 'A1',
-    L15: 'F1',
-    L16: 'V1',
-    L17: 'V2',
-    L18: 'L18',
-    L43: 'C2',
-    L44: 'A2',
-    L45: 'F2',
-    L46: 'TD2',
-    L47: 'TBB2',
-    L48: 'L48',
-    V5: 'V5',
-    L19: 'D1',
-    L20: 'B1',
-    L21: 'G1',
-    L22: 'TE1',
-    L23: 'TCC1',
-    L24: 'L24',
-    L49: 'D2',
-    L50: 'B2',
-    L51: 'G2',
-    L52: 'TE2',
-    L53: 'TCC2',
-    L54: 'L54',
-    V6: 'V6',
-    L25: 'E1',
-    L26: 'C1',
-    L27: 'TA1',
-    L28: 'TF1',
-    L29: 'TD1',
-    L30: 'L30',
-    L55: 'E2',
-    L56: 'C2',
-    L57: 'TA2',
-    L58: 'TF2',
-    L59: 'TDD2',
-    L60: 'L60',
-    V7: 'V7',
-};
+// ********************* Global Functions *********************
+// ================== Basic ==================
 
-// make the list of all slots in the activeTabe.data
-function getSlots() {
-    var slots = [];
-    activeTable.data.forEach((el) => {
-        el.slots.forEach((slot) => {
-            slots.push(slot);
-        });
-    });
-    slots = updateSlots(slots);
-    return slots;
-}
-
-/*
-    Function to add slot buttons and filter options
- */
+// To toggle the dropdown
 function toggleDropdown(dropdownHeading) {
     if (editSub === false) {
         var dropdownList = dropdownHeading.nextElementSibling;
@@ -94,8 +19,8 @@ function toggleDropdown(dropdownHeading) {
         dropdownHeading.classList.toggle('open');
     }
 }
-// Call the function to remove the click event listener
 
+// To hide the radio input from the dropdown
 function removeInputFieldsInSection(sectionId) {
     var section = document.getElementById(sectionId);
     var listItems = section.querySelectorAll('li');
@@ -106,13 +31,13 @@ function removeInputFieldsInSection(sectionId) {
     });
 }
 
+// To close and open all dropdowns
 function closeAllDropdowns() {
     document.querySelectorAll('.dropdown-list').forEach((dropdownList) => {
         dropdownList.classList.remove('show');
         dropdownList.previousElementSibling.classList.remove('open');
     });
 }
-
 function openAllDropdowns() {
     document.querySelectorAll('.dropdown-list').forEach((dropdownList) => {
         dropdownList.classList.add('show');
@@ -120,15 +45,188 @@ function openAllDropdowns() {
     });
 }
 
+// on click of button with id 'tt-subject-collapse'
+// button : 'Collapse All'
 function editPrefCollapse() {
     closeAllDropdowns();
 }
-window.editPrefCollapse = editPrefCollapse;
-window.toggleDropdown = toggleDropdown;
-window.closeAllDropdowns = closeAllDropdowns;
-window.openAllDropdowns = openAllDropdowns;
-window.removeInputFieldsInSection = removeInputFieldsInSection;
 
+// ------------------ Basic Ends Here ------------------
+
+// ================== Get From Something ==================
+
+// to get the courseList from subject area
+function getCourseListFromSubjectArea() {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    var courseList = [];
+    for (const span of allSpan) {
+        courseList.push(span.innerText);
+    }
+    return courseList;
+}
+
+function getCourseDivInSubjectArea(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            return span.parentElement.parentElement;
+        }
+    }
+}
+
+// to get the UL element
+// UL containing teachert list of perticular course
+function getUlInSubjectArea(courseName) {
+    var courseName = courseName.trim().toLowerCase();
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName) {
+            return span.parentElement.parentElement.parentElement.parentElement.querySelector(
+                'ul',
+            );
+        }
+    }
+}
+
+// Function to find the li element of the teacher
+function getTeacherLiInSubjectArea(courseName, teacherName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            var allLi =
+                span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
+                    'li',
+                );
+            for (const li of allLi) {
+                const allDiv = li.querySelectorAll('div');
+                if (
+                    allDiv[0].innerText.toLowerCase() ===
+                    teacherName.toLowerCase()
+                ) {
+                    return li;
+                }
+            }
+        }
+    }
+}
+// function to get credits from course name in subject area
+function getCreditsFromCourseName(courseName) {
+    var subjectArea = document.getElementById('subjectArea');
+    var allSpan = subjectArea.querySelectorAll('.cname');
+    for (const span of allSpan) {
+        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
+            return parseInt(
+                span.parentElement.parentElement
+                    .querySelector('h4')
+                    .innerText.replace('[', '')
+                    .replace(']', ''),
+            );
+        }
+    }
+}
+
+// to get courseCode and Course Title from
+// courseName(CourseCode+CourseTitle)
+function getCourseCodeAndCourseTitle(courseName) {
+    var courseName = courseName.split('-');
+    if (courseName.length > 1) {
+        var courseCode = courseName[0].trim();
+        var part2 = '';
+        for (var i = 1; i < courseName.length; i++) {
+            part2 += courseName[i].trim() + '-';
+        }
+        var courseTitle = part2.slice(0, -1);
+    } else {
+        var courseTitle = courseName[0].trim();
+        var courseCode = '';
+    }
+    return [courseCode, courseTitle];
+}
+
+// course name from course data
+// course data is the object of activeTable.data
+function getCourseNameFromCourseData(courseData) {
+    var courseName = '';
+    if (courseData.courseCode === '') {
+        courseName = courseData.courseTitle;
+    } else {
+        courseName = courseData.courseCode + '-' + courseData.courseTitle;
+    }
+    return courseName;
+}
+
+// Function to find/get tr element of the course
+function getCourseTrInCourseList(courseName, teacherName) {
+    var courseList = document.getElementById('courseList-tbody');
+    var trElements = courseList.querySelectorAll('tr');
+    for (const trElement of trElements) {
+        var tempData = getCourseNameAndFacultyFromTr(trElement); // [courseName,faculty]
+        if (tempData[0] === courseName) {
+            if (teacherName) {
+                if (tempData[1] === teacherName) {
+                    return trElement;
+                }
+            } else {
+                return trElement;
+            }
+        }
+    }
+}
+
+// get course from tr
+function getCourseNameAndFacultyFromTr(trElement) {
+    var td = trElement.querySelectorAll('td');
+    if (td[1].innerText === '') {
+        var courseName = td[2].innerText;
+    } else {
+        var courseName = td[1].innerText + '-' + td[2].innerText;
+    }
+
+    return [courseName, td[3].innerText];
+}
+
+// get the processed course name from input course name
+// to process the raw course name from input field
+function processRawCourseName(courseInput) {
+    try {
+        var courseListStr = courseInput.trim('-').split('-');
+        let courseName = '';
+        for (i = 0; i < courseListStr.length; i++) {
+            if (courseListStr[i].trim() === '') {
+                courseListStr.splice(i, 1);
+            }
+        }
+        if (courseListStr.length > 1 && courseListStr[0] !== '') {
+            var part2 = '';
+            for (var i = 1; i < courseListStr.length; i++) {
+                if (courseListStr[i].trim() !== '') {
+                    part2 += '-' + courseListStr[i].trim();
+                }
+            }
+            courseName = courseListStr[0].trim() + part2;
+        } else {
+            courseName = courseListStr[0].trim();
+        }
+        if (courseName) {
+            courseName = courseName.trim('-');
+            return courseName;
+        }
+        return '';
+    } catch (error) {
+        return '';
+    }
+}
+
+// ------------------ Get From Something Ends Here ------------------
+
+// ================== Sortables ==================
+
+// To activate and deactivate the sortable
 function activateSortable() {
     // Detect whether the user is on a mobile device
     if (sortableIsActive === false) {
@@ -167,37 +265,34 @@ function deactivateSortable() {
         });
     }
 }
-function closeEditPref1() {
-    editTeacher = false;
-    deactivateSortable();
 
-    document.getElementById('edit_msg_').style.display = 'none';
-    document.getElementById('div-for-edit-teacher').style.display = 'none';
-    selectBackgroundRemovalOfPreviousH2s();
-}
-function editPrefAddOn() {
-    activateSortable();
-    document.getElementById('edit_msg_').style.display = 'block';
-    document.getElementById('div-for-edit-teacher').style.display = 'none';
-}
+// Sortable for course list after dropping should save that instance
+function activateSortableForCourseList() {
+    var isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+        );
 
-window.editPrefAddOn = editPrefAddOn;
-window.closeEditPref1 = closeEditPref1;
+    var courseList = document.querySelector('#course-list tbody');
 
-// function to update the array of slots if slot is in key of getCourseTTDataObject it will be replaced with its value
-function updateSlots(slots) {
-    var newSlots = [];
-    slots.forEach((slot) => {
-        if (slot in ttDataStructureInLFormat) {
-            newSlots.push(ttDataStructureInLFormat[slot]);
-        } else {
-            newSlots.push(slot);
-        }
+    Sortable.create(courseList, {
+        animation: 150,
+        delay: isMobile ? 170 : 6, // Different delay for mobile and desktop
+        chosenClass: 'sortable-chosen1',
+
+        onEnd: function () {
+            updateDataJsonFromCourseList();
+        },
     });
-    return newSlots;
 }
+
+// ------------------ Sortables Ends Here ------------------
+
+// ================== Slots ==================
 
 // from this function we got the ttDataStructureInLFormat
+// Not in use, (Dead Function)
+// to generate the ttDataStructureInLFormat use it when courselist is empty
 function getCourseTTDataObject() {
     const timetableTable = document.querySelector('.table-bordered');
     const rows = timetableTable.querySelectorAll('tr');
@@ -228,14 +323,904 @@ function getCourseTTDataObject() {
             }
         }
     });
-
     return timetable;
+}
+
+// slots processing for course list
+// for example param 'L1+L2+L3' , return ['L1', 'L2', 'L3']
+function slotsProcessingForCourseList(slotString) {
+    var slots = (function () {
+        var arr = [];
+
+        try {
+            slotString.split(/\s*\+\s*/).forEach(function (el) {
+                if (el && $('.' + el)) {
+                    arr.push(el);
+                }
+            });
+        } catch (error) {
+            arr = [];
+        }
+
+        return arr;
+    })();
+    return slots;
+}
+
+// function to update the array of slots if slot is in key of getCourseTTDataObject it will be replaced with its value
+function updateSlots(slots) {
+    var newSlots = [];
+    slots.forEach((slot) => {
+        if (slot in ttDataStructureInLFormat) {
+            newSlots.push(ttDataStructureInLFormat[slot]);
+        } else {
+            newSlots.push(slot);
+        }
+    });
+    return newSlots;
+}
+
+// make the list of all slots in the activeTabe.data
+function getSlots() {
+    var slots = [];
+    activeTable.data.forEach((el) => {
+        el.slots.forEach((slot) => {
+            if (slot === '' || slot === 'SLOTS') {
+            } else {
+                slots.push(slot);
+            }
+        });
+    });
+    slots = updateSlots(slots);
+    return slots;
 }
 
 // get the slots of the course in activeTable.data with Course Name
 function getSlotsOfCourse(courseName) {
     var slots = [];
     activeTable.data.forEach((el) => {
+        const CourseNameData = getCourseNameFromCourseData(el);
+        if (
+            CourseNameData.toLocaleLowerCase() == courseName.toLocaleLowerCase()
+        ) {
+            el.slots.forEach((slot) => {
+                if (slot === '' || slot === 'SLOTS') {
+                } else if (!slots.includes(slot)) {
+                    slots.push(slot);
+                }
+            });
+        }
+    });
+    slots = updateSlots(slots);
+    return slots;
+}
+
+// find the subtraction of two arrays
+// Note: returns array2 - array1,
+// prefered arr1 = getSlotsOfCourse, arr2 = getSlots()
+function subtractArray(arr1, arr2) {
+    //Array2 -Array1
+    arr1.forEach((el) => {
+        if (arr2.includes(el)) {
+            let index = arr2.indexOf(el);
+            if (index !== -1) {
+                // Remove the first occurrence of the element using splice
+                arr2.splice(index, 1);
+            }
+        }
+    });
+    return arr2;
+}
+
+// function to check is there any common slot between two arrays
+function isCommonSlot(arr1, arr2) {
+    var result = false;
+    arr1.forEach((el) => {
+        if (arr2.includes(el)) {
+            result = true;
+        }
+    });
+    return result;
+}
+
+// ------------------ Slots Ends Here ------------------
+
+// ================== Build / Update ==================
+
+// Make input radio true on the bases of activeTable.data values
+function makeRadioTrueOnPageLoad() {
+    activeTable.data.forEach((courseData) => {
+        if (courseData.courseCode === '') {
+            var courseName = courseData.courseTitle;
+        } else {
+            var courseName =
+                courseData.courseCode + '-' + courseData.courseTitle;
+        }
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = true;
+    });
+}
+
+// Make Radio all radios false which were true according to activeTable.data
+function makeRadioFalseOnNeed() {
+    activeTable.data.forEach((courseData) => {
+        if (courseData.courseCode === '') {
+            var courseName = courseData.courseTitle;
+        } else {
+            var courseName =
+                courseData.courseCode + '-' + courseData.courseTitle;
+        }
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = false;
+    });
+}
+
+// Function to fill the timetable and course list/ subjectArea
+function fillLeftBoxInCoursePanel() {
+    const activeId = window.activeTable.id;
+    const activeTable = timetableStoragePref[activeId];
+
+    if (activeTable.subject && Object.keys(activeTable.subject).length > 0) {
+        const leftBox = document.getElementById('subjectArea');
+        leftBox.innerHTML = '';
+
+        for (const courseName in activeTable.subject) {
+            const subject = activeTable.subject[courseName];
+            const dropdown = createSubjectDropdown(courseName, subject);
+            leftBox.appendChild(dropdown);
+        }
+    } else {
+        const leftBox = document.getElementById('subjectArea');
+        leftBox.innerHTML = '';
+    }
+    rearrangeTeacherRefresh();
+}
+
+// to build the HTML for course/subject dropdown
+// courseName is the key of activeTable.subject
+// subject is the value of activeTable.subject
+function createSubjectDropdown(courseName, subject) {
+    const dropdown = document.createElement('div');
+    dropdown.classList.add('dropdown');
+    dropdown.classList.add('dropdown-teacher');
+
+    const dropdownHeading = document.createElement('div');
+    dropdownHeading.classList.add('dropdown-heading');
+    dropdownHeading.setAttribute('onclick', 'toggleDropdown(this)');
+
+    const h2sDiv = document.createElement('div');
+    h2sDiv.classList.add('h2s');
+    h2sDiv.style.display = 'flex';
+    h2sDiv.style.flexDirection = 'row';
+
+    const cName = document.createElement('span');
+    cName.classList.add('cname');
+    cName.innerText = courseName;
+    const h2 = document.createElement('h2');
+    h2.innerText = '';
+    h2.appendChild(cName);
+
+    const span = document.createElement('p');
+    span.classList.add('arrow');
+
+    const h4 = document.createElement('h4');
+    h4.innerText = `[${subject.credits}]`;
+    h2.appendChild(span);
+    h2sDiv.appendChild(h2);
+    h2sDiv.appendChild(h4);
+
+    dropdownHeading.appendChild(h2sDiv);
+
+    const dropdownList = document.createElement('ul');
+    dropdownList.classList.add('dropdown-list');
+
+    const allTeacherLi = constructTeacherLi(courseName, subject);
+    allTeacherLi.forEach((li) => {
+        dropdownList.appendChild(li);
+    });
+    dropdown.appendChild(dropdownHeading);
+    dropdown.appendChild(dropdownList);
+
+    return dropdown;
+}
+
+// To build the teacher li item from the teacher data
+function createTeacherLI(teacherData) {
+    const li = document.createElement('li');
+    li.style.backgroundColor = teacherData.color;
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = teacherData.courseName;
+    input.value = teacherData.teacherName;
+
+    const teacherNameDiv = document.createElement('div');
+    teacherNameDiv.style.paddingLeft = '4%';
+    teacherNameDiv.style.width = '47%';
+    teacherNameDiv.innerText = teacherData.teacherName;
+
+    const slotsDiv = document.createElement('div');
+    slotsDiv.style.width = '38%';
+    slotsDiv.style.opacity = '70%';
+    slotsDiv.innerText = teacherData.slots;
+
+    const venueDiv = document.createElement('div');
+    venueDiv.style.width = '15%';
+    venueDiv.style.opacity = '70%';
+    venueDiv.innerText = teacherData.venue;
+
+    li.appendChild(input);
+    li.appendChild(teacherNameDiv);
+    li.appendChild(slotsDiv);
+    li.appendChild(venueDiv);
+    return li;
+}
+
+// to build the teacher li item from course name and subject element
+// activeTable.subject['CourseName'] is the subject element
+function constructTeacherLi(courseName, subject) {
+    var result = [];
+    for (const teacherName in subject.teacher) {
+        var slotsInput = subject.teacher[teacherName].slots;
+        var venueInput = subject.teacher[teacherName].venue;
+        const colorInput = subject.teacher[teacherName].color;
+        if (slotsInput === '') {
+            slotsInput = 'SLOTS';
+        }
+        if (venueInput === '') {
+            venueInput = 'VENUE';
+        }
+        const teacherData = {
+            courseName: courseName,
+            slots: slotsInput,
+            venue: venueInput,
+            color: colorInput,
+            teacherName: teacherName,
+        };
+        const li = createTeacherLI(teacherData);
+        result.push(li);
+    }
+    return result;
+}
+
+// to build the json format of current state of the subject area & save it
+function createSubjectJsonFromHtml() {
+    let result = {};
+    let dropdowns = document.querySelectorAll('.dropdown-teacher');
+
+    dropdowns.forEach((dropdown) => {
+        let courseNameElement = dropdown.querySelector('h2 .cname');
+        let courseName = courseNameElement
+            ? courseNameElement.textContent
+            : null;
+        let credits = parseInt(
+            dropdown
+                .querySelector('h4')
+                .textContent.replace('[', '')
+                .replace(']', ''),
+        );
+        let teachers = dropdown.querySelectorAll('li');
+
+        let teacherData = {};
+
+        teachers.forEach((teacher) => {
+            let teacherName = teacher.querySelectorAll('div')[0].textContent;
+            let slots = teacher.querySelectorAll('div')[1].textContent;
+            let venue = teacher.querySelectorAll('div')[2].textContent;
+            let color = teacher.style.backgroundColor;
+
+            teacherData[teacherName] = {
+                slots: slots,
+                venue: venue,
+                color: color,
+            };
+        });
+
+        result[courseName] = {
+            teacher: teacherData,
+            credits: credits,
+        };
+    });
+    timetableStoragePref[window.activeTable.id].subject = result;
+    updateLocalForage();
+}
+
+// to create activeTable.data json from the course list and save
+// the that instance of course list
+function updateDataJsonFromCourseList() {
+    let courseList = document.getElementById('courseList-tbody');
+    let trElements = courseList.querySelectorAll('tr');
+    activeTable.data = [];
+    trElements.forEach((trElement) => {
+        let td = trElement.querySelectorAll('td');
+        let courseName = td[2].innerText;
+        let faculty = td[3].innerText;
+        let courseCode = td[1].innerText;
+        let slots = slotsProcessingForCourseList(td[0].innerText);
+        let venue = td[4].innerText;
+        let credits = parseInt(td[5].innerText);
+        let isProject = trElement.getAttribute('data-is-project');
+        let dataCourseValue = trElement.getAttribute('data-course');
+        let courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
+
+        let courseData = {
+            courseId: courseId,
+            courseTitle: courseName,
+            faculty: faculty,
+            slots: slots,
+            venue: venue,
+            credits: credits,
+            isProject: isProject,
+            courseCode: courseCode,
+        };
+        activeTable.data.push(courseData);
+    });
+    updateLocalForage();
+}
+
+function updateTeacherInCourseList(
+    trElementCourseList,
+    teacherName,
+    slotsInput,
+    venueInput,
+) {
+    var td = trElementCourseList.querySelectorAll('td');
+    td[3].innerText = teacherName;
+    td[0].innerText = slotsInput;
+    td[4].innerText = venueInput;
+    updateDataJsonFromCourseList();
+    var courseIdNum = trElementCourseList.getAttribute('data-course');
+    removeCourseFromTimetable(courseIdNum);
+    courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
+    for (var i = 0; i < activeTable.data.length; ++i) {
+        if (activeTable.data[i].courseId == courseIdNum) {
+            addCourseToTimetable(activeTable.data[i]);
+            break;
+        }
+    }
+}
+
+// to build couse div in subject area
+// used while adding new subject
+function addSubDiv(subjectName, credits) {
+    const div = document.createElement('div');
+    div.classList.add('dropdown');
+    div.classList.add('dropdown-teacher');
+    const divHeading = document.createElement('div');
+    divHeading.classList.add('dropdown-heading');
+    divHeading.setAttribute('onclick', 'toggleDropdown(this)');
+    const divH2s = document.createElement('div');
+    divH2s.classList.add('h2s');
+    divH2s.style.display = 'flex';
+    divH2s.style.flexDirection = 'row';
+    const h2 = document.createElement('h2');
+    const spanCname = document.createElement('span');
+    spanCname.c;
+    lassList.add('cname');
+    spanCname.textContent = subjectName;
+
+    const pArrow = document.createElement('p');
+    pArrow.classList.add('arrow');
+
+    const h4 = document.createElement('h4');
+    h4.textContent = `[${credits}]`;
+    divH2s.appendChild(h2);
+    divH2s.appendChild(h4);
+    h2.appendChild(spanCname);
+    h2.appendChild(pArrow);
+    divHeading.appendChild(divH2s);
+    div.appendChild(divHeading);
+    const ul = document.createElement('ul');
+    ul.classList.add('dropdown-list');
+    div.appendChild(ul);
+    document.getElementById('subjectArea').appendChild(div);
+}
+// ------------------ Build / Update Ends Here ------------------
+
+// ================== Add / Remove ==================
+
+// double click on tr of course list
+function doubleClickOnTrOfCourseList() {
+    // Get the course name and faculty from the tr element
+    var courseList = document.querySelector('#course-list tbody');
+
+    editPref();
+    editPrefAddOn();
+    var courseName_Faculty = getCourseNameAndFacultyFromTr(this);
+    var courseName = courseName_Faculty[0];
+    var faculty = courseName_Faculty[1];
+
+    // Get the li element corresponding to the course name and faculty
+    if (editSub === true) {
+        closeAllDropdowns();
+        document.getElementById('div-for-edit-teacher').style.display = 'none';
+        document.getElementById('edit_msg_').style.display = 'block';
+        document.getElementById('edit_msg_').innerText =
+            'Click on the Course to edit it.';
+        var div = getCourseDivInSubjectArea(courseName);
+        div.click();
+        div.focus();
+    } else {
+        var li = getTeacherLiInSubjectArea(courseName, faculty);
+        closeAllDropdowns();
+        li.parentElement.previousElementSibling.click();
+        li.click();
+        li.focus();
+    }
+
+    // scroll to the top
+    window.scrollTo(0, 0);
+}
+
+// Add double click event listener to course list
+function addEventListnerToCourseList() {
+    console.log(11);
+    var lastTouchTime = 0;
+    var timeout;
+    var eventTr;
+    // try to remove all eventlistner from course list first
+    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+        tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
+        tr.removeEventListener('click', handleClick);
+    });
+
+    function handleClick(event) {
+        // Prevent the event listener from running if eventTr is already defined
+        var currentTime = new Date().getTime();
+        var tapLength = currentTime - lastTouchTime;
+
+        clearTimeout(timeout);
+        if (tapLength < 215 && tapLength > 0) {
+            // Double tap action
+            console.log(eventTr === event.target.parentElement);
+            if (eventTr === event.target.parentElement) {
+                doubleClickOnTrOfCourseList.call(eventTr);
+            }
+        } else {
+            // Single tap action
+
+            timeout = setTimeout(function () {
+                clearTimeout(timeout);
+            }, 215);
+        }
+        eventTr = event.target.parentElement;
+        lastTouchTime = currentTime;
+    }
+
+    // on double click or double tap on tr element do something
+    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
+        tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
+        tr.addEventListener('click', handleClick);
+    });
+}
+
+// Targets the li to make it toggable when clicked anywhere on the li element eg the teacher name list
+function addEventListeners() {
+    var listItems = document.querySelectorAll('.dropdown li');
+    for (var i = 0; i < listItems.length; i++) {
+        listItems[i].addEventListener('click', liClick);
+    }
+}
+
+// Function to add to timetable and in course table when clicked on radio button
+function addOnRadioTrue(radioButton) {
+    var current = radioButton; // This radio button is now the currently selected one
+    var courseToRemove =
+        current.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
+    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
+    courseRemove(courseToRemove);
+
+    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
+    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
+    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
+    var credits = getCreditsFromCourseName(courseToRemove);
+
+    var isProject = false;
+
+    var slots = slotsProcessingForCourseList(slotString);
+    var courseId = 0;
+    if (activeTable.data.length != 0) {
+        var lastAddedCourse = activeTable.data[activeTable.data.length - 1];
+        courseId = lastAddedCourse.courseId + 1;
+    }
+    var courseData = {
+        courseId: courseId,
+        courseTitle: courseTitle,
+        faculty: faculty,
+        slots: slots,
+        venue: venue,
+        credits: credits,
+        isProject: isProject,
+        courseCode: courseCode,
+    };
+    activeTable.data.push(courseData);
+    addCourseToCourseList(courseData);
+    addCourseToTimetable(courseData);
+    updateLocalForage();
+}
+
+// Function to remove all liClick event listeners from teacher li elements
+function removeEventListeners() {
+    var listItems = document.querySelectorAll('.dropdown li');
+    for (var i = 0; i < listItems.length; i++) {
+        listItems[i].removeEventListener('click', liClick);
+    }
+}
+
+// delete from subject
+function removeCourseFromSubject(dataCourseValue) {
+    var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
+    for (var i = 0; i < activeTable.data.length; ++i) {
+        if (activeTable.data[i].courseId == courseId) {
+            activeTable.data.splice(i, 1);
+            break;
+        }
+    }
+}
+
+// Remove Course
+// Removing all element related to that course code from tt and course list
+function courseRemove(courseToRemove) {
+    var courseList = document.getElementById('courseList-tbody');
+    // Loop through each <tr> element and log the value of the data-course attribute
+    var trElements = courseList.querySelectorAll('tr');
+    trElements.forEach(function (trElement) {
+        var dataCourseValue = trElement.getAttribute('data-course');
+        var courseII = getCourseNameAndFacultyFromTr(trElement)[0];
+        if (courseToRemove === courseII) {
+            removeCourseFromTimetable(dataCourseValue);
+            removeCourseFromCourseList(dataCourseValue);
+            removeCourseFromSubject(dataCourseValue);
+        }
+    });
+}
+
+// Remove the course from time table on deselection of radio button
+function removeRadioFalse(radioButton) {
+    var courseToRemove =
+        radioButton.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    courseRemove(courseToRemove);
+}
+
+// Removal of selection background (purple color on editing)
+// Removal from course name dropdown
+function selectBackgroundRemovalOfPreviousH2s() {
+    let courseDiv = document.getElementById('div-for-edit-course');
+    var courseNameToRemoveBlueFrom = courseDiv.querySelector(
+        '#course-input-edit-pre',
+    ).innerText;
+    var courseDivPre = getCourseDivInSubjectArea(courseNameToRemoveBlueFrom);
+    if (courseDivPre) {
+        courseDivPre.classList.remove('select_background');
+    }
+}
+// Removal from teacher list
+function selectBackgroundRemovalOfPreviousLi() {
+    let teacherDiv = document.getElementById('div-for-edit-teacher');
+    var teacherNameToRemoveSelectFrom = teacherDiv.querySelector(
+        '#teacher-input_remove-edit-pre',
+    ).value;
+    let courseNameOfRemovalTeacher = document.getElementById(
+        'teacher-edit-course',
+    ).value;
+    var teacherDivPre = getTeacherLiInSubjectArea(
+        courseNameOfRemovalTeacher,
+        teacherNameToRemoveSelectFrom,
+    );
+    if (teacherDivPre) {
+        teacherDivPre.classList.remove('select_background');
+    }
+}
+
+// ------------------ Add / Remove Ends Here ------------------
+
+// ================== Click ==================
+
+// on click of button with id 'tt-subject-edit'
+// button : 'Edit'
+function editPrefAddOn() {
+    activateSortable();
+    document.getElementById('edit_msg_').style.display = 'block';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
+}
+function editPref() {
+    editTeacher = true;
+    document.getElementById('tt-subject-edit').style.display = 'none';
+    document.getElementById('tt-subject-add').style.display = 'none';
+    document.getElementById('tt-teacher-add').style.display = 'none';
+    document.getElementById('div-for-add-teacher').style.display = 'none';
+    document.getElementById('div-for-add-course').style.display = 'none';
+    document.getElementById('tt-subject-collapse').style.display = 'block';
+    document.getElementById('tt-subject-done').style.display = 'block';
+    document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
+    document.getElementById('edit_msg_').style.display = 'block';
+    openAllDropdowns();
+    removeEventListeners();
+    revertRerrange();
+    removeInputFieldsInSection('subjectArea');
+    // Add event listeners to .h2s div elements
+    document.querySelectorAll('.h2s').forEach((div) => {
+        div.addEventListener('click', function () {
+            if (editSub === true) {
+                document.getElementById('edit_msg_').style.display = 'none';
+                const subjectName = this.querySelector('.cname').innerText;
+                let credit = this.querySelector('h4')
+                    .innerText.replace('[', '')
+                    .replace(']', '');
+                credit = parseInt(credit);
+                let courseDiv = document.getElementById('div-for-edit-course');
+                selectBackgroundRemovalOfPreviousH2s();
+                // add class to this
+                this.classList.add('select_background');
+
+                courseDiv.style.display = 'block';
+                courseDiv.querySelector('#course-input_edit').value =
+                    subjectName;
+                courseDiv.querySelector('#credits-input-edit').value = credit;
+                courseDiv.querySelector('#course-input-edit-pre').innerText =
+                    subjectName;
+                courseDiv.querySelector('#credit-input-edit-pre').innerText =
+                    credit;
+            }
+        });
+    });
+
+    // Add event listeners to li items
+    document.querySelectorAll('li').forEach((li) => {
+        li.addEventListener('click', function () {
+            if (editSub === false && editTeacher === true) {
+                document.getElementById('edit_msg_').style.display = 'none';
+                document.getElementById('div-for-edit-teacher').style.display =
+                    'block';
+                var allDivInLi = this.querySelectorAll('div');
+                const courseName =
+                    this.parentElement.parentElement.querySelector(
+                        '.cname',
+                    ).innerText;
+                const teacherName = allDivInLi[0].innerText;
+                let slot = allDivInLi[1].innerText;
+                let venue = allDivInLi[2].innerText;
+                const color = this.style.backgroundColor;
+                if (slot === 'SLOTS') {
+                    slot = '';
+                }
+                if (venue === 'VENUE') {
+                    venue = '';
+                }
+
+                selectBackgroundRemovalOfPreviousLi();
+                this.classList.add('select_background');
+                document.getElementById('teacher-input_remove-edit').value =
+                    teacherName;
+                document.getElementById('slot-input-edit').value = slot;
+                document.getElementById('venue-input-edit').value = venue;
+                document.getElementById('teacher-edit-course').value =
+                    courseName;
+                document.getElementById('color1-select-edit').value = color;
+                document.getElementById('teacher-input_remove-edit-pre').value =
+                    teacherName;
+            }
+        });
+    });
+}
+
+// on click of button with id 'tt-subject-done'
+// button : 'Done'
+function closeEditPref1() {
+    editTeacher = false;
+    deactivateSortable();
+
+    document.getElementById('edit_msg_').style.display = 'none';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
+    selectBackgroundRemovalOfPreviousH2s();
+}
+
+// close the edit view
+function closeEditPref() {
+    document.getElementById('tt-subject-edit').style.display = 'block';
+    document.getElementById('tt-subject-add').style.display = 'block';
+    document.getElementById('tt-teacher-add').style.display = 'block';
+    document.getElementById('tt-subject-collapse').style.display = 'none';
+    document.getElementById('tt-subject-done').style.display = 'none';
+    document.getElementById('div-for-add-teacher').style.display = 'block';
+    document.getElementById('tt-sub-edit-switch-div').style.display = 'none';
+    document.getElementById('tt-sub-edit-switch').checked = false;
+    document.getElementById('div-for-edit-course').style.display = 'none';
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
+    editSub = false;
+    createSubjectJsonFromHtml();
+    addEventListeners();
+    revertRerrange();
+    rearrangeTeacherRefresh();
+    showAddTeacherDiv();
+    document.getElementById('edit_msg_').innerText =
+        'Click on the Teacher to edit it.';
+}
+
+// What happens after cliking on li element anywhere
+function liClick() {
+    // Get the radio button inside this list item
+    var radioButton = this.querySelector('input[type="radio"]');
+    if (radioButton.checked) {
+        try {
+            radioButton.checked = false;
+            removeRadioFalse(radioButton);
+            updateDataJsonFromCourseList();
+            revertRerrange();
+            rearrangeTeacherRefresh();
+        } catch (error) {}
+    } else {
+        radioButton.checked = true; // This radio button is now the currently selected one
+        addOnRadioTrue(radioButton);
+        updateDataJsonFromCourseList();
+        revertRerrange();
+        rearrangeTeacherRefresh();
+    }
+}
+
+// ------------------ Click Ends Here ------------------
+
+// ================== Arrange ==================
+
+function rearrangeTeacherLiInSubjectArea(courseName) {
+    var ul = getUlInSubjectArea(courseName);
+    var allTeacherLi = ul.querySelectorAll('li');
+    var slotsOfCourse = getSlotsOfCourse(courseName);
+    var activeSlots = getSlots();
+    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
+    var nonActiveTeacherLi = [];
+    var activeTeacherLi = [];
+    allTeacherLi.forEach((teacherLi) => {
+        const teacherSlot = updateSlots(
+            slotsProcessingForCourseList(
+                teacherLi.querySelectorAll('div')[1].innerText,
+            ),
+        );
+        if (isCommonSlot(teacherSlot, consideredSlots)) {
+            teacherLi.classList.add('clashLi');
+            teacherLi.querySelector('div').classList.add('clash');
+            nonActiveTeacherLi.push(teacherLi);
+        } else {
+            try {
+                teacherLi.classList.remove('clashLi');
+                teacherLi.querySelector('div').classList.remove('clash');
+            } catch (error) {}
+            activeTeacherLi.push(teacherLi);
+        }
+    });
+    // get the ul under that course name in subject area
+    ul.innerHTML = '';
+    activeTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+    nonActiveTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+}
+
+//rearrange the teacherli within the subjectArea if slots are clashing
+function rearrangeTeacherRefresh() {
+    const courseList = getCourseListFromSubjectArea();
+    courseList.forEach((courseName) => {
+        rearrangeTeacherLiInSubjectArea(courseName);
+    });
+    addEventListeners();
+}
+
+function revertRerrange() {
+    var allSubject = activeTable.subject;
+    Object.keys(allSubject).forEach((subjectName) => {
+        const subjectNameStr = subjectName.toString();
+        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
+        const TeacherLi = constructTeacherLi(
+            subjectNameStr,
+            allSubject[subjectNameStr],
+        );
+        ulToUpdate.innerHTML = '';
+        TeacherLi.forEach((li) => {
+            ulToUpdate.appendChild(li);
+        });
+        makeRadioTrueOnPageLoad();
+    });
+}
+// ------------------ Arrange Ends Here ------------------
+
+// ================== Attack Mode Function ==================
+
+// function addEventListenersAttack() {
+//     var listItems = document.querySelectorAll('.dropdown li');
+//     for (var i = 0; i < listItems.length; i++) {
+//         listItems[i].addEventListener('click', attackLiClick);
+//     }
+// }
+function rearrangeTeacherRefreshAttack() {
+    const courseList = getCourseListFromSubjectArea();
+    courseList.forEach((courseName) => {
+        rearrangeTeacherLiInSubjectAreaAttack(courseName);
+    });
+}
+
+function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
+    var ul = getUlInSubjectArea(courseName);
+    var allTeacherLi = ul.querySelectorAll('li');
+    var slotsOfCourse = getcourseSlotsAttack(courseName);
+    var activeSlots = slotsForAttack();
+    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
+    var nonActiveTeacherLi = [];
+    var activeTeacherLi = [];
+    allTeacherLi.forEach((teacherLi) => {
+        const teacherSlot = updateSlots(
+            slotsProcessingForCourseList(
+                teacherLi.querySelectorAll('div')[1].innerText,
+            ),
+        );
+        if (isCommonSlot(teacherSlot, consideredSlots)) {
+            teacherLi.classList.add('clashLi');
+            teacherLi.removeEventListener('click', attackLiClick);
+            teacherLi.querySelector('div').classList.add('clash');
+            nonActiveTeacherLi.push(teacherLi);
+        } else {
+            teacherLi.addEventListener('click', attackLiClick);
+            try {
+                teacherLi.classList.remove('clashLi');
+                teacherLi.querySelector('div').classList.remove('clash');
+            } catch (error) {}
+            activeTeacherLi.push(teacherLi);
+        }
+    });
+    // get the ul under that course name in subject area
+    ul.innerHTML = '';
+    activeTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+    nonActiveTeacherLi.forEach((teacherLi) => {
+        ul.appendChild(teacherLi);
+    });
+}
+// Make input radio true on the basis of attackData values
+function makeRadioTrueAttack() {
+    attackData.forEach((courseData) => {
+        var courseName = getCourseNameFromCourseData(courseData);
+        var faculty = courseData.faculty;
+        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
+        teacherLi.querySelector('input[type="radio"]').checked = true;
+    });
+}
+function revertRerrangeAttack() {
+    var allSubject = activeTable.subject;
+    Object.keys(allSubject).forEach((subjectName) => {
+        const subjectNameStr = subjectName.toString();
+        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
+        const TeacherLi = constructTeacherLi(
+            subjectNameStr,
+            allSubject[subjectNameStr],
+        );
+        ulToUpdate.innerHTML = '';
+        TeacherLi.forEach((li) => {
+            ulToUpdate.appendChild(li);
+        });
+        makeRadioTrueAttack();
+    });
+}
+
+function slotsForAttack() {
+    var slots = [];
+    for (var i = 0; i < attackData.length; i++) {
+        slots = slots.concat(attackData[i].slots);
+    }
+    slots = updateSlots(slots);
+    return slots;
+}
+function getcourseSlotsAttack(courseName) {
+    var slots = [];
+    attackData.forEach((el) => {
         const CourseNameData = getCourseNameFromCourseData(el);
         if (
             CourseNameData.toLocaleLowerCase() == courseName.toLocaleLowerCase()
@@ -251,92 +1236,191 @@ function getSlotsOfCourse(courseName) {
     return slots;
 }
 
-// find the subtraction of two arrays
-function subtractArray(arr1, arr2) {
-    //Array2 -Array1
-    arr1.forEach((el) => {
-        if (arr2.includes(el)) {
-            let index = arr2.indexOf(el);
-            if (index !== -1) {
-                // Remove the first occurrence of the element using splice
-                arr2.splice(index, 1);
-            }
-        }
-    });
-    return arr2;
-}
-
-function getAllTeacherLiInSubjectArea(courseName) {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-    for (const span of allSpan) {
-        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-            let allLi =
-                span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
-                    'li',
-                );
-            return allLi;
+function removeRadioFalseAttack(radioButton) {
+    var courseToRemove =
+        radioButton.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+    for (var i = 0; i < attackData.length; ++i) {
+        var attackCourse = getCourseNameFromCourseData(attackData[i]);
+        if (
+            attackCourse.toLocaleLowerCase() ===
+            courseToRemove.toLocaleLowerCase()
+        ) {
+            attackData.splice(i, 1);
+            break;
         }
     }
 }
-// function to check is there any common slot between two arrays
-function isCommonSlot(arr1, arr2) {
-    var result = false;
-    arr1.forEach((el) => {
-        if (arr2.includes(el)) {
-            result = true;
-        }
-    });
-    return result;
+
+function addOnRadioAttack(radioButton) {
+    var current = radioButton; // This radio button is now the currently selected one
+    var courseToRemove =
+        current.parentElement.parentElement.parentElement.querySelector(
+            'h2 .cname',
+        ).innerText;
+
+    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
+    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
+    var currentDropdown =
+        current.parentElement.parentElement.previousElementSibling;
+    var nextDropdown =
+        currentDropdown.parentElement.nextElementSibling.querySelector('div');
+    try {
+        currentDropdown.click();
+        nextDropdown.click();
+    } catch (error) {}
+
+    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
+    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
+    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
+    var credits = getCreditsFromCourseName(courseToRemove);
+
+    var isProject = false;
+
+    var slots = slotsProcessingForCourseList(slotString);
+    var courseId = 0;
+    if (attackData.length != 0) {
+        var lastAddedCourse = attackData[attackData.length - 1];
+        courseId = lastAddedCourse.courseId + 1;
+    }
+    var courseData = {
+        courseId: courseId,
+        courseTitle: courseTitle,
+        faculty: faculty,
+        slots: slots,
+        venue: venue,
+        credits: credits,
+        isProject: isProject,
+        courseCode: courseCode,
+    };
+    attackData.push(courseData);
 }
 
-// function to get the courseName from subject area
-function getCourseListFromSubjectArea() {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-    var courseList = [];
-    for (const span of allSpan) {
-        courseList.push(span.innerText);
+function removeEventListenersAttack() {
+    var listItems = document.querySelectorAll('.dropdown li');
+    for (var i = 0; i < listItems.length; i++) {
+        listItems[i].removeEventListener('click', attackLiClick);
     }
-    return courseList;
 }
 
-function getUlInSubjectArea(courseName) {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-    for (const span of allSpan) {
-        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-            return span.parentElement.parentElement.parentElement.parentElement.querySelector(
-                'ul',
-            );
-        }
+function attackLiClick() {
+    // Get the radio button inside this list item
+    var radioButton = this.querySelector('input[type="radio"]');
+    if (radioButton.checked) {
+        try {
+            radioButton.checked = false;
+            removeRadioFalseAttack(radioButton);
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+        } catch (error) {}
+    } else {
+        radioButton.checked = true; // This radio button is now the currently selected one
+        removeRadioFalseAttack(radioButton);
+        addOnRadioAttack(radioButton);
+
+        revertRerrangeAttack();
+        rearrangeTeacherRefreshAttack();
     }
 }
-// Add event listener to the toggle checkbox
-document
-    .querySelector('#tt-sub-edit-switch')
-    .addEventListener('change', function () {
-        // Update the value of editSub based on the checkbox state
-        editSub = this.checked;
-        if (this.checked) {
-            closeAllDropdowns();
-            document.getElementById('div-for-edit-teacher').style.display =
-                'none';
-            document.getElementById('edit_msg_').style.display = 'block';
-            document.getElementById('edit_msg_').innerText =
-                'Click on the Course to edit it.';
+
+// ------------------ Attack Mode Function Ends Here ------------------
+
+// ================== File Processing ==================
+
+// on upload tt file it process the file and update the activeTable
+// and updates front end
+function processFile(file) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        // Extract the data from the Data URL
+        var base64Data = event.target.result;
+
+        // Decode the base64 string back into a URI-encoded string
+        var uriEncodedData = atob(base64Data);
+
+        // Decode the URI-encoded string back into a JSON string
+        var jsonStr = decodeURIComponent(uriEncodedData);
+
+        // Parse the JSON string back into an object
+        var activeTableUpdate = JSON.parse(jsonStr);
+        activeTableUpdate.id = activeTable.id;
+        activeTableUpdate.name = activeTable.name;
+        timetableStoragePref[activeTable.id] = activeTableUpdate;
+        updateLocalForage();
+        switchTable(activeTable.id);
+        updateDataJsonFromCourseList();
+        updateCredits();
+
+        // Update the UI to reflect the new activeTable
+        // ...
+    };
+    reader.readAsText(file);
+}
+
+// ------------------ File Processing Ends Here ------------------
+
+// ================== Misslenious ==================
+
+// Function to be executed on page load'
+// Add event listener for DOMContentLoaded event
+// show teacher view + refresh and build the course select input
+function showAddTeacherDiv() {
+    document.getElementById('div-for-edit-teacher').style.display = 'none';
+    var addCourseDiv = document.getElementById('div-for-add-course');
+    var addTeacherDiv = document.getElementById('div-for-add-teacher');
+    addCourseDiv.style.display = 'none';
+    addTeacherDiv.style.display = 'block';
+    const courseSelect = document.getElementById('course-select-add-teacher');
+    document.getElementById('slot-input').value = '';
+    courseSelect.innerHTML = '';
+    if (
+        !timetableStoragePref[window.activeTable.id].hasOwnProperty('subject')
+    ) {
+        courseSelect.innerHTML =
+            '<option selected>You need to add courses</option>';
+    } else {
+        if (
+            Object.keys(timetableStoragePref[window.activeTable.id].subject)
+                .length === 0
+        ) {
+            courseSelect.innerHTML =
+                '<option selected>You need to add courses</option>';
         } else {
-            document.getElementById('div-for-edit-course').style.display =
-                'none';
-            document.getElementById('div-for-edit-teacher').style.display =
-                'none';
-            document.getElementById('edit_msg_').style.display = 'block';
-            document.getElementById('edit_msg_').innerText =
-                'Click on the Teacher to edit it.';
-            selectBackgroundRemovalOfPreviousH2s();
-            selectBackgroundRemovalOfPreviousLi();
+            courseSelect.innerHTML = '<option selected>Select Course</option>';
+            Object.keys(
+                timetableStoragePref[window.activeTable.id].subject,
+            ).forEach((key) => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = key;
+                courseSelect.appendChild(option);
+            });
         }
-    });
+    }
+}
+
+function onPageLoad() {
+    fillPage();
+    fillLeftBoxInCoursePanel();
+    activateSortableForCourseList();
+    addEventListnerToCourseList();
+    // if window size is less then 630 show mobile_message
+    if (window.innerWidth < 631) {
+        document.getElementById('mobile_message').style.display = 'block';
+    }
+}
+
+// ------------------ Misslenious Ends Here ------------------
+
+window.editPrefCollapse = editPrefCollapse;
+window.toggleDropdown = toggleDropdown;
+window.closeAllDropdowns = closeAllDropdowns;
+window.openAllDropdowns = openAllDropdowns;
+window.removeInputFieldsInSection = removeInputFieldsInSection;
+
+window.editPrefAddOn = editPrefAddOn;
+window.closeEditPref1 = closeEditPref1;
 
 /*
  *  This file contains the events and functions applied to
@@ -585,7 +1669,7 @@ $(() => {
         addTableToPicker(newTableId, newTableName);
         switchTable(newTableId);
         updateLocalForage();
-        fillPage1();
+        fillLeftBoxInCoursePanel();
     });
 
     /*
@@ -652,7 +1736,7 @@ $(() => {
 
         if (timetableStoragePref.length == 1) {
             $('#tt-picker-dropdown .tt-picker-delete').first().remove();
-            fillPage1();
+            fillLeftBoxInCoursePanel();
         }
     });
 
@@ -826,7 +1910,7 @@ $(() => {
         activeTable.quick = [];
         activeTable['subject'] = {};
         updateLocalForage();
-        fillPage1();
+        fillLeftBoxInCoursePanel();
     });
 });
 
@@ -870,18 +1954,14 @@ function appendHeader($layout, width) {
     return $layout.append($header).append($title);
 }
 
-/*
-    Function to update the saved data
- */
+// Function to update the saved data
 function updateLocalForage() {
     localforage
         .setItem('timetableStoragePref', timetableStoragePref)
         .catch(console.error);
 }
 
-/*
-    Function to get the table index
- */
+// Function to get the table index
 function getTableIndex(id) {
     return timetableStoragePref.findIndex((el) => el.id == id);
 }
@@ -922,7 +2002,7 @@ function switchTable(tableId) {
 function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
     fillPage();
-    fillPage1();
+    fillLeftBoxInCoursePanel();
     closeEditPref();
     closeEditPref1();
 }
@@ -1427,24 +2507,33 @@ window.clearTimetable = () => {
     }
 };
 
-function generateCourseName(courseInput) {
-    var courseListStr = courseInput.split('-');
-    let courseName = '';
-    for (i = 0; i < courseListStr.length; i++) {
-        courseListStr[i] = courseListStr[i].trim();
-    }
-    if (courseListStr.length > 1) {
-        var part2 = '';
-        for (var i = 1; i < courseListStr.length; i++) {
-            part2 += '-' + courseListStr[i];
+// Add event listener to the toggle checkbox
+document
+    .querySelector('#tt-sub-edit-switch')
+    .addEventListener('change', function () {
+        // Update the value of editSub based on the checkbox state
+        editSub = this.checked;
+        if (this.checked) {
+            closeAllDropdowns();
+            document.getElementById('div-for-edit-teacher').style.display =
+                'none';
+            document.getElementById('edit_msg_').style.display = 'block';
+            document.getElementById('edit_msg_').innerText =
+                'Click on the Course to edit it.';
+        } else {
+            document.getElementById('div-for-edit-course').style.display =
+                'none';
+            document.getElementById('div-for-edit-teacher').style.display =
+                'none';
+            document.getElementById('edit_msg_').style.display = 'block';
+            document.getElementById('edit_msg_').innerText =
+                'Click on the Teacher to edit it.';
+            selectBackgroundRemovalOfPreviousH2s();
+            selectBackgroundRemovalOfPreviousLi();
         }
-        courseName = courseListStr[0] + part2;
-    } else {
-        courseName = courseListStr[0];
-    }
-    return courseName;
-}
-// save added course
+    });
+
+// Add new course on click of add button
 document
     .getElementById('saveSubjectModal')
     .addEventListener('click', function () {
@@ -1452,7 +2541,7 @@ document
             .getElementById('course-input_remove')
             .value.trim();
 
-        courseName = generateCourseName(courseName);
+        courseName = processRawCourseName(courseName);
         const credits = parseInt(
             document.getElementById('credits-input').value.trim(),
         );
@@ -1494,11 +2583,12 @@ document
         const spanCourseAddSuccess = document.getElementById('span-course-add');
         var spanMsg = '';
         var spanMsgColor = '';
+
         if (courseName === '' || isNaN(credits)) {
             if (courseName === '' && isNaN(credits)) {
                 spanMsg = 'Course Name and Credits are empty';
                 spanMsgColor = 'red';
-            } else if (courseName === '') {
+            } else if (courseName === '' || courseName === undefined) {
                 spanMsg = 'Course Name is empty';
                 spanMsgColor = 'red';
             } else if (isNaN(credits)) {
@@ -1553,53 +2643,6 @@ document
         }, 5000);
     });
 
-// show teacher view + refresh and build the course select input
-function showAddTeacherDiv() {
-    document.getElementById('div-for-edit-teacher').style.display = 'none';
-    var addCourseDiv = document.getElementById('div-for-add-course');
-    var addTeacherDiv = document.getElementById('div-for-add-teacher');
-    addCourseDiv.style.display = 'none';
-    addTeacherDiv.style.display = 'block';
-    const courseSelect = document.getElementById('course-select-add-teacher');
-    document.getElementById('slot-input').value = '';
-    courseSelect.innerHTML = '';
-    if (
-        !timetableStoragePref[window.activeTable.id].hasOwnProperty('subject')
-    ) {
-        courseSelect.innerHTML =
-            '<option selected>You need to add courses</option>';
-    } else {
-        if (
-            Object.keys(timetableStoragePref[window.activeTable.id].subject)
-                .length === 0
-        ) {
-            courseSelect.innerHTML =
-                '<option selected>You need to add courses</option>';
-        } else {
-            courseSelect.innerHTML = '<option selected>Select Course</option>';
-            Object.keys(
-                timetableStoragePref[window.activeTable.id].subject,
-            ).forEach((key) => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.text = key;
-                courseSelect.appendChild(option);
-            });
-        }
-    }
-}
-
-// course name from course data
-function getCourseNameFromCourseData(courseData) {
-    var courseName = '';
-    if (courseData.courseCode === '') {
-        courseName = courseData.courseTitle;
-    } else {
-        courseName = courseData.courseCode + '-' + courseData.courseTitle;
-    }
-    return courseName;
-}
-
 // load teacher view
 document
     .getElementById('tt-teacher-add')
@@ -1607,63 +2650,11 @@ document
         showAddTeacherDiv();
     });
 
-// close the edit view
-function closeEditPref() {
-    document.getElementById('tt-subject-edit').style.display = 'block';
-    document.getElementById('tt-subject-add').style.display = 'block';
-    document.getElementById('tt-teacher-add').style.display = 'block';
-    document.getElementById('tt-subject-collapse').style.display = 'none';
-    document.getElementById('tt-subject-done').style.display = 'none';
-    document.getElementById('div-for-add-teacher').style.display = 'block';
-    document.getElementById('tt-sub-edit-switch-div').style.display = 'none';
-    document.getElementById('tt-sub-edit-switch').checked = false;
-    document.getElementById('div-for-edit-course').style.display = 'none';
-    document.getElementById('div-for-edit-teacher').style.display = 'none';
-    editSub = false;
-    createSubjectJsonFromHtml();
-    addEventListeners();
-    revertRerrange();
-    rearrangeTeacherRefresh();
-    showAddTeacherDiv();
-    document.getElementById('edit_msg_').innerText =
-        'Click on the Teacher to edit it.';
-}
 document
     .getElementById('tt-subject-done')
     .addEventListener('click', closeEditPref);
 
-function createTeacherLI(teacherData) {
-    const li = document.createElement('li');
-    li.style.backgroundColor = teacherData.color;
-
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = teacherData.courseName;
-    input.value = teacherData.teacherName;
-
-    const teacherNameDiv = document.createElement('div');
-    teacherNameDiv.style.paddingLeft = '4%';
-    teacherNameDiv.style.width = '47%';
-    teacherNameDiv.innerText = teacherData.teacherName;
-
-    const slotsDiv = document.createElement('div');
-    slotsDiv.style.width = '38%';
-    slotsDiv.style.opacity = '70%';
-    slotsDiv.innerText = teacherData.slots;
-
-    const venueDiv = document.createElement('div');
-    venueDiv.style.width = '15%';
-    venueDiv.style.opacity = '70%';
-    venueDiv.innerText = teacherData.venue;
-
-    li.appendChild(input);
-    li.appendChild(teacherNameDiv);
-    li.appendChild(slotsDiv);
-    li.appendChild(venueDiv);
-    return li;
-}
-
-// Save teacher
+// Add New teacher
 document
     .getElementById('saveTeacherModal')
     .addEventListener('click', function () {
@@ -1792,433 +2783,18 @@ document
         addEventListeners();
     });
 
-// Removal of selection background
-
-function selectBackgroundRemovalOfPreviousH2s() {
-    let courseDiv = document.getElementById('div-for-edit-course');
-    var courseNameToRemoveBlueFrom = courseDiv.querySelector(
-        '#course-input-edit-pre',
-    ).innerText;
-    var courseDivPre = getCourseDivInSubjectArea(courseNameToRemoveBlueFrom);
-    if (courseDivPre) {
-        courseDivPre.classList.remove('select_background');
-    }
-}
-function selectBackgroundRemovalOfPreviousLi() {
-    let teacherDiv = document.getElementById('div-for-edit-teacher');
-    var teacherNameToRemoveSelectFrom = teacherDiv.querySelector(
-        '#teacher-input_remove-edit-pre',
-    ).value;
-    let courseNameOfRemovalTeacher = document.getElementById(
-        'teacher-edit-course',
-    ).value;
-    var teacherDivPre = getTeacherLiInSubjectArea(
-        courseNameOfRemovalTeacher,
-        teacherNameToRemoveSelectFrom,
-    );
-    if (teacherDivPre) {
-        teacherDivPre.classList.remove('select_background');
-    }
-}
 // On click of edit button
 document.getElementById('tt-subject-edit').addEventListener('click', editPref);
-function editPref() {
-    editTeacher = true;
-    document.getElementById('tt-subject-edit').style.display = 'none';
-    document.getElementById('tt-subject-add').style.display = 'none';
-    document.getElementById('tt-teacher-add').style.display = 'none';
-    document.getElementById('div-for-add-teacher').style.display = 'none';
-    document.getElementById('div-for-add-course').style.display = 'none';
-    document.getElementById('tt-subject-collapse').style.display = 'block';
-    document.getElementById('tt-subject-done').style.display = 'block';
-    document.getElementById('tt-sub-edit-switch-div').style.display = 'block';
-    document.getElementById('edit_msg_').style.display = 'block';
-    openAllDropdowns();
-    removeEventListeners();
-    revertRerrange();
-    removeInputFieldsInSection('subjectArea');
-    // Add event listeners to .h2s div elements
-    document.querySelectorAll('.h2s').forEach((div) => {
-        div.addEventListener('click', function () {
-            if (editSub === true) {
-                document.getElementById('edit_msg_').style.display = 'none';
-                const subjectName = this.querySelector('.cname').innerText;
-                let credit = this.querySelector('h4')
-                    .innerText.replace('[', '')
-                    .replace(']', '');
-                credit = parseInt(credit);
-                let courseDiv = document.getElementById('div-for-edit-course');
-                selectBackgroundRemovalOfPreviousH2s();
-                // add class to this
-                this.classList.add('select_background');
 
-                courseDiv.style.display = 'block';
-                courseDiv.querySelector('#course-input_edit').value =
-                    subjectName;
-                courseDiv.querySelector('#credits-input-edit').value = credit;
-                courseDiv.querySelector('#course-input-edit-pre').innerText =
-                    subjectName;
-                courseDiv.querySelector('#credit-input-edit-pre').innerText =
-                    credit;
-            }
-        });
-    });
-
-    // Add event listeners to li items
-    document.querySelectorAll('li').forEach((li) => {
-        li.addEventListener('click', function () {
-            if (editSub === false && editTeacher === true) {
-                document.getElementById('edit_msg_').style.display = 'none';
-                document.getElementById('div-for-edit-teacher').style.display =
-                    'block';
-                var allDivInLi = this.querySelectorAll('div');
-                const courseName =
-                    this.parentElement.parentElement.querySelector(
-                        '.cname',
-                    ).innerText;
-                const teacherName = allDivInLi[0].innerText;
-                let slot = allDivInLi[1].innerText;
-                let venue = allDivInLi[2].innerText;
-                const color = this.style.backgroundColor;
-                if (slot === 'SLOTS') {
-                    slot = '';
-                }
-                if (venue === 'VENUE') {
-                    venue = '';
-                }
-
-                selectBackgroundRemovalOfPreviousLi();
-                this.classList.add('select_background');
-                document.getElementById('teacher-input_remove-edit').value =
-                    teacherName;
-                document.getElementById('slot-input-edit').value = slot;
-                document.getElementById('venue-input-edit').value = venue;
-                document.getElementById('teacher-edit-course').value =
-                    courseName;
-                document.getElementById('color1-select-edit').value = color;
-                document.getElementById('teacher-input_remove-edit-pre').value =
-                    teacherName;
-            }
-        });
-    });
-}
-
-// Targets the li to make it toggable when clicked anywhere on the li element eg the teacher name list
-function addEventListeners() {
-    var listItems = document.querySelectorAll('.dropdown li');
-    for (var i = 0; i < listItems.length; i++) {
-        listItems[i].addEventListener('click', liClick);
-    }
-}
-
-// Function to remove all event listeners
-function removeEventListeners() {
-    var listItems = document.querySelectorAll('.dropdown li');
-    for (var i = 0; i < listItems.length; i++) {
-        listItems[i].removeEventListener('click', liClick);
-    }
-}
-
-// What happens after cliking on li element anywhere
-function liClick() {
-    // Get the radio button inside this list item
-    var radioButton = this.querySelector('input[type="radio"]');
-    if (radioButton.checked) {
-        try {
-            radioButton.checked = false;
-            removeRadioFalse(radioButton);
-            updateDataJsonFromCourseList();
-            revertRerrange();
-            rearrangeTeacherRefresh();
-        } catch (error) {}
-    } else {
-        radioButton.checked = true; // This radio button is now the currently selected one
-        addOnRadioTrue(radioButton);
-        updateDataJsonFromCourseList();
-        revertRerrange();
-        rearrangeTeacherRefresh();
-    }
-}
-
-// delete from subject
-function removeCourseFromSubject(dataCourseValue) {
-    var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
-    for (var i = 0; i < activeTable.data.length; ++i) {
-        if (activeTable.data[i].courseId == courseId) {
-            activeTable.data.splice(i, 1);
-            break;
-        }
-    }
-}
-// get course from tr
-function getCourseNameAndFacultyFromTr(trElement) {
-    var td = trElement.querySelectorAll('td');
-    if (td[1].innerText === '') {
-        var courseII = td[2].innerText;
-    } else {
-        var courseII = td[1].innerText + '-' + td[2].innerText;
-    }
-
-    return [courseII, td[3].innerText];
-}
-
-// Remove Course
-// Removing all element related to that course code from tt and course list
-function courseRemove(courseToRemove) {
-    var courseList = document.getElementById('courseList-tbody');
-    // Loop through each <tr> element and log the value of the data-course attribute
-    var trElements = courseList.querySelectorAll('tr');
-    trElements.forEach(function (trElement) {
-        var dataCourseValue = trElement.getAttribute('data-course');
-        var courseII = getCourseNameAndFacultyFromTr(trElement)[0];
-        if (courseToRemove === courseII) {
-            removeCourseFromTimetable(dataCourseValue);
-            removeCourseFromCourseList(dataCourseValue);
-            removeCourseFromSubject(dataCourseValue);
-        }
-    });
-}
-
-// Remove the course from time table on deselection of radio button
-function removeRadioFalse(radioButton) {
-    var courseToRemove =
-        radioButton.parentElement.parentElement.parentElement.querySelector(
-            'h2 .cname',
-        ).innerText;
-    courseRemove(courseToRemove);
-}
-
-// slots processing for course list
-function slotsProcessingForCourseList(slotString) {
-    var slots = (function () {
-        var arr = [];
-
-        try {
-            slotString.split(/\s*\+\s*/).forEach(function (el) {
-                if (el && $('.' + el)) {
-                    arr.push(el);
-                }
-            });
-        } catch (error) {
-            arr = [];
-        }
-
-        return arr;
-    })();
-    return slots;
-}
-//function to get courseCode and Course Title from courseName
-function getCourseCodeAndCourseTitle(courseName) {
-    var courseName = courseName.split('-');
-    if (courseName.length > 1) {
-        var courseCode = courseName[0].trim();
-        var part2 = '';
-        for (var i = 1; i < courseName.length; i++) {
-            part2 += courseName[i].trim() + '-';
-        }
-        var courseTitle = part2.slice(0, -1);
-    } else {
-        var courseTitle = courseName[0].trim();
-        var courseCode = '';
-    }
-    return [courseCode, courseTitle];
-}
-
-// Function to add to timetable and in course table when clicked on radio button
-function addOnRadioTrue(radioButton) {
-    var current = radioButton; // This radio button is now the currently selected one
-    var courseToRemove =
-        current.parentElement.parentElement.parentElement.querySelector(
-            'h2 .cname',
-        ).innerText;
-    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
-    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
-    courseRemove(courseToRemove);
-
-    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
-    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
-    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
-    var credits = getCreditsFromCourseName(courseToRemove);
-
-    var isProject = false;
-
-    var slots = slotsProcessingForCourseList(slotString);
-    var courseId = 0;
-    if (activeTable.data.length != 0) {
-        var lastAddedCourse = activeTable.data[activeTable.data.length - 1];
-        courseId = lastAddedCourse.courseId + 1;
-    }
-    var courseData = {
-        courseId: courseId,
-        courseTitle: courseTitle,
-        faculty: faculty,
-        slots: slots,
-        venue: venue,
-        credits: credits,
-        isProject: isProject,
-        courseCode: courseCode,
-    };
-    activeTable.data.push(courseData);
-    addCourseToCourseList(courseData);
-    addCourseToTimetable(courseData);
-    updateLocalForage();
-}
-
-function constructTeacherLi(courseName, subject) {
-    var result = [];
-    for (const teacherName in subject.teacher) {
-        var slotsInput = subject.teacher[teacherName].slots;
-        var venueInput = subject.teacher[teacherName].venue;
-        const colorInput = subject.teacher[teacherName].color;
-        if (slotsInput === '') {
-            slotsInput = 'SLOTS';
-        }
-        if (venueInput === '') {
-            venueInput = 'VENUE';
-        }
-        const teacherData = {
-            courseName: courseName,
-            slots: slotsInput,
-            venue: venueInput,
-            color: colorInput,
-            teacherName: teacherName,
-        };
-        const li = createTeacherLI(teacherData);
-        result.push(li);
-    }
-    return result;
-}
-
-// Function to create the HTML for subject dropdown
-function createSubjectDropdown(courseName, subject) {
-    const dropdown = document.createElement('div');
-    dropdown.classList.add('dropdown');
-    dropdown.classList.add('dropdown-teacher');
-
-    const dropdownHeading = document.createElement('div');
-    dropdownHeading.classList.add('dropdown-heading');
-    dropdownHeading.setAttribute('onclick', 'toggleDropdown(this)');
-
-    const h2sDiv = document.createElement('div');
-    h2sDiv.classList.add('h2s');
-    h2sDiv.style.display = 'flex';
-    h2sDiv.style.flexDirection = 'row';
-
-    const cName = document.createElement('span');
-    cName.classList.add('cname');
-    cName.innerText = courseName;
-    const h2 = document.createElement('h2');
-    h2.innerText = '';
-    h2.appendChild(cName);
-
-    const span = document.createElement('p');
-    span.classList.add('arrow');
-
-    const h4 = document.createElement('h4');
-    h4.innerText = `[${subject.credits}]`;
-    h2.appendChild(span);
-    h2sDiv.appendChild(h2);
-    h2sDiv.appendChild(h4);
-
-    dropdownHeading.appendChild(h2sDiv);
-
-    const dropdownList = document.createElement('ul');
-    dropdownList.classList.add('dropdown-list');
-
-    const allTeacherLi = constructTeacherLi(courseName, subject);
-    allTeacherLi.forEach((li) => {
-        dropdownList.appendChild(li);
-    });
-    dropdown.appendChild(dropdownHeading);
-    dropdown.appendChild(dropdownList);
-
-    return dropdown;
-}
-
-// Function to fill the timetable and course list/ subjectArea
-function fillPage1() {
-    const activeId = window.activeTable.id;
-    const activeTable = timetableStoragePref[activeId];
-
-    if (activeTable.subject && Object.keys(activeTable.subject).length > 0) {
-        const leftBox = document.getElementById('subjectArea');
-        leftBox.innerHTML = '';
-
-        for (const courseName in activeTable.subject) {
-            const subject = activeTable.subject[courseName];
-            const dropdown = createSubjectDropdown(courseName, subject);
-            leftBox.appendChild(dropdown);
-        }
-    } else {
-        const leftBox = document.getElementById('subjectArea');
-        leftBox.innerHTML = '';
-    }
-    rearrangeTeacherRefresh();
-}
-
-// Function to be executed on page load'
 // Load the subjectArea show all info
 document.addEventListener('DOMContentLoaded', onPageLoad);
-function onPageLoad() {
-    fillPage();
-    fillPage1();
-    activateSortableForCourseList();
-    addEventListnerToCourseList();
-    // if window size is less then 630 show mobile_message
-    if (window.innerWidth < 631) {
-        document.getElementById('mobile_message').style.display = 'block';
-    }
-}
-// Add event listener for DOMContentLoaded event
-
-//function to save the json format of current state of the subject area
-function createSubjectJsonFromHtml() {
-    let result = {};
-    let dropdowns = document.querySelectorAll('.dropdown-teacher');
-
-    dropdowns.forEach((dropdown) => {
-        let courseNameElement = dropdown.querySelector('h2 .cname');
-        let courseName = courseNameElement
-            ? courseNameElement.textContent
-            : null;
-        let credits = parseInt(
-            dropdown
-                .querySelector('h4')
-                .textContent.replace('[', '')
-                .replace(']', ''),
-        );
-        let teachers = dropdown.querySelectorAll('li');
-
-        let teacherData = {};
-
-        teachers.forEach((teacher) => {
-            let teacherName = teacher.querySelectorAll('div')[0].textContent;
-            let slots = teacher.querySelectorAll('div')[1].textContent;
-            let venue = teacher.querySelectorAll('div')[2].textContent;
-            let color = teacher.style.backgroundColor;
-
-            teacherData[teacherName] = {
-                slots: slots,
-                venue: venue,
-                color: color,
-            };
-        });
-
-        result[courseName] = {
-            teacher: teacherData,
-            credits: credits,
-        };
-    });
-    timetableStoragePref[window.activeTable.id].subject = result;
-    updateLocalForage();
-}
 
 // Edit Subject Save button cliuck event
 document
     .getElementById('saveSubjectEditModal')
     .addEventListener('click', function () {
         let courseDiv = document.getElementById('div-for-edit-course');
-        var courseName = generateCourseName(
+        var courseName = processRawCourseName(
             courseDiv.querySelector('#course-input_edit').value.trim(),
         );
         var credits = parseInt(
@@ -2368,27 +2944,7 @@ document
         if (venueInput === '') {
             venueInput = 'VENUE';
         }
-        function updateTeacherInCourseList(
-            trElementCourseList,
-            teacherName,
-            slotsInput,
-            venueInput,
-        ) {
-            var td = trElementCourseList.querySelectorAll('td');
-            td[3].innerText = teacherName;
-            td[0].innerText = slotsInput;
-            td[4].innerText = venueInput;
-            updateDataJsonFromCourseList();
-            var courseIdNum = trElementCourseList.getAttribute('data-course');
-            removeCourseFromTimetable(courseIdNum);
-            courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
-            for (var i = 0; i < activeTable.data.length; ++i) {
-                if (activeTable.data[i].courseId == courseIdNum) {
-                    addCourseToTimetable(activeTable.data[i]);
-                    break;
-                }
-            }
-        }
+
         const colorInput = document.getElementById('color1-select-edit').value;
         const spanTeacherMsg = document.getElementById('span-teacher-edit');
         const brHideTeacher = document.getElementById('hide_br_teacher-edit');
@@ -2546,152 +3102,6 @@ document
         }
     });
 
-// Function to find the li element of the teacher
-function getTeacherLiInSubjectArea(courseName, teacherName) {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-
-    for (const span of allSpan) {
-        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-            var allLi =
-                span.parentElement.parentElement.parentElement.nextElementSibling.querySelectorAll(
-                    'li',
-                );
-            for (const li of allLi) {
-                const allDiv = li.querySelectorAll('div');
-                if (
-                    allDiv[0].innerText.toLowerCase() ===
-                    teacherName.toLowerCase()
-                ) {
-                    return li;
-                }
-            }
-        }
-    }
-}
-function getCourseDivInSubjectArea(courseName) {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-    for (const span of allSpan) {
-        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-            return span.parentElement.parentElement;
-        }
-    }
-}
-// Function to find/get tr element of the course
-function getCourseTrInCourseList(courseName, teacherName) {
-    var courseList = document.getElementById('courseList-tbody');
-    var trElements = courseList.querySelectorAll('tr');
-    for (const trElement of trElements) {
-        var tempData = getCourseNameAndFacultyFromTr(trElement); // [courseName,faculty]
-        if (tempData[0] === courseName) {
-            if (teacherName) {
-                if (tempData[1] === teacherName) {
-                    return trElement;
-                }
-            } else {
-                return trElement;
-            }
-        }
-    }
-}
-
-//function to create sunject json from the course list
-function updateDataJsonFromCourseList() {
-    let courseList = document.getElementById('courseList-tbody');
-    let trElements = courseList.querySelectorAll('tr');
-    activeTable.data = [];
-    trElements.forEach((trElement) => {
-        let td = trElement.querySelectorAll('td');
-        let courseName = td[2].innerText;
-        let faculty = td[3].innerText;
-        let courseCode = td[1].innerText;
-        let slots = slotsProcessingForCourseList(td[0].innerText);
-        let venue = td[4].innerText;
-        let credits = parseInt(td[5].innerText);
-        let isProject = trElement.getAttribute('data-is-project');
-        let dataCourseValue = trElement.getAttribute('data-course');
-        let courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
-
-        let courseData = {
-            courseId: courseId,
-            courseTitle: courseName,
-            faculty: faculty,
-            slots: slots,
-            venue: venue,
-            credits: credits,
-            isProject: isProject,
-            courseCode: courseCode,
-        };
-        activeTable.data.push(courseData);
-    });
-    updateLocalForage();
-}
-
-// Sortable for course list after dropping should do something
-function activateSortableForCourseList() {
-    var isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
-        );
-
-    var courseList = document.querySelector('#course-list tbody');
-
-    Sortable.create(courseList, {
-        animation: 150,
-        delay: isMobile ? 170 : 6, // Different delay for mobile and desktop
-        chosenClass: 'sortable-chosen1',
-
-        onEnd: function () {
-            updateDataJsonFromCourseList();
-        },
-    });
-}
-
-// function to get credits from course name in subject area
-function getCreditsFromCourseName(courseName) {
-    var subjectArea = document.getElementById('subjectArea');
-    var allSpan = subjectArea.querySelectorAll('.cname');
-    for (const span of allSpan) {
-        if (span.innerText.toLowerCase() === courseName.toLowerCase()) {
-            return parseInt(
-                span.parentElement.parentElement
-                    .querySelector('h4')
-                    .innerText.replace('[', '')
-                    .replace(']', ''),
-            );
-        }
-    }
-}
-
-// Make input radio true on the bases of activeTable.data values
-function makeRadioTrueOnPageLoad() {
-    activeTable.data.forEach((courseData) => {
-        if (courseData.courseCode === '') {
-            var courseName = courseData.courseTitle;
-        } else {
-            var courseName =
-                courseData.courseCode + '-' + courseData.courseTitle;
-        }
-        var faculty = courseData.faculty;
-        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
-        teacherLi.querySelector('input[type="radio"]').checked = true;
-    });
-}
-function makeRadioFalseOnNeed() {
-    activeTable.data.forEach((courseData) => {
-        if (courseData.courseCode === '') {
-            var courseName = courseData.courseTitle;
-        } else {
-            var courseName =
-                courseData.courseCode + '-' + courseData.courseTitle;
-        }
-        var faculty = courseData.faculty;
-        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
-        teacherLi.querySelector('input[type="radio"]').checked = false;
-    });
-}
-
 // Delete for Subject Edit
 document
     .getElementById('deleteSubjectEdit')
@@ -2731,269 +3141,7 @@ document
         }
     });
 
-//rearrange the teacherli within the subjectArea if slots are clashing
-function rearrangeTeacherRefresh() {
-    const courseList = getCourseListFromSubjectArea();
-    courseList.forEach((courseName) => {
-        rearrangeTeacherLiInSubjectArea(courseName);
-    });
-    addEventListeners();
-}
-function rearrangeTeacherLiInSubjectArea(courseName) {
-    var ul = getUlInSubjectArea(courseName);
-    var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
-    var slotsOfCourse = getSlotsOfCourse(courseName);
-    var activeSlots = getSlots();
-    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
-    var nonActiveTeacherLi = [];
-    var activeTeacherLi = [];
-    allTeacherLi.forEach((teacherLi) => {
-        const teacherSlot = updateSlots(
-            slotsProcessingForCourseList(
-                teacherLi.querySelectorAll('div')[1].innerText,
-            ),
-        );
-        if (isCommonSlot(teacherSlot, consideredSlots)) {
-            teacherLi.classList.add('clashLi');
-            teacherLi.querySelector('div').classList.add('clash');
-            nonActiveTeacherLi.push(teacherLi);
-        } else {
-            try {
-                teacherLi.classList.remove('clashLi');
-                teacherLi.querySelector('div').classList.remove('clash');
-            } catch (error) {}
-            activeTeacherLi.push(teacherLi);
-        }
-    });
-    // get the ul under that course name in subject area
-    ul.innerHTML = '';
-    activeTeacherLi.forEach((teacherLi) => {
-        ul.appendChild(teacherLi);
-    });
-    nonActiveTeacherLi.forEach((teacherLi) => {
-        ul.appendChild(teacherLi);
-    });
-}
-
-function revertRerrange() {
-    var allSubject = activeTable.subject;
-    Object.keys(allSubject).forEach((subjectName) => {
-        const subjectNameStr = subjectName.toString();
-        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
-        const TeacherLi = constructTeacherLi(
-            subjectNameStr,
-            allSubject[subjectNameStr],
-        );
-        ulToUpdate.innerHTML = '';
-        TeacherLi.forEach((li) => {
-            ulToUpdate.appendChild(li);
-        });
-        makeRadioTrueOnPageLoad();
-    });
-}
-
-// Attack Mode Code
-
-function rearrangeTeacherRefreshAttack() {
-    const courseList = getCourseListFromSubjectArea();
-    courseList.forEach((courseName) => {
-        rearrangeTeacherLiInSubjectAreaAttack(courseName);
-    });
-}
-
-function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
-    var ul = getUlInSubjectArea(courseName);
-    var allTeacherLi = getAllTeacherLiInSubjectArea(courseName);
-    var slotsOfCourse = getcourseSlotsAttack(courseName);
-    var activeSlots = slotsForAttack();
-    var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
-    var nonActiveTeacherLi = [];
-    var activeTeacherLi = [];
-    allTeacherLi.forEach((teacherLi) => {
-        const teacherSlot = updateSlots(
-            slotsProcessingForCourseList(
-                teacherLi.querySelectorAll('div')[1].innerText,
-            ),
-        );
-        if (isCommonSlot(teacherSlot, consideredSlots)) {
-            teacherLi.classList.add('clashLi');
-            teacherLi.removeEventListener('click', attackLiClick);
-            teacherLi.querySelector('div').classList.add('clash');
-            nonActiveTeacherLi.push(teacherLi);
-        } else {
-            teacherLi.addEventListener('click', attackLiClick);
-            try {
-                teacherLi.classList.remove('clashLi');
-                teacherLi.querySelector('div').classList.remove('clash');
-            } catch (error) {}
-            activeTeacherLi.push(teacherLi);
-        }
-    });
-    // get the ul under that course name in subject area
-    ul.innerHTML = '';
-    activeTeacherLi.forEach((teacherLi) => {
-        ul.appendChild(teacherLi);
-    });
-    nonActiveTeacherLi.forEach((teacherLi) => {
-        ul.appendChild(teacherLi);
-    });
-}
-// Make input radio true on the basis of attackData values
-function makeRadioTrueAttack() {
-    attackData.forEach((courseData) => {
-        if (courseData.courseCode === '') {
-            var courseName = courseData.courseTitle;
-        } else {
-            var courseName =
-                courseData.courseCode + '-' + courseData.courseTitle;
-        }
-        var faculty = courseData.faculty;
-        var teacherLi = getTeacherLiInSubjectArea(courseName, faculty);
-        teacherLi.querySelector('input[type="radio"]').checked = true;
-    });
-}
-function revertRerrangeAttack() {
-    var allSubject = activeTable.subject;
-    Object.keys(allSubject).forEach((subjectName) => {
-        const subjectNameStr = subjectName.toString();
-        const ulToUpdate = getUlInSubjectArea(subjectNameStr);
-        const TeacherLi = constructTeacherLi(
-            subjectNameStr,
-            allSubject[subjectNameStr],
-        );
-        ulToUpdate.innerHTML = '';
-        TeacherLi.forEach((li) => {
-            ulToUpdate.appendChild(li);
-        });
-        makeRadioTrueAttack();
-    });
-}
-
-function addEventListenersAttack() {
-    var listItems = document.querySelectorAll('.dropdown li');
-    for (var i = 0; i < listItems.length; i++) {
-        listItems[i].addEventListener('click', attackLiClick);
-    }
-}
-function removeEventListenersAttack() {
-    var listItems = document.querySelectorAll('.dropdown li');
-    for (var i = 0; i < listItems.length; i++) {
-        listItems[i].removeEventListener('click', attackLiClick);
-    }
-}
-
-function slotsForAttack() {
-    var slots = [];
-    for (var i = 0; i < attackData.length; i++) {
-        slots = slots.concat(attackData[i].slots);
-    }
-    slots = updateSlots(slots);
-    return slots;
-}
-function getcourseSlotsAttack(courseName) {
-    var slots = [];
-    attackData.forEach((el) => {
-        const CourseNameData = getCourseNameFromCourseData(el);
-        if (
-            CourseNameData.toLocaleLowerCase() == courseName.toLocaleLowerCase()
-        ) {
-            el.slots.forEach((slot) => {
-                if (!slots.includes(slot)) {
-                    slots.push(slot);
-                }
-            });
-        }
-    });
-    slots = updateSlots(slots);
-    return slots;
-}
-
-function removeRadioFalseAttack(radioButton) {
-    var courseToRemove =
-        radioButton.parentElement.parentElement.parentElement.querySelector(
-            'h2 .cname',
-        ).innerText;
-    for (var i = 0; i < attackData.length; ++i) {
-        var attackCourse = getCourseNameFromCourseData(attackData[i]);
-        if (
-            attackCourse.toLocaleLowerCase() ===
-            courseToRemove.toLocaleLowerCase()
-        ) {
-            attackData.splice(i, 1);
-            break;
-        }
-    }
-}
-
-function addOnRadioAttack(radioButton) {
-    var current = radioButton; // This radio button is now the currently selected one
-    var courseToRemove =
-        current.parentElement.parentElement.parentElement.querySelector(
-            'h2 .cname',
-        ).innerText;
-
-    var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
-    var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
-    var dropdownUlRemoveShow = current.parentElement.parentElement;
-    var dropdownDivRemoveOpen = dropdownUlRemoveShow.previousElementSibling;
-    try {
-        var dropdownDivAddOpen =
-            dropdownDivRemoveOpen.parentElement.nextElementSibling;
-        var dropdownUlAddShow = dropdownDivAddOpen.querySelector('ul');
-        var dropdownDivAddOpen =
-            dropdownDivRemoveOpen.parentElement.nextElementSibling;
-        var dropdownUlAddShow = dropdownDivAddOpen.querySelector('ul');
-        dropdownUlRemoveShow.classList.remove('show');
-        dropdownDivRemoveOpen.classList.remove('open');
-        dropdownDivAddOpen.classList.add('open');
-        dropdownUlAddShow.classList.add('show');
-    } catch (error) {}
-
-    var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
-    var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
-    var venue = current.parentElement.querySelectorAll('div')[2].innerText;
-    var credits = getCreditsFromCourseName(courseToRemove);
-
-    var isProject = false;
-
-    var slots = slotsProcessingForCourseList(slotString);
-    var courseId = 0;
-    if (attackData.length != 0) {
-        var lastAddedCourse = attackData[attackData.length - 1];
-        courseId = lastAddedCourse.courseId + 1;
-    }
-    var courseData = {
-        courseId: courseId,
-        courseTitle: courseTitle,
-        faculty: faculty,
-        slots: slots,
-        venue: venue,
-        credits: credits,
-        isProject: isProject,
-        courseCode: courseCode,
-    };
-    attackData.push(courseData);
-}
-
-function attackLiClick() {
-    // Get the radio button inside this list item
-    var radioButton = this.querySelector('input[type="radio"]');
-    if (radioButton.checked) {
-        try {
-            radioButton.checked = false;
-            removeRadioFalseAttack(radioButton);
-            revertRerrangeAttack();
-            rearrangeTeacherRefreshAttack();
-        } catch (error) {}
-    } else {
-        radioButton.checked = true; // This radio button is now the currently selected one
-        removeRadioFalseAttack(radioButton);
-        addOnRadioAttack(radioButton);
-
-        revertRerrangeAttack();
-        rearrangeTeacherRefreshAttack();
-    }
-}
+// ==================== Attack Mode ====================
 
 // Add event listener to the toggle checkbox
 document
@@ -3080,36 +3228,8 @@ document
         URL.revokeObjectURL(url);
     });
 
-function processFile(file) {
-    var reader = new FileReader();
-    reader.onload = function (event) {
-        // Extract the data from the Data URL
-        var base64Data = event.target.result;
-
-        // Decode the base64 string back into a URI-encoded string
-        var uriEncodedData = atob(base64Data);
-
-        // Decode the URI-encoded string back into a JSON string
-        var jsonStr = decodeURIComponent(uriEncodedData);
-
-        // Parse the JSON string back into an object
-        var activeTableUpdate = JSON.parse(jsonStr);
-        activeTableUpdate.id = activeTable.id;
-        activeTableUpdate.name = activeTable.name;
-        timetableStoragePref[activeTable.id] = activeTableUpdate;
-        updateLocalForage();
-        switchTable(activeTable.id);
-        updateDataJsonFromCourseList();
-        updateCredits();
-
-        // Update the UI to reflect the new activeTable
-        // ...
-    };
-    reader.readAsText(file);
-}
-// on click on the load data and on upload of json file the data should be loaded to the activeTable
-// and the page should be refreshed the data should be loaded to the activeTable and check the structure is matching or not
 // id of the upload button is 'load-panel-button'
+// Upload button click event (Upload TT)
 document
     .getElementById('load-panel-button')
     .addEventListener('click', function () {
@@ -3122,8 +3242,7 @@ document
         input.click();
     });
 
-// onclick clear with id 'clear-course-button' the courselist should get cleared
-// and all radio button should turned into false
+// onclick clear with id 'clear-course-button' the courselist get cleared
 document
     .getElementById('clear-course-button')
     .addEventListener('click', function () {
@@ -3139,135 +3258,23 @@ document
         rearrangeTeacherRefresh();
     });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const switchButton = document.getElementById('switchButton'); // Adjust the ID according to your HTML
-
-    switchButton.addEventListener('click', () => {
-        // Open pref_index.html in a new window
-        window.open('./pref_index.html', '_blank');
-    });
-});
-
-// on click on div with class 'c_pref' run function closealldropdown
+// onclick of div with class 'c_pref' close all dropdowns
 document.querySelectorAll('.c_pref').forEach((div) => {
     div.addEventListener('click', function () {
         closeAllDropdowns();
     });
 });
 
-function doubleClickOnTrOfCourseList() {
-    // Get the course name and faculty from the tr element
-    var courseList = document.querySelector('#course-list tbody');
+// Not for parcel bundler
+// if use other bundler which supports routing
+// then uncomment this code
+// and remove the hidden tag from the element with id 'switchButton' in index.html
 
-    editPref();
-    editPrefAddOn();
-    var courseName_Faculty = getCourseNameAndFacultyFromTr(this);
-    var courseName = courseName_Faculty[0];
-    var faculty = courseName_Faculty[1];
+// document.addEventListener('DOMContentLoaded', () => {
+//     const switchButton = document.getElementById('switchButton');
 
-    // Get the li element corresponding to the course name and faculty
-    if (editSub === true) {
-        closeAllDropdowns();
-        document.getElementById('div-for-edit-teacher').style.display = 'none';
-        document.getElementById('edit_msg_').style.display = 'block';
-        document.getElementById('edit_msg_').innerText =
-            'Click on the Course to edit it.';
-        var div = getCourseDivInSubjectArea(courseName);
-        div.click();
-        div.focus();
-    } else {
-        var li = getTeacherLiInSubjectArea(courseName, faculty);
-        closeAllDropdowns();
-        li.parentElement.previousElementSibling.click();
-        li.click();
-        li.focus();
-    }
-
-    // scroll to the top
-    window.scrollTo(0, 0);
-}
-
-function addEventListnerToCourseList() {
-    console.log(11);
-    var lastTouchTime = 0;
-    var timeout;
-    var eventTr;
-    // try to remove all eventlistner from course list first
-    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
-        tr.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
-        tr.removeEventListener('click', handleClick);
-    });
-
-    function handleClick(event) {
-        // Prevent the event listener from running if eventTr is already defined
-        var currentTime = new Date().getTime();
-        var tapLength = currentTime - lastTouchTime;
-
-        clearTimeout(timeout);
-        if (tapLength < 215 && tapLength > 0) {
-            // Double tap action
-            console.log(eventTr === event.target.parentElement);
-            if (eventTr === event.target.parentElement) {
-                doubleClickOnTrOfCourseList.call(eventTr);
-            }
-        } else {
-            // Single tap action
-
-            timeout = setTimeout(function () {
-                clearTimeout(timeout);
-            }, 215);
-        }
-        eventTr = event.target.parentElement;
-        lastTouchTime = currentTime;
-    }
-
-    // on double click or double tap on tr element do something
-    document.querySelectorAll('#course-list tbody tr').forEach((tr) => {
-        tr.addEventListener('dblclick', doubleClickOnTrOfCourseList);
-        tr.addEventListener('click', handleClick);
-    });
-}
-
-// Tested code but not used due to addition of eventlistners to td tr are less in number then td
-// jquery for double click on tr element of course list
-// $(document).on('dblclick', '#course-list tbody tr', function () {
-//     doubleClickOnTrOfCourseList.call(this);
+//     switchButton.addEventListener('click', () => {
+//         // Open pref_index.html in a new window
+//         window.open('./pref_index.html', '_blank');
+//     });
 // });
-
-// function addEventListnerToCourseList() {
-//     var lastTouchTime = 0;
-//     var timeout;
-//     var eventTr;
-
-//     // try to remove all eventlistner from course list first
-//     document.querySelectorAll('#course-list tbody td').forEach((td) => {
-//         td.removeEventListener('dblclick', doubleClickOnTrOfCourseList);
-//         td.removeEventListener('click', handleClick);
-//     });
-
-//     function handleClick(event) {
-//         var currentTime = new Date().getTime();
-//         var tapLength = currentTime - lastTouchTime;
-
-//         clearTimeout(timeout);
-//         if (tapLength < 215 && tapLength > 0) {
-//             // Double tap action
-//             if (eventTr === event.target.parentElement) {
-//                 doubleClickOnTrOfCourseList.call(eventTr);
-//             }
-//         } else {
-//             // Single tap action
-//             timeout = setTimeout(function () {
-//                 clearTimeout(timeout);
-//             }, 215);
-//         }
-//         eventTr = event.target.parentElement;
-//         lastTouchTime = currentTime;
-//     }
-
-//     // on double click or double tap on td element do something
-//     document.querySelectorAll('#course-list tbody td').forEach((td) => {
-//         td.addEventListener('dblclick', doubleClickOnTrOfCourseList);
-//         td.addEventListener('click', handleClick);
-//     });
-// }
