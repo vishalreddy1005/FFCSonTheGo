@@ -2904,6 +2904,7 @@ document
                     spanMsgColor = 'orange';
                 }
             }
+            rearrangeTeacherRefresh();
             updateLocalForage();
         }
         document.getElementById('hide_br').style.display = 'none';
@@ -3170,6 +3171,7 @@ document
                                             venueInput,
                                         );
                                     }
+                                    rearrangeTeacherRefresh();
                                     createSubjectJsonFromHtml();
                                     break;
                                 }
