@@ -1390,7 +1390,6 @@ function processFile(file) {
         timetableStoragePref[activeTable.id] = activeTableUpdate;
         updateLocalForage();
         switchTable(activeTable.id);
-        updateDataJsonFromCourseList();
         updateCredits();
 
         // Update the UI to reflect the new activeTable
@@ -2118,6 +2117,7 @@ function updatePickerLabel(tableName) {
     $('#tt-picker-button').text(tableName);
     fillPage();
     fillLeftBoxInCoursePanel();
+    revertRerrange();
     closeEditPref();
     closeEditPref1();
 }
