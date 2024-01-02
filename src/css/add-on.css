@@ -235,11 +235,11 @@ input[type='radio'] {
 
 @media screen and (max-width: 430px) {
     .nav-btn-outline {
-        font-size: small;
-        padding: 0.1rem;
+        font-size: smaller;
+        padding: 0.08rem;
         margin-top: 2px;
         margin-bottom: 2px;
-        padding: 4px 5px 4px 5px;
+        padding: 3px 4px 3px 4px;
     }
 }
 
