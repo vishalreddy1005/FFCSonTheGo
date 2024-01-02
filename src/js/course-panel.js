@@ -243,7 +243,47 @@ function initializeAutocomplete() {
             },
         },
     };
+    const courseOptions1 = {
+        data: courses_data.courses,
+        getValue: function (el) {
+            return el.CODE + ' - ' + el.TITLE;
+        },
+        list: {
+            match: {
+                enabled: true,
+            },
+            maxNumberOfElements: 10,
+            onSelectItemEvent: function () {
+                var title = $('#course-input_remove').getSelectedItemData()
+                    .TITLE;
+                var code = $('#course-input_remove').getSelectedItemData().CODE;
 
+                $('#course-input_remove').val(code + ' - ' + title);
+                addSlotButtons(code);
+            },
+        },
+    };
+    const courseOptionsForEdit = {
+        data: courses_data.courses,
+        getValue: function (el) {
+            return el.CODE + ' - ' + el.TITLE;
+        },
+        list: {
+            match: {
+                enabled: true,
+            },
+            maxNumberOfElements: 10,
+            onSelectItemEvent: function () {
+                var title = $('#course-input_edit').getSelectedItemData().TITLE;
+                var code = $('#course-input_edit').getSelectedItemData().CODE;
+
+                $('#course-input_edit').val(code + ' - ' + title);
+                addSlotButtons(code);
+            },
+        },
+    };
+    $('#course-input_remove').easyAutocomplete(courseOptions1);
+    $('#course-input_edit').easyAutocomplete(courseOptionsForEdit);
     $('#course-input').easyAutocomplete(courseOptions);
     $('div .easy-autocomplete').removeAttr('style');
 }
@@ -281,9 +321,6 @@ function buildSlotButton(courseData) {
     return $slotButton;
 }
 
-/*
-    Function to add slot buttons and filter options
- */
 window.addSlotButtons = (courseCode) => {
     $('#slot-buttons').html('');
     resetFilters();

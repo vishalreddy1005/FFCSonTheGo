@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -231,14 +231,35 @@
                                 <i class="fab fa-github"></i>&nbsp;&nbsp;GitHub
                             </button>
                         </a>
-                        <a href="./pref_index.html" target="_blank">
+                        <a
+                            hidden
+                            href="pref_index.html#vellore"
+                            target="_blank"
+                        >
+                            <button
+                                class="btn btn-outline-secondary nav-btn-outline ms-2"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#about-modal"
+                                id="switchButton"
+                            >
+                                <i class="fa fa-calendar"></i>&nbsp;&nbsp;OG TT
+                            </button>
+                        </a>
+
+                        <a
+                            rel="noopener"
+                            href="https://sarveshdakhore.github.io/HowToUseFFCSOnTheGo/"
+                            target="_blank"
+                        >
                             <button
                                 class="btn btn-outline-secondary nav-btn-outline ms-2"
                                 type="button"
                                 data-bs-toggle="modal"
                                 data-bs-target="#about-modal"
                             >
-                                <i class="fa fa-calendar"></i>&nbsp;&nbsp;OG TT
+                                <i class="fa fa-bicycle" aria-hidden="true"></i
+                                >&nbsp;&nbsp;How To Use ?
                             </button>
                         </a>
                     </div>
@@ -246,6 +267,20 @@
             </div>
         </nav>
         <!-- End of navbar -->
+
+        <div style="text-align: center; display: none" id="mobile_message">
+            <p
+                style="
+                    padding: 6px 6%;
+                    margin: 0%;
+                    color: red;
+                    font-weight: 500;
+                "
+            >
+                For optimal use of all features, please tilt your device to
+                landscape mode or switch to a larger screen.
+            </p>
+        </div>
 
         <!-- #1 - Course Panel -->
         <div class="container-xl">
@@ -266,7 +301,6 @@
                             id="tt-subject-add"
                             type="button"
                             class="btn btn-primary"
-                            onclick="showAddCourseDiv()"
                         >
                             <!-- data-toggle="modal"
                             data-target="#exampleModal" -->
@@ -359,7 +393,7 @@
                                 </h4>
                                 <hr style="margin-left: 4.5%" />
                             </div>
-                            <div id="courseSaveForm">
+                            <form id="courseSaveForm">
                                 <div
                                     style="
                                         margin: 4.5%;
@@ -378,6 +412,7 @@
                                         id="course-input_remove"
                                         placeholder="CSE1001&emsp13;-&emsp13;Problem Solving and Programming"
                                         autocomplete="off"
+                                        oninput="removeDotsLive(this)"
                                     />
                                     <div
                                         style="
@@ -412,6 +447,8 @@
                                         style="max-width: 25%"
                                         autocomplete="off"
                                         placeholder="4"
+                                        min="1"
+                                        max="30"
                                     />
                                     <span id="span-course-add"></span>
                                     <br style="display: none" id="hide_br" />
@@ -427,7 +464,7 @@
                                         Save
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         <!-- add course ends here -->
@@ -440,7 +477,7 @@
                                 </h4>
                                 <hr style="margin-left: 4.5%" />
                             </div>
-                            <div id="courseEditSaveForm-1">
+                            <form id="courseEditSaveForm-1">
                                 <div
                                     style="
                                         margin: 4.5%;
@@ -459,6 +496,7 @@
                                         id="course-input_edit"
                                         placeholder="CSE1001 Problem Solving and Programming"
                                         autocomplete="off"
+                                        oninput="removeDotsLive(this)"
                                     />
 
                                     <label
@@ -481,6 +519,8 @@
                                         style="max-width: 25%"
                                         autocomplete="off"
                                         placeholder="4"
+                                        min="1"
+                                        max="30"
                                     />
 
                                     <span id="span-course-edit"></span>
@@ -508,7 +548,7 @@
                                         Save
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         <!-- Course Edit ends here -->
@@ -516,7 +556,7 @@
                         <!-- add teacher starts -->
 
                         <div id="div-for-add-teacher">
-                            <div id="teacherSaveForm">
+                            <form id="teacherSaveForm">
                                 <div>
                                     <h4
                                         style="padding: 4.5%; padding-bottom: 0"
@@ -538,7 +578,6 @@
                                         >&emsp14;Course &emsp14;&emsp14;<a
                                             id="course_link"
                                             href=""
-                                            onclick="event.preventDefault(); showAddCourseDiv();"
                                             >Add Courses</a
                                         ></label
                                     >
@@ -565,6 +604,7 @@
                                                 id="teacher-input_remove"
                                                 placeholder="JOHN DOE"
                                                 autocomplete="off"
+                                                oninput="removeDotsLive(this)"
                                             />
                                         </div>
                                         <div style="width: 2%"></div>
@@ -637,6 +677,7 @@
                                                 style="max-width: 100%"
                                                 autocomplete="off"
                                                 placeholder="A1+TA1"
+                                                oninput="removeSlotSplCharLive(this)"
                                             />
                                         </div>
 
@@ -673,7 +714,7 @@
                                         Save
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         <!-- add teacher ends -->
@@ -681,7 +722,7 @@
                         <!-- Edit Teacher starts Here -->
 
                         <div id="div-for-edit-teacher" style="display: none">
-                            <div id="teacherSaveFormEdit">
+                            <form id="teacherSaveFormEdit">
                                 <div>
                                     <h4
                                         style="padding: 4.5%; padding-bottom: 0"
@@ -709,6 +750,7 @@
                                         id="teacher-edit-course"
                                         placeholder="Course"
                                         autocomplete="off"
+                                        oninput="removeDotsLive(this)"
                                     />
                                     <br />
 
@@ -729,6 +771,7 @@
                                                 id="teacher-input_remove-edit"
                                                 placeholder="JOHN DOE"
                                                 autocomplete="off"
+                                                oninput="removeDotsLive(this)"
                                             />
                                             <input
                                                 hidden
@@ -810,6 +853,7 @@
                                                 style="max-width: 100%"
                                                 autocomplete="off"
                                                 placeholder="A1+TA1"
+                                                oninput="removeSlotSplCharLive(this)"
                                             />
                                         </div>
 
@@ -854,7 +898,7 @@
                                         Save
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         <!-- Edit Teacher ends Here -->
@@ -863,16 +907,16 @@
 
                 <div class="card-footer">
                     <div class="row align-items-center justify-content-between">
-                        <div class="col-sm-auto my-1 text-center">
+                        <div class="col-sm-auto my-1">
                             <span id="last-update_remove" class="fw-bold"
                                 ><div
-                                    class="form-check form-switch"
+                                    class="form-check form-switch attack-toggle"
                                     style="margin-top: 7px"
                                 >
                                     &emsp14;
                                     <label
                                         class="form-check-label"
-                                        for="toggle-switch"
+                                        for="attack-toggle"
                                     >
                                         Attack Mode
                                     </label>
@@ -885,20 +929,20 @@
                         </div>
 
                         <!-- _remove to remove the last updated text in the above span -->
-                        <div class="col-sm-auto my-1 text-center">
+                        <div class="col-sm-auto my-1">
                             <button
                                 id="save-panel-button"
                                 type="button"
                                 class="btn btn-light me-1"
                             >
-                                Save
+                                Save TT
                             </button>
                             <button
                                 id="load-panel-button"
                                 type="button"
                                 class="btn btn-light me-1"
                             >
-                                Load Last Saved
+                                Upload TT
                             </button>
 
                             <button
@@ -1385,6 +1429,7 @@
             </div>
         </div>
         <!-- End of switch campus modal -->
+
         <!-- The Download Timetable Modal -->
 
         <div

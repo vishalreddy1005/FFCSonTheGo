@@ -36,7 +36,7 @@
     display: inline-block;
     width: 0;
     height: 0;
-    margin-left: 2rem;
+    margin-left: 0.8rem;
     margin-bottom: 0.1rem;
     border-top: 0.5rem solid transparent;
     border-bottom: 0.5rem solid transparent;
@@ -81,22 +81,27 @@
     padding-left: 3%;
     border-top: 0.5px solid rgba(0, 0, 0, 0.2);
     background-color: rgb(252, 252, 252);
-    border-radius: 3px;
     margin: 0;
 }
 
 .dropdown .h2s h2 {
     width: 90%;
+    font-size: larger;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    height: auto;
+    margin-bottom: 0.1rem;
 }
 .dropdown .h2s h4 {
     width: 10%;
 }
-.dropdown h4 {
+.dropdown span .cname {
     justify-content: center;
     justify-self: center;
     align-self: center;
     align-items: center;
-    background-color: rgba(252, 252, 252, 0);
+    font-size: medium;
 }
 
 .dropdown ul {
@@ -113,7 +118,6 @@
     padding-left: 5%;
     padding-top: 8px;
     padding-bottom: 8px;
-    background-color: azure;
     border-top: 0.5px solid rgba(0, 0, 0, 0.2);
 }
 .dropdown li label {
@@ -154,9 +158,6 @@
     }
 }
 
-.sortable-chosen .h2s {
-    background-color: rgb(217, 234, 255);
-}
 li.sortable-chosen {
     background-color: rgb(217, 234, 255) !important;
 }
@@ -184,4 +185,72 @@ input[type='radio'] {
 #attack-toggle:checked {
     background-color: red !important;
     border-color: red !important;
+}
+
+#attack-toggle {
+    text-align: left !important;
+}
+
+.attack-toggle {
+    display: inline-block;
+    margin-top: 7px;
+    margin-left: 12px;
+}
+
+.c_pref:hover {
+    cursor: pointer;
+}
+
+.dropdown h4 {
+    display: flex !important;
+    text-align: center;
+    justify-content: center;
+}
+
+/* at screen size 900px  and smaller*/
+@media screen and (max-width: 770px) {
+    .cname {
+        font-size: small;
+    }
+    .dropdown h4 {
+        font-size: small;
+    }
+    .dropdown li {
+        font-size: x-small;
+    }
+}
+@media screen and (max-width: 800px) {
+    .card-header button {
+        font-size: small;
+        padding: 0.1rem;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        padding: 4px 5px 4px 5px;
+    }
+}
+
+.select_background {
+    background-color: rgb(244, 173, 246) !important;
+}
+
+@media screen and (max-width: 430px) {
+    .nav-btn-outline {
+        font-size: small;
+        padding: 0.1rem;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        padding: 4px 5px 4px 5px;
+    }
+}
+
+tr.sortable-chosen1 td {
+    background-color: rgb(217, 234, 255);
+}
+
+#subjectArea input[type='radio'] {
+    /* disable this input */
+    pointer-events: none !important;
+}
+.sortable-chosen .h2s {
+    background-color: rgb(217, 234, 255) !important;
 }
