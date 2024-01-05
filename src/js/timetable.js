@@ -1247,6 +1247,7 @@ function revertRerrangeAttack() {
         TeacherLi.forEach((li) => {
             ulToUpdate.appendChild(li);
         });
+
         makeRadioTrueAttack();
     });
 }
@@ -3290,6 +3291,7 @@ document
         // Update the value of editSub based on the checkbox state
         if (this.checked) {
             activateSortable();
+            revertRerrange();
             closeEditPref();
             closeEditPref1();
             document.getElementById('div-for-edit-teacher').style.display =
@@ -3327,6 +3329,7 @@ document
                 'Click on the Teacher to edit it.';
             document.getElementById('edit_msg_').style.display = 'none';
             removeEventListenersAttack();
+            revertRerrange();
             closeEditPref();
             activateSortable();
             closeEditPref1();
