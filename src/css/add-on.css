@@ -134,6 +134,10 @@
 }
 .right-box {
     width: 36%;
+    /* BEGIN: ed8c6549bwf9 */
+    overflow-y: auto;
+    /* END: ed8c6549bwf9 */
+    font-size: medium;
 }
 .modal-footer {
     padding-right: 4%;
@@ -208,6 +212,15 @@ input[type='radio'] {
     text-align: center;
     justify-content: center;
 }
+.cname {
+    font-size: medium;
+}
+.dropdown h4 {
+    font-size: medium;
+}
+.dropdown li {
+    font-size: small;
+}
 
 /* at screen size 900px  and smaller*/
 @media screen and (max-width: 770px) {
@@ -221,7 +234,7 @@ input[type='radio'] {
         font-size: x-small;
     }
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 830px) {
     .card-header button {
         font-size: small;
         padding: 0.1rem;
@@ -229,15 +242,40 @@ input[type='radio'] {
         margin-bottom: 2px;
         padding: 4px 5px 4px 5px;
     }
+    #div-for-attack-slot legend {
+        font-size: medium !important;
+        font-weight: bold;
+        color: #020202;
+        padding-bottom: 1%;
+    }
+    #div-for-attack-slot h4,
+    #div-for-attack-slot h5,
+    #div-for-attack-slot h6 {
+        color: red;
+        font-size: small !important;
+        word-spacing: 0px;
+    }
 }
 
 .select_background {
     background-color: rgb(244, 173, 246) !important;
 }
 
-@media screen and (max-width: 430px) {
+@media screen and (max-width: 850px) {
     .nav-btn-outline {
         font-size: smaller;
+        padding: 0.08rem;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        padding: 3px 4px 3px 4px;
+    }
+    .right-box input {
+        font-size: small !important;
+    }
+}
+@media screen and (max-width: 430px) {
+    .nav-btn-outline {
+        font-size: x-small;
         padding: 0.08rem;
         margin-top: 2px;
         margin-bottom: 2px;
@@ -270,10 +308,16 @@ tr.sortable-chosen1 td {
     padding: 2% 4% 2% 4%;
 }
 
+#div-for-attack-slot legend {
+    font-size: large;
+    font-weight: bold;
+    color: #020202;
+    padding-bottom: 1%;
+}
 #div-for-attack-slot h4,
 #div-for-attack-slot h5,
 #div-for-attack-slot h6 {
     color: red;
-    font-size: large;
+    font-size: medium;
     word-spacing: 0px;
 }

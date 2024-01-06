@@ -1255,7 +1255,6 @@ function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
     var allTeacherLi = ul.querySelectorAll('li');
     var slotsOfCourse = getCourseSlotsAttack(courseName);
     var activeSlots = slotsForAttack();
-    console.log(activeSlots);
     var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
     var nonActiveTeacherLi = [];
     var activeTeacherLi = [];
@@ -3598,10 +3597,13 @@ document
                 'none';
             document.getElementById('div-auto-focus').style.display = 'block';
             closeAllDropdowns();
-            document.querySelector('.dropdown-list').classList.add('show');
-            document
-                .querySelector('.dropdown-list')
-                .previousElementSibling.classList.add('open');
+            try {
+                document.querySelector('.dropdown-list').classList.add('show');
+                document
+                    .querySelector('.dropdown-list')
+                    .previousElementSibling.classList.add('open');
+            } catch (error) {}
+
             revertRerrangeAttack();
             rearrangeTeacherRefreshAttack();
             removeEventListeners();
