@@ -3637,6 +3637,9 @@ document
     .getElementById('save-panel-button')
     .addEventListener('click', function () {
         // Convert the activeTable to a JSON string
+        if (editTeacher == true || editSub == true) {
+            document.getElementById('tt-subject-done').click();
+        }
         var jsonStr = JSON.stringify(activeTable);
         var utf8Str = btoa(encodeURIComponent(jsonStr));
         var blob = new Blob([utf8Str], { type: 'text/plain' }); // Create a new Blob object
@@ -3663,7 +3666,7 @@ document
     .addEventListener('click', function () {
         var input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.ffcsonthego, .txt';
+        input.accept = '.ffcsonthego, .txt,';
         input.onchange = function (event) {
             processFile(event.target.files[0]);
         };
