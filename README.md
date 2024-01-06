@@ -1,6 +1,6 @@
 # FFCS On The Go
 
-[![Netlify Status](https://img.shields.io/netlify/6d48d2f4-8dc7-4780-ae32-e8da62053826)](https://app.netlify.com/sites/ffcsonthego/deploys) ![Last Update - Vellore](https://img.shields.io/badge/dynamic/json?color=blue&label=vellore&query=$.lastUpdate.vellore&url=https://raw.githubusercontent.com/vatz88/FFCSonTheGo/master/package.json) ![Last Update - Chennai](https://img.shields.io/badge/dynamic/json?color=blue&label=chennai&query=$.lastUpdate.chennai&url=https://raw.githubusercontent.com/vatz88/FFCSonTheGo/master/package.json) [![License](https://img.shields.io/github/license/vatz88/FFCSonTheGo)](/LICENSE.md)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bef6de6b-7b6b-4c14-9ba9-923595184c26/deploy-status)](https://app.netlify.com/sites/cyccy2-rystum-qarvak/deploys)
 
 This web application is a tool to visualize your timetable for the students of VIT Vellore & Chennai to help with FFCS course registrations.
 
@@ -10,8 +10,8 @@ This web application is a tool to visualize your timetable for the students of V
 
 This application has been deployed at the following links.
 
--   https://ffcsonthego.vatz88.in/ - Currently used
--   https://ffcsonthego-archive.vatz88.in/ - Used until **Winter Semester 2018-19**
+-   https://ffcs.sarveshdakhore.in/ - Currently used
+-   https://ffcsonthego.vatz88.in/ - Forked From
 
 ## Contributing
 
@@ -27,16 +27,13 @@ If you're interested in contributing to our code, refer the [contributing guidli
 
 ## Authors
 
+-   **Sarvesh Dakhore** - [@sarveshdakhore](https://github.com/sarveshdakhore)
 -   **Vatsal Joshi** (Initial work) - [@vatz88](https://github.com/vatz88)
 -   **Sangeeth Sudheer** - [@sangeeth96](https://github.com/sangeeth96)
--   **Sarvesh Dakhore** - [@sarveshdakhore](https://github.com/sarveshdakhore)
 
-## Contributors
 
--   **Sujit Kumar** (Active maintainer) - [@therealsujitk](https://github.com/therealsujitk)
--   **Sanket Mohapatra** - [@sanket9918](https://github.com/sanket9918)
 
-See also the list of [contributors](https://github.com/vatz88/FFCSonTheGo/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/sarveshdakhore/FFCSonTheGo/contributors) who participated in this project.
 
 ## License
 
