@@ -7,7 +7,7 @@ let {
     ttDataStructureInLFormat,
     slotsExistInNonLectureFormat,
 } = globalVars;
-
+window.ttDataStructureInLFormat = ttDataStructureInLFormat;
 // push '' and 'SLOTS' in slotsExistInNonLectureFormat
 slotsExistInNonLectureFormat.add('');
 slotsExistInNonLectureFormat.add('SLOTS');
@@ -339,7 +339,6 @@ function isSlotExist(slotsArray) {
     if (typeof slotsArray === 'string') {
         slotsArray = slotsProcessingForCourseList(slotsArray);
     }
-    slotsArray = updateSlots(slotsArray);
     var result = true;
     slotsArray.forEach((slot) => {
         if (!slotsExistInNonLectureFormat.has(slot)) {
@@ -371,15 +370,33 @@ function slotsProcessingForCourseList(slotString) {
 
 // function to update the array of slots if slot is in key of getCourseTTDataObject it will be replaced with its value
 function updateSlots(slots) {
-    var newSlots = [];
-    slots.forEach((slot) => {
-        if (slot in ttDataStructureInLFormat) {
-            newSlots.push(ttDataStructureInLFormat[slot]);
+    var allSlots = slots;
+    var thSlots = [];
+    var labSlots = [];
+    allSlots.forEach((slot) => {
+        if (slot.includes('L')) {
+            labSlots.push(slot);
+            if (slot in ttDataStructureInLFormat) {
+                if (slot != ttDataStructureInLFormat[slot]) {
+                    thSlots.push(ttDataStructureInLFormat[slot]);
+                }
+            }
+        } else if (slot.includes('V')) {
+            var vSlotLec = findLec(slot);
+            if (vSlotLec[0] != slot) {
+                labSlots.push(vSlotLec[0]);
+            }
+            thSlots.push(slot);
         } else {
-            newSlots.push(slot);
+            thSlots.push(slot);
+            var lSlots = findLec(slot);
+            lSlots.forEach((lSlot) => {
+                labSlots.push(lSlot);
+            });
         }
     });
-    return newSlots;
+
+    return thSlots.concat(labSlots);
 }
 
 // return array of lecture associated with theory
@@ -471,9 +488,16 @@ function updateCourseList(courseTr, courseName, credits) {
     var courseIdNum = courseTr.getAttribute('data-course');
     removeCourseFromTimetable(courseIdNum);
     courseIdNum = Number(courseIdNum.split(/(\d+)/)[1]);
-    for (var i = 0; i < activeTable.data.length; ++i) {
-        if (activeTable.data[i].courseId == courseIdNum) {
-            addCourseToTimetable(activeTable.data[i]);
+    var activeData;
+
+    if ($('#attack-toggle').is(':checked')) {
+        activeData = activeTable.attackData;
+    } else {
+        activeData = activeTable.data;
+    }
+    for (var i = 0; i < activeData.length; ++i) {
+        if (activeData[i].courseId == courseIdNum) {
+            addCourseToTimetable(activeData[i]);
             break;
         }
     }
@@ -1153,10 +1177,8 @@ function rearrangeTeacherLiInSubjectArea(courseName) {
     var nonActiveTeacherLi = [];
     var activeTeacherLi = [];
     allTeacherLi.forEach((teacherLi) => {
-        const teacherSlot = updateSlots(
-            slotsProcessingForCourseList(
-                teacherLi.querySelectorAll('div')[1].innerText,
-            ),
+        const teacherSlot = slotsProcessingForCourseList(
+            teacherLi.querySelectorAll('div')[1].innerText,
         );
         if (isCommonSlot(teacherSlot, consideredSlots)) {
             teacherLi.classList.add('clashLi');
@@ -1231,16 +1253,15 @@ function rearrangeTeacherRefreshAttack() {
 function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
     var ul = getUlInSubjectArea(courseName);
     var allTeacherLi = ul.querySelectorAll('li');
-    var slotsOfCourse = getcourseSlotsAttack(courseName);
+    var slotsOfCourse = getCourseSlotsAttack(courseName);
     var activeSlots = slotsForAttack();
+    console.log(activeSlots);
     var consideredSlots = subtractArray(slotsOfCourse, activeSlots);
     var nonActiveTeacherLi = [];
     var activeTeacherLi = [];
     allTeacherLi.forEach((teacherLi) => {
-        const teacherSlot = updateSlots(
-            slotsProcessingForCourseList(
-                teacherLi.querySelectorAll('div')[1].innerText,
-            ),
+        const teacherSlot = slotsProcessingForCourseList(
+            teacherLi.querySelectorAll('div')[1].innerText,
         );
         if (isCommonSlot(teacherSlot, consideredSlots)) {
             teacherLi.classList.add('clashLi');
@@ -1295,15 +1316,35 @@ function revertRerrangeAttack() {
 
 function slotsForAttack() {
     var attackData = activeTable.attackData;
+    var activeQuick = activeTable.attackQuick;
     var slots = [];
     for (var i = 0; i < attackData.length; i++) {
         slots = slots.concat(attackData[i].slots);
     }
     slots = updateSlots(slots);
+    if (
+        document.getElementById('quick-toggle').getAttribute('data-state') ===
+        'enabled'
+    ) {
+        activeQuick.forEach((el) => {
+            var rows = document
+                .getElementById('timetable')
+                .getElementsByTagName('tr');
+            var cells = rows[el[0]].getElementsByTagName('td');
+            const x = cells[el[1]].innerText.split(' / ');
+            if (x.length == 1) {
+                slots.push(x[0]);
+            } else {
+                slots.push(x[0]);
+                slots.push(x[1].split('\n')[0]);
+            }
+        });
+    }
+
     return slots;
 }
 
-function getcourseSlotsAttack(courseName) {
+function getCourseSlotsAttack(courseName) {
     var slots = [];
     var attackData = activeTable.attackData;
     attackData.forEach((el) => {
@@ -1431,6 +1472,7 @@ function attackLiClick() {
 function slotOccupiedTheoryLab() {
     var allSlots = [];
     var attackData = activeTable.attackData;
+    var activeQuick = activeTable.attackQuick;
     for (var i = 0; i < attackData.length; i++) {
         allSlots = allSlots.concat(attackData[i].slots);
     }
@@ -1458,6 +1500,29 @@ function slotOccupiedTheoryLab() {
             });
         }
     });
+    if (
+        document.getElementById('quick-toggle').getAttribute('data-state') ===
+        'enabled'
+    ) {
+        activeQuick.forEach((el) => {
+            var rows = document
+                .getElementById('timetable')
+                .getElementsByTagName('tr');
+            var cells = rows[el[0]].getElementsByTagName('td');
+            const x = cells[el[1]].innerText.split(' / ');
+            if (x.length == 1) {
+                if (x[0].includes('L')) {
+                    labSlots.add(x[0]);
+                } else {
+                    thSlots.add(x[0]);
+                }
+            } else {
+                labSlots.add(x[1].split('\n')[0]);
+                thSlots.add(x[0]);
+            }
+        });
+    }
+
     const thSlotsArray = Array.from(thSlots).sort();
     const labSlotsArray = Array.from(labSlots).sort();
     return [thSlotsArray, labSlotsArray];
@@ -1717,7 +1782,7 @@ $(() => {
 
         if ($('#attack-toggle').is(':checked')) {
             var courseId = Number(course.split(/(\d+)/)[1]);
-            for (var i = 0; i < activeTable.data.length; ++i) {
+            for (var i = 0; i < activeTable.attackData.length; ++i) {
                 if (activeTable.attackData[i].courseId == courseId) {
                     activeTable.attackData.splice(i, 1);
                     break;
@@ -1908,6 +1973,9 @@ $(() => {
             name: newTableName,
             data: [],
             quick: [],
+            subject: [],
+            attackData: [],
+            attackQuick: [],
         });
 
         addTableToPicker(newTableId, newTableName);
@@ -2147,8 +2215,12 @@ $(() => {
                     .addClass('highlight'),
             );
         }
-
         $('.quick-buttons').slideToggle();
+        if (document.getElementById('attack-toggle').checked) {
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+            showOccupiedSlots();
+        }
     });
 
     /*
@@ -2157,7 +2229,9 @@ $(() => {
     $('#reset-tt-button').on('click', function () {
         resetPage();
         activeTable.data = [];
+        activeTable.attackData = [];
         activeTable.quick = [];
+        activeTable.attackQuick = [];
         activeTable['subject'] = {};
         updateLocalForage();
         fillLeftBoxInCoursePanel();
@@ -2479,7 +2553,15 @@ function initializeQuickVisualization() {
     /*
         Click event for the quick visualization buttons
      */
+
     $('.quick-buttons *[class*="-tile"]').on('click', function () {
+        var activeQuick;
+
+        if ($('#attack-toggle').is(':checked')) {
+            activeQuick = activeTable.attackQuick;
+        } else {
+            activeQuick = activeTable.quick;
+        }
         var slot = this.classList[0].split('-')[0];
 
         if (
@@ -2497,23 +2579,45 @@ function initializeQuickVisualization() {
 
             if ($(this).hasClass('highlight')) {
                 $(`#timetable .${slot}`).removeClass('highlight');
+                if ($('#attack-toggle').is(':checked')) {
+                    activeTable.attackQuick = activeTable.attackQuick.filter(
+                        (el) => {
+                            for (var i = 0; i < slots.length; ++i) {
+                                if (
+                                    el[0] == slots[i][0] &&
+                                    el[1] == slots[i][1]
+                                ) {
+                                    return false;
+                                }
+                            }
 
-                activeTable.quick = activeTable.quick.filter((el) => {
-                    for (var i = 0; i < slots.length; ++i) {
-                        if (el[0] == slots[i][0] && el[1] == slots[i][1]) {
-                            return false;
+                            return true;
+                        },
+                    );
+                } else {
+                    activeTable.quick = activeTable.quick.filter((el) => {
+                        for (var i = 0; i < slots.length; ++i) {
+                            if (el[0] == slots[i][0] && el[1] == slots[i][1]) {
+                                return false;
+                            }
                         }
-                    }
 
-                    return true;
-                });
+                        return true;
+                    });
+                }
             } else {
                 $(`#timetable .${slot}`).addClass('highlight');
-                activeTable.quick.push(...slots);
+                activeQuick.push(...slots);
             }
 
             $(this).toggleClass('highlight');
+
             updateLocalForage();
+        }
+        if (document.getElementById('attack-toggle').checked) {
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+            showOccupiedSlots();
         }
     });
 
@@ -2521,6 +2625,13 @@ function initializeQuickVisualization() {
         Click event for the periods when quick visualization is enabled
      */
     $('#timetable .period:not([disabled])').on('click', function () {
+        if ($('#attack-toggle').is(':checked')) {
+            var activeQuick = activeTable.attackQuick;
+        } else {
+            var activeQuick = activeTable.quick;
+        }
+        var slot = this.classList[0].split('-')[0];
+
         if (
             $('#quick-toggle').attr('data-state') == 'enabled' &&
             !$(this).hasClass('clash') &&
@@ -2533,11 +2644,17 @@ function initializeQuickVisualization() {
             $(this).toggleClass('highlight');
 
             if (!$(this).hasClass('highlight')) {
-                activeTable.quick = activeTable.quick.filter(
-                    (el) => el[0] != row || el[1] != column,
-                );
+                if ($('#attack-toggle').is(':checked')) {
+                    activeTable.attackQuick = activeTable.attackQuick.filter(
+                        (el) => el[0] != row || el[1] != column,
+                    );
+                } else {
+                    activeTable.quick = activeTable.quick.filter(
+                        (el) => el[0] != row || el[1] != column,
+                    );
+                }
             } else {
-                activeTable.quick.push([row, column]);
+                activeQuick.push([row, column]);
             }
 
             if ($(`#timetable .${slot}`).not('.highlight').length == 0) {
@@ -2547,6 +2664,11 @@ function initializeQuickVisualization() {
             }
 
             updateLocalForage();
+        }
+        if (document.getElementById('attack-toggle').checked) {
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+            showOccupiedSlots();
         }
     });
 }
@@ -2729,6 +2851,13 @@ window.removeCourseFromTimetable = (course) => {
     $(`#timetable tr td div[data-course="${course}"]`)
         .parent()
         .each(function () {
+            var activeQuick;
+
+            if ($('#attack-toggle').is(':checked')) {
+                activeQuick = activeTable.attackQuick;
+            } else {
+                activeQuick = activeTable.quick;
+            }
             if ($(this).children().length != 1) {
                 return;
             }
@@ -2743,8 +2872,8 @@ window.removeCourseFromTimetable = (course) => {
             var row = $(this).parent().index();
             var column = $(this).index();
 
-            for (var i = 0; i < activeTable.quick.length; ++i) {
-                var el = activeTable.quick[i];
+            for (var i = 0; i < activeQuick.length; ++i) {
+                var el = activeQuick[i];
 
                 if (el[0] == row && el[1] == column) {
                     if ($('#quick-toggle').attr('data-state') == 'enabled') {
@@ -3544,10 +3673,15 @@ document
     .getElementById('clear-course-button')
     .addEventListener('click', function () {
         // Ask for confirmation
-        if (!confirm('Are you sure you want to clear the course list?')) {
-            return;
-        }
+
         if (document.getElementById('attack-toggle').checked) {
+            if (
+                !confirm(
+                    'Are you sure you want to clear the course list and Quick Visualization?',
+                )
+            ) {
+                return;
+            }
             clearTimetable();
             clearCourseList();
             activeTable.attackQuick = [];
@@ -3558,6 +3692,9 @@ document
             revertRerrangeAttack();
             rearrangeTeacherRefreshAttack();
         } else {
+            if (!confirm('Are you sure you want to clear the course list?')) {
+                return;
+            }
             getCourseListFromSubjectArea().forEach((courseName) => {
                 courseRemove(courseName);
             });
