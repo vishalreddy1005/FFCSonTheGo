@@ -6,8 +6,6 @@ let {
     sortableIsActive,
     ttDataStructureInLFormat,
     slotsExistInNonLectureFormat,
-    attackData,
-    attackQuick,
 } = globalVars;
 
 // push '' and 'SLOTS' in slotsExistInNonLectureFormat
@@ -499,7 +497,12 @@ function makeRadioTrueOnPageLoad() {
 
 // Make Radio all radios false which were true according to activeTable.data
 function makeRadioFalseOnNeed() {
-    activeTable.data.forEach((courseData) => {
+    if (document.getElementById('attack-toggle').checked) {
+        var dataToProcess = activeTable.attackData;
+    } else {
+        var dataToProcess = activeTable.data;
+    }
+    dataToProcess.forEach((courseData) => {
         if (courseData.courseCode === '') {
             var courseName = courseData.courseTitle;
         } else {
@@ -687,7 +690,12 @@ function createSubjectJsonFromHtml() {
 function updateDataJsonFromCourseList() {
     let courseList = document.getElementById('courseList-tbody');
     let trElements = courseList.querySelectorAll('tr');
-    activeTable.data = [];
+    if (document.getElementById('attack-toggle').checked) {
+        var activeData = activeTable.attackData;
+    } else {
+        var activeData = activeTable.data;
+    }
+    activeData = [];
     trElements.forEach((trElement) => {
         let td = trElement.querySelectorAll('td');
         let courseName = td[2].innerText;
@@ -710,7 +718,7 @@ function updateDataJsonFromCourseList() {
             isProject: isProject,
             courseCode: courseCode,
         };
-        activeTable.data.push(courseData);
+        activeData.push(courseData);
     });
     updateLocalForage();
 }
@@ -779,8 +787,6 @@ function addSubDiv(subjectName, credits) {
 // double click on tr of course list
 function doubleClickOnTrOfCourseList() {
     // Get the course name and faculty from the tr element
-    var courseList = document.querySelector('#course-list tbody');
-
     editPref();
     editPrefAddOn();
     var courseName_Faculty = getCourseNameAndFacultyFromTr(this);
@@ -811,6 +817,10 @@ function doubleClickOnTrOfCourseList() {
 
 // Add double click event listener to course list
 function addEventListnerToCourseList() {
+    // Get the course name and faculty from the tr element
+    if (document.getElementById('attack-toggle').checked === true) {
+        return;
+    }
     var lastTouchTime = 0;
     var timeout;
     var eventTr;
@@ -907,10 +917,17 @@ function removeEventListeners() {
 
 // delete from subject
 function removeCourseFromSubject(dataCourseValue) {
+    var activeData;
+
+    if ($('#attack-toggle').is(':checked')) {
+        activeData = activeTable.attackData;
+    } else {
+        activeData = activeTable.data;
+    }
     var courseId = Number(dataCourseValue.split(/(\d+)/)[1]);
-    for (var i = 0; i < activeTable.data.length; ++i) {
-        if (activeTable.data[i].courseId == courseId) {
-            activeTable.data.splice(i, 1);
+    for (var i = 0; i < activeData.length; ++i) {
+        if (activeData[i].courseId == courseId) {
+            activeData.splice(i, 1);
             break;
         }
     }
@@ -984,7 +1001,11 @@ function editPrefAddOn() {
     document.getElementById('div-for-edit-teacher').style.display = 'none';
 }
 function editPref() {
-    document.getElementById('attack-toggle').click();
+    if ($('#attack-toggle').is(':checked')) {
+        document.getElementById('attack-toggle').click();
+    } else {
+    }
+
     editTeacher = true;
     document.getElementById('tt-subject-edit').style.display = 'none';
     document.getElementById('tt-subject-add').style.display = 'none';
@@ -1246,6 +1267,7 @@ function rearrangeTeacherLiInSubjectAreaAttack(courseName) {
 }
 // Make input radio true on the basis of attackData values
 function makeRadioTrueAttack() {
+    var attackData = activeTable.attackData;
     attackData.forEach((courseData) => {
         var courseName = getCourseNameFromCourseData(courseData);
         var faculty = courseData.faculty;
@@ -1272,6 +1294,7 @@ function revertRerrangeAttack() {
 }
 
 function slotsForAttack() {
+    var attackData = activeTable.attackData;
     var slots = [];
     for (var i = 0; i < attackData.length; i++) {
         slots = slots.concat(attackData[i].slots);
@@ -1282,6 +1305,7 @@ function slotsForAttack() {
 
 function getcourseSlotsAttack(courseName) {
     var slots = [];
+    var attackData = activeTable.attackData;
     attackData.forEach((el) => {
         const CourseNameData = getCourseNameFromCourseData(el);
         if (
@@ -1299,10 +1323,12 @@ function getcourseSlotsAttack(courseName) {
 }
 
 function removeRadioFalseAttack(radioButton) {
+    var attackData = activeTable.attackData;
     var courseToRemove =
         radioButton.parentElement.parentElement.parentElement.querySelector(
             'h2 .cname',
         ).innerText;
+    courseRemove(courseToRemove);
     for (var i = 0; i < attackData.length; ++i) {
         var attackCourse = getCourseNameFromCourseData(attackData[i]);
         if (
@@ -1324,14 +1350,24 @@ function addOnRadioAttack(radioButton) {
 
     var courseTitle = getCourseCodeAndCourseTitle(courseToRemove)[1];
     var courseCode = getCourseCodeAndCourseTitle(courseToRemove)[0];
-    var currentDropdown =
-        current.parentElement.parentElement.previousElementSibling;
-    var nextDropdown =
-        currentDropdown.parentElement.nextElementSibling.querySelector('div');
-    try {
+    courseRemove(courseToRemove);
+    if ($('#tt-auto-focus-switch').is(':checked')) {
+        var currentDropdown =
+            current.parentElement.parentElement.previousElementSibling;
         currentDropdown.click();
-        nextDropdown.click();
-    } catch (error) {}
+        closeAllDropdowns();
+        try {
+            var nextDropdown =
+                currentDropdown.parentElement.nextElementSibling.querySelector(
+                    'div',
+                );
+
+            if ($(nextDropdown).hasClass('open')) {
+            } else {
+                nextDropdown.click();
+            }
+        } catch (error) {}
+    }
 
     var faculty = current.parentElement.querySelectorAll('div')[0].innerText;
     var slotString = current.parentElement.querySelectorAll('div')[1].innerText;
@@ -1342,6 +1378,7 @@ function addOnRadioAttack(radioButton) {
 
     var slots = slotsProcessingForCourseList(slotString);
     var courseId = 0;
+    var attackData = activeTable.attackData;
     if (attackData.length != 0) {
         var lastAddedCourse = attackData[attackData.length - 1];
         courseId = lastAddedCourse.courseId + 1;
@@ -1356,6 +1393,8 @@ function addOnRadioAttack(radioButton) {
         isProject: isProject,
         courseCode: courseCode,
     };
+    addCourseToCourseList(courseData);
+    addCourseToTimetable(courseData);
     attackData.push(courseData);
 }
 
@@ -1376,6 +1415,7 @@ function attackLiClick() {
             revertRerrangeAttack();
             rearrangeTeacherRefreshAttack();
             showOccupiedSlots();
+            updateLocalForage();
         } catch (error) {}
     } else {
         radioButton.checked = true; // This radio button is now the currently selected one
@@ -1384,11 +1424,13 @@ function attackLiClick() {
         revertRerrangeAttack();
         rearrangeTeacherRefreshAttack();
         showOccupiedSlots();
+        updateLocalForage();
     }
 }
 
 function slotOccupiedTheoryLab() {
     var allSlots = [];
+    var attackData = activeTable.attackData;
     for (var i = 0; i < attackData.length; i++) {
         allSlots = allSlots.concat(attackData[i].slots);
     }
@@ -1672,17 +1714,33 @@ $(() => {
         removeCourseFromCourseList(course);
         removeCourseFromTimetable(course);
         //teacherLi.querySelector('input[type="radio"]').checked = false;
-        var courseId = Number(course.split(/(\d+)/)[1]);
-        for (var i = 0; i < activeTable.data.length; ++i) {
-            if (activeTable.data[i].courseId == courseId) {
-                activeTable.data.splice(i, 1);
-                break;
+
+        if ($('#attack-toggle').is(':checked')) {
+            var courseId = Number(course.split(/(\d+)/)[1]);
+            for (var i = 0; i < activeTable.data.length; ++i) {
+                if (activeTable.attackData[i].courseId == courseId) {
+                    activeTable.attackData.splice(i, 1);
+                    break;
+                }
+            }
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+            showOccupiedSlots();
+        } else {
+            var courseId = Number(course.split(/(\d+)/)[1]);
+            for (var i = 0; i < activeTable.data.length; ++i) {
+                if (activeTable.data[i].courseId == courseId) {
+                    activeTable.data.splice(i, 1);
+                    break;
+                }
+            }
+
+            if (editSub === true || editTeacher === true) {
+            } else {
+                revertRerrange();
+                rearrangeTeacherRefresh();
             }
         }
-        revertRerrange();
-        rearrangeTeacherRefresh();
-        closeEditPref();
-        closeEditPref1();
     });
 });
 
@@ -2063,6 +2121,12 @@ $(() => {
         Click event for the quick visualization button
      */
     $('#quick-toggle').on('click', function () {
+        var activeQuick;
+        if ($('#attack-toggle').is(':checked')) {
+            activeQuick = activeTable.attackQuick;
+        } else {
+            activeQuick = activeTable.quick;
+        }
         if ($(this).attr('data-state') == 'enabled') {
             $('i', this).prop('class', 'fas fa-eye');
             $('span', this).html('&nbsp;&nbsp;Enable Quick Visualization');
@@ -2074,7 +2138,7 @@ $(() => {
             $('span', this).html('&nbsp;&nbsp;Disable Quick Visualization');
             $(this).attr('data-state', 'enabled');
 
-            activeTable.quick.forEach((el) =>
+            activeQuick.forEach((el) =>
                 $('#timetable')
                     .find('tr')
                     .eq(el[0])
@@ -2156,9 +2220,17 @@ function getTableIndex(id) {
     Function to fill the timetable and course list
  */
 function fillPage() {
+    // there is attackData in activeTable then do nothing else add it
+    // same for attackQuick
+    if (!activeTable.hasOwnProperty('attackData')) {
+        activeTable['attackData'] = [];
+    }
+    if (!activeTable.hasOwnProperty('attackQuick')) {
+        activeTable['attackQuick'] = [];
+    }
     if (document.getElementById('attack-toggle').checked) {
-        var activeData = attackData;
-        var activeQuick = attackQuick;
+        var activeData = activeTable.attackData;
+        var activeQuick = activeTable.attackQuick;
     } else {
         var activeData = activeTable.data;
         var activeQuick = activeTable.quick;
@@ -3395,12 +3467,12 @@ document
                 'none';
             document.getElementById('div-for-edit-teacher').style.display =
                 'none';
+            document.getElementById('div-auto-focus').style.display = 'block';
             closeAllDropdowns();
             document.querySelector('.dropdown-list').classList.add('show');
             document
                 .querySelector('.dropdown-list')
                 .previousElementSibling.classList.add('open');
-            attackData = [];
             revertRerrangeAttack();
             rearrangeTeacherRefreshAttack();
             removeEventListeners();
@@ -3410,8 +3482,11 @@ document
             showOccupiedSlots();
             clearTimetable();
             clearCourseList();
+            makeRadioTrueAttack();
             fillPage();
         } else {
+            document.getElementById('div-auto-focus').style.display = 'none';
+
             document.getElementById('edit_msg_').innerText =
                 'Click on the Teacher to edit it.';
             document.getElementById('edit_msg_').style.display = 'none';
@@ -3422,6 +3497,8 @@ document
             closeEditPref1();
             document.getElementById('div-for-attack-slot').style.display =
                 'none';
+            clearTimetable();
+            clearCourseList();
             fillPage();
         }
     });
@@ -3470,12 +3547,23 @@ document
         if (!confirm('Are you sure you want to clear the course list?')) {
             return;
         }
-
-        getCourseListFromSubjectArea().forEach((courseName) => {
-            courseRemove(courseName);
-        });
-        revertRerrange();
-        rearrangeTeacherRefresh();
+        if (document.getElementById('attack-toggle').checked) {
+            clearTimetable();
+            clearCourseList();
+            activeTable.attackQuick = [];
+            activeTable.attackData = [];
+            showOccupiedSlots();
+            makeRadioTrueAttack();
+            makeRadioFalseOnNeed();
+            revertRerrangeAttack();
+            rearrangeTeacherRefreshAttack();
+        } else {
+            getCourseListFromSubjectArea().forEach((courseName) => {
+                courseRemove(courseName);
+            });
+            revertRerrange();
+            rearrangeTeacherRefresh();
+        }
     });
 
 // onclick of div with class 'c_pref' close all dropdowns
