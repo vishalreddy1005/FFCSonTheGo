@@ -4,6 +4,7 @@ var editSub = false; // edit subject (course edit toggle)
 var editTeacher = false; // edit teacher (course edit false, edit clicked, then true)
 var sortableIsActive = false; // sortable is activated or not
 var attackData = []; // attack data for the temp usage
+var attackQuick = [];
 
 // This data structure is used to store the timetable slots
 // to convert them into one format(Lecture To Theory)
@@ -83,9 +84,10 @@ export var globalVars = {
     editSub: editSub,
     editTeacher: editTeacher,
     sortableIsActive: sortableIsActive,
-    attackData: [],
+    attackData: attackData,
     ttDataStructureInLFormat: ttDataStructureInLFormat,
     slotsExistInNonLectureFormat: slotsExistInNonLectureFormat,
+    attackQuick: attackQuick,
 };
 
 // Tried to do so and failed

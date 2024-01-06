@@ -133,9 +133,11 @@
     overflow: auto;
 }
 .right-box {
-    width: 34%;
+    width: 36%;
 }
-
+.modal-footer {
+    padding-right: 4%;
+}
 @media screen and (max-width: 630px) {
     .left-box {
         width: 150%;
@@ -253,4 +255,25 @@ tr.sortable-chosen1 td {
 }
 .sortable-chosen .h2s {
     background-color: rgb(217, 234, 255) !important;
+}
+
+#div-for-attack-slot {
+    display: flex;
+    flex-direction: column;
+    min-height: 89%;
+    max-height: 89%;
+    padding: 2% 4% 2% 4%;
+
+    /* BEGIN: ed8c6549bwf9 */
+    overflow-y: auto;
+    /* END: ed8c6549bwf9 */
+    padding: 2% 4% 2% 4%;
+}
+
+#div-for-attack-slot h4,
+#div-for-attack-slot h5,
+#div-for-attack-slot h6 {
+    color: red;
+    font-size: large;
+    word-spacing: 0px;
 }

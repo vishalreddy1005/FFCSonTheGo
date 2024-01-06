@@ -4,9 +4,10 @@ let {
     editSub,
     editTeacher,
     sortableIsActive,
-    attackData,
     ttDataStructureInLFormat,
     slotsExistInNonLectureFormat,
+    attackData,
+    attackQuick,
 } = globalVars;
 
 // push '' and 'SLOTS' in slotsExistInNonLectureFormat
@@ -381,6 +382,17 @@ function updateSlots(slots) {
         }
     });
     return newSlots;
+}
+
+// return array of lecture associated with theory
+function findLec(value) {
+    var keys = [];
+    for (var key in ttDataStructureInLFormat) {
+        if (ttDataStructureInLFormat[key] === value) {
+            keys.push(key);
+        }
+    }
+    return keys;
 }
 
 // make the list of all slots in the activeTabe.data
@@ -972,6 +984,7 @@ function editPrefAddOn() {
     document.getElementById('div-for-edit-teacher').style.display = 'none';
 }
 function editPref() {
+    document.getElementById('attack-toggle').click();
     editTeacher = true;
     document.getElementById('tt-subject-edit').style.display = 'none';
     document.getElementById('tt-subject-add').style.display = 'none';
@@ -1156,6 +1169,12 @@ function rearrangeTeacherRefresh() {
 }
 
 function revertRerrange() {
+    if (activeTable.subject === undefined) {
+        return;
+    }
+    if (Object.keys(activeTable.subject).length === 0) {
+        return;
+    }
     var allSubject = activeTable.subject;
     Object.keys(allSubject).forEach((subjectName) => {
         const subjectNameStr = subjectName.toString();
@@ -1260,6 +1279,7 @@ function slotsForAttack() {
     slots = updateSlots(slots);
     return slots;
 }
+
 function getcourseSlotsAttack(courseName) {
     var slots = [];
     attackData.forEach((el) => {
@@ -1355,15 +1375,64 @@ function attackLiClick() {
             removeRadioFalseAttack(radioButton);
             revertRerrangeAttack();
             rearrangeTeacherRefreshAttack();
+            showOccupiedSlots();
         } catch (error) {}
     } else {
         radioButton.checked = true; // This radio button is now the currently selected one
         removeRadioFalseAttack(radioButton);
         addOnRadioAttack(radioButton);
-
         revertRerrangeAttack();
         rearrangeTeacherRefreshAttack();
+        showOccupiedSlots();
     }
+}
+
+function slotOccupiedTheoryLab() {
+    var allSlots = [];
+    for (var i = 0; i < attackData.length; i++) {
+        allSlots = allSlots.concat(attackData[i].slots);
+    }
+    var thSlots = new Set();
+    var labSlots = new Set();
+    allSlots.forEach((slot) => {
+        if (slot.includes('L')) {
+            labSlots.add(slot);
+            if (slot in ttDataStructureInLFormat) {
+                if (slot != ttDataStructureInLFormat[slot]) {
+                    thSlots.add(ttDataStructureInLFormat[slot]);
+                }
+            }
+        } else if (slot.includes('V')) {
+            var vSlotLec = findLec(slot);
+            if (vSlotLec[0] != slot) {
+                labSlots.add(vSlotLec[0]);
+            }
+            thSlots.add(slot);
+        } else {
+            thSlots.add(slot);
+            var lSlots = findLec(slot);
+            lSlots.forEach((lSlot) => {
+                labSlots.add(lSlot);
+            });
+        }
+    });
+    const thSlotsArray = Array.from(thSlots).sort();
+    const labSlotsArray = Array.from(labSlots).sort();
+    return [thSlotsArray, labSlotsArray];
+}
+
+function showOccupiedSlots() {
+    const slotsThLab = slotOccupiedTheoryLab();
+    const thSlots = slotsThLab[0];
+    const labSlots = slotsThLab[1];
+    var h6Th = document
+        .getElementById('div-for-attack-slot')
+        .querySelectorAll('h6')[0];
+    var h6Lab = document
+        .getElementById('div-for-attack-slot')
+        .querySelectorAll('h6')[1];
+    h6Th.innerText = thSlots.join(' ,  ');
+    h6Lab.innerText = labSlots.join(' ,  ');
 }
 
 // ------------------ Attack Mode Function Ends Here ------------------
@@ -1750,7 +1819,7 @@ window.clearCourseList = () => {
 import localforage from 'localforage/dist/localforage';
 import html2canvas from 'html2canvas/dist/html2canvas';
 import { parse, isValid, add } from 'date-fns';
-import { fi, te } from 'date-fns/locale';
+import { fi, te, th } from 'date-fns/locale';
 import { get } from 'jquery';
 
 var timetableStoragePref = [
@@ -1760,6 +1829,8 @@ var timetableStoragePref = [
         data: [],
         subject: [],
         quick: [],
+        attackData: [],
+        attackQuick: [],
     },
 ];
 
@@ -2085,12 +2156,19 @@ function getTableIndex(id) {
     Function to fill the timetable and course list
  */
 function fillPage() {
-    $.each(activeTable.data, function (index, courseData) {
+    if (document.getElementById('attack-toggle').checked) {
+        var activeData = attackData;
+        var activeQuick = attackQuick;
+    } else {
+        var activeData = activeTable.data;
+        var activeQuick = activeTable.quick;
+    }
+    $.each(activeData, function (index, courseData) {
         addCourseToCourseList(courseData);
         addCourseToTimetable(courseData);
     });
 
-    $.each(activeTable.quick, function (index, el) {
+    $.each(activeQuick, function (index, el) {
         var $el = $('#timetable').find('tr').eq(el[0]).find('td').eq(el[1]);
         var slot = $el.get(0).classList[1];
 
@@ -2106,6 +2184,9 @@ function fillPage() {
     Function to change the active table
  */
 function switchTable(tableId) {
+    if (document.getElementById('attack-toggle').checked) {
+        document.getElementById('attack-toggle').click();
+    }
     resetPage();
     activeTable = timetableStoragePref[getTableIndex(tableId)];
     updatePickerLabel(activeTable.name);
@@ -3324,6 +3405,12 @@ document
             rearrangeTeacherRefreshAttack();
             removeEventListeners();
             makeRadioFalseOnNeed();
+            document.getElementById('div-for-attack-slot').style.display =
+                'flex';
+            showOccupiedSlots();
+            clearTimetable();
+            clearCourseList();
+            fillPage();
         } else {
             document.getElementById('edit_msg_').innerText =
                 'Click on the Teacher to edit it.';
@@ -3333,6 +3420,9 @@ document
             closeEditPref();
             activateSortable();
             closeEditPref1();
+            document.getElementById('div-for-attack-slot').style.display =
+                'none';
+            fillPage();
         }
     });
 document
