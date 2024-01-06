@@ -3666,7 +3666,7 @@ document
     .addEventListener('click', function () {
         var input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.ffcsonthego, .txt,';
+        input.accept = '.ffcsonthego, .txt';
         input.onchange = function (event) {
             processFile(event.target.files[0]);
         };
