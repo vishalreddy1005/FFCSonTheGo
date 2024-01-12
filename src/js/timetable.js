@@ -1783,7 +1783,8 @@ $(() => {
         Click event to sort the course list
      */
     $('#course-list th:not(:last)').on('click', function () {
-        var isAscending = (isDescending = false);
+        var isAscending = false;
+        var isDescending = false;
         var $items = retrieveColumnItems($(this));
 
         if ($(this).hasClass('ascending')) {
