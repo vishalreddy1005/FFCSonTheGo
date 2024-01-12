@@ -2623,16 +2623,7 @@ bootstrap-select@^1.13.18:
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.6.0.tgz#97b9f29ac98f98dfa43bf7468262d84392552fd7"
   integrity sha512-Io55IuQY3kydzHtbGvQya3H+KorS/M9rSNyfCGCg9WZ4pyT/lCxIlpJgG1GXW/PswzC84Tr2fBYi+7+jFVQQBw==
 
-bootstrap5-toggle@5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/bootstrap5-toggle/-/bootstrap5-toggle-5.0.4.tgz#7260b382a5ea234909b68dc1abafdcbe2a6d66f2"
-  integrity sha512-UBTq/dHNQJJ3lUxkd7vIO+s651I6xK9GEw3781svY7pkipngfCTxplpxFJrzzSa+HrhNzVtucCXt5SWsHVQdXg==
-  dependencies:
-    bootstrap "^5.0.0"
-  optionalDependencies:
-    jquery "^3.6.0"
-
-bootstrap@^5.0.0, bootstrap@^5.3.2:
+bootstrap@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.2.tgz#97226583f27aae93b2b28ab23f4c114757ff16ae"
   integrity sha512-D32nmNWiQHo94BKHLmOrdjlL05q1c8oxbtBphQFb9Z5to6eGRDCm0QgeaZ4zFBHzfg2++rqa2JkqCcxDy0sH0g==
@@ -4523,7 +4514,7 @@ jest@^29.7.0:
     import-local "^3.0.2"
     jest-cli "^29.7.0"
 
-jquery@*, jquery@3.7.1, jquery@^3.6.0:
+jquery@*, jquery@3.7.1:
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.7.1.tgz#083ef98927c9a6a74d05a6af02806566d16274de"
   integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==

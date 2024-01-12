@@ -477,6 +477,23 @@ function isCommonSlot(arr1, arr2) {
 
 // ================== Build / Update ==================
 
+function updateAttackDataOnCourseSave(oldCourseName, newCourseName, credits) {
+    const courseTitle = getCourseCodeAndCourseTitle(newCourseName)[1];
+    const courseCode = getCourseCodeAndCourseTitle(newCourseName)[0];
+    activeTable.attackData.forEach((courseData) => {
+        if (
+            processRawCourseName(
+                courseData.courseCode + '-' + courseData.courseTitle,
+            ).toLocaleLowerCase() === oldCourseName.toLocaleLowerCase()
+        ) {
+            courseData.courseTitle = courseTitle;
+            courseData.courseCode = courseCode;
+            courseData.credits = credits;
+        }
+    });
+    updateLocalForage();
+}
+
 function updateCourseList(courseTr, courseName, credits) {
     var td = courseTr.querySelectorAll('td');
     const courseTitle = getCourseCodeAndCourseTitle(courseName)[1];
@@ -715,11 +732,13 @@ function updateDataJsonFromCourseList() {
     let courseList = document.getElementById('courseList-tbody');
     let trElements = courseList.querySelectorAll('tr');
     if (document.getElementById('attack-toggle').checked) {
+        activeTable.attackData = [];
         var activeData = activeTable.attackData;
     } else {
+        activeTable.data = [];
         var activeData = activeTable.data;
     }
-    activeData = [];
+
     trElements.forEach((trElement) => {
         let td = trElement.querySelectorAll('td');
         let courseName = td[2].innerText;
@@ -743,6 +762,44 @@ function updateDataJsonFromCourseList() {
             courseCode: courseCode,
         };
         activeData.push(courseData);
+    });
+    updateLocalForage();
+}
+
+function updateTeacherInAttackDataOnTeacherSave(
+    courseName,
+    teacherNamePre,
+    teacherName,
+    slotsInput,
+    venueInput,
+) {
+    activeTable.attackData.forEach((courseData) => {
+        if (
+            processRawCourseName(
+                courseData.courseCode + '-' + courseData.courseTitle,
+            ).toLocaleLowerCase() === courseName.toLocaleLowerCase()
+        ) {
+            if (
+                teacherNamePre.toLowerCase() ===
+                courseData.faculty.toLowerCase()
+            ) {
+                var slotsOfCourse = slotsInput.trim().split(/\s*\+\s*/);
+                var activeSlots = slotsForAttack();
+                var consideredSlots = subtractArray(
+                    courseData.slots,
+                    activeSlots,
+                );
+                if (isCommonSlot(slotsOfCourse, consideredSlots)) {
+                    // delete this courseData from activeTable.attackData
+                    var index = activeTable.attackData.indexOf(courseData);
+                    activeTable.attackData.splice(index, 1);
+                } else {
+                    courseData.faculty = teacherName;
+                    courseData.slots = slotsOfCourse;
+                    courseData.venue = venueInput;
+                }
+            }
+        }
     });
     updateLocalForage();
 }
@@ -3301,6 +3358,11 @@ document
                         if (courseTr) {
                             updateCourseList(courseTr, courseName, credits);
                         }
+                        updateAttackDataOnCourseSave(
+                            courseNamePre,
+                            courseName,
+                            credits,
+                        );
                         createSubjectJsonFromHtml();
                     } else {
                         spanMsg = 'Course already exists';
@@ -3403,6 +3465,13 @@ document
                                         venueInput,
                                     );
                                 }
+                                updateTeacherInAttackDataOnTeacherSave(
+                                    courseName,
+                                    teacherNamePre,
+                                    teacherName,
+                                    slotsInput,
+                                    venueInput,
+                                );
                                 break;
                             }
                         }
@@ -3453,6 +3522,13 @@ document
                                             venueInput,
                                         );
                                     }
+                                    updateTeacherInAttackDataOnTeacherSave(
+                                        courseName,
+                                        teacherNamePre,
+                                        teacherName,
+                                        slotsInput,
+                                        venueInput,
+                                    );
                                     rearrangeTeacherRefresh();
                                     createSubjectJsonFromHtml();
                                     break;
@@ -3564,6 +3640,18 @@ document
     });
 
 // ==================== Attack Mode ====================
+//contruct course Data Again for attack mode
+function constructCourseDataAttack() {
+    const courseL = getCourseListFromSubjectArea();
+    courseL.forEach((courseName) => {
+        var ul = getUlInSubjectArea(courseName);
+        var radio = ul.querySelectorAll('input[type="radio"]');
+        radio.forEach((rad) => {
+            if (rad.checked === true) {
+            }
+        });
+    });
+}
 
 // Add event listener to the toggle checkbox
 document
