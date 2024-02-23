@@ -2248,10 +2248,34 @@ $(() => {
     $('#quick-toggle').on('click', function () {
         var activeQuick;
         if ($('#attack-toggle').is(':checked')) {
-            activeQuick = activeTable.attackQuick;
+            var attackData = activeTable.attackData;
+            var activeQuick = activeTable.attackQuick;
+            var slots = [];
+            for (var i = 0; i < attackData.length; i++) {
+                slots = slots.concat(attackData[i].slots);
+            }
+            slots = updateSlots(slots);
+            activeTable.attackQuick = activeQuick.filter((el) => {
+                var rows = document
+                    .getElementById('timetable')
+                    .getElementsByTagName('tr');
+                var cells = rows[el[0]].getElementsByTagName('td');
+                const x = cells[el[1]].innerText.split(' / ');
+                if (x.length == 1) {
+                    if (!slots.includes(x[0])) {
+                        return true;
+                    }
+                } else {
+                    if (!slots.includes(x[1].split('\n')[0])) {
+                        return true;
+                    }
+                }
+                return false;
+            });
         } else {
             activeQuick = activeTable.quick;
         }
+
         if ($(this).attr('data-state') == 'enabled') {
             $('i', this).prop('class', 'fas fa-eye');
             $('span', this).html('&nbsp;&nbsp;Enable Quick Visualization');
@@ -3668,7 +3692,7 @@ document
                 'none';
             document.getElementById('edit_msg_').style.display = 'block';
             document.getElementById('edit_msg_').innerText =
-                'Attack Mode Enabled.';
+                'Live FFCS Mode Enabled.';
             document.getElementById('tt-subject-edit').style.display = 'none';
             document.getElementById('tt-subject-add').style.display = 'none';
             document.getElementById('tt-teacher-add').style.display = 'none';
